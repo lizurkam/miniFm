@@ -10,7 +10,7 @@ Maintenance
 ```php
 <?php
 $auth_pass = '$2y$10$u0LRXNXe3JeFZuQSrIrASu3Puc.wNLrtXWvRntANJ8h03Xfnnr4YK'; /* ganti dengan password andalan kalian!. contoh: PASSWORD_HASH('r00t',PASSWORD_DEFAULT) */
-php```
+```
 
 VirusTotal result
 -------
