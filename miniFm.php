@@ -971,8 +971,8 @@ if(!isset($_SESSION['auth'])){
 			<div class="tab-content mt-3" id="nav-tabContent">
 				<div class="tab-pane show active fade" id="nav-berkas" role="tabpanel">
 					<div class="form-row">
-						<div class='col-12 mb-3'>
-							<div class="row mb-n3" id="fberkas">
+						<div class='col-12 mb-n3'>
+							<div class="row mb-3" id="fberkas">
 								<?php
 								$drives = "";
 								if($GLOBALS['os'] == 'win'){
