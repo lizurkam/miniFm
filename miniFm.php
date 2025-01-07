@@ -31,14 +31,30 @@ if(!function_exists('array_column')){
 	}
 }
 function listdirs($dir) {
-	if(@is_dir($dir)){
-		if ($handle = @opendir($dir)) {
-			while (($file = @readdir($handle)) !== false) {
+	if(AvFunc(['opendir','readdir','closedir'])){
+		if(@is_dir($dir)){
+			if($handle = @opendir($dir)) {
+				while (($file = @readdir($handle)) !== false) {
+					$files[] = $file;
+				}
+				@closedir($handle);
+			}			
+		}
+	} else {
+		if(class_exists('DirectoryIterator')){
+			$iterator = new DirectoryIterator($dir);
+			foreach($iterator as $fileinfo){
+				if(!$fileinfo->isDot()){
+					$files[] = $fileinfo->getFilename();
+				}
+			}
+		} else if(class_exists('RecursiveIteratorIterator')){
+			$iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
+			foreach ($iterator as $file) {
 				$files[] = $file;
 			}
-			@closedir($handle);
 		}
-	}	
+	}
 	return isset($files) ? $files : [];
 }
 function blockCrawler(){
