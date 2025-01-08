@@ -17,5 +17,5 @@ $auth_pass = '$2y$10$u0LRXNXe3JeFZuQSrIrASu3Puc.wNLrtXWvRntANJ8h03Xfnnr4YK'; /* 
 ![command execution](https://github.com/user-attachments/assets/ee471579-52ff-494e-a360-1662a219fa85)
 ![sql manager](https://github.com/user-attachments/assets/21917dad-95bd-4a1a-8ba9-b82f6cd5db3e)
 
-## VirusTotal result
-<a href="https://www.virustotal.com/gui/file/22ab99956600927beb5903709c8923529e2ee6e7d1cc912ae4915808b37b357e?nocache=1" target="_blank">Lihat hasil scan!</a>
+## Virus scan result
+<a href="https://virusscan.jotti.org/en-US/filescanjob/ju6di7f8db" target="_blank">Lihat hasil scan!</a>
